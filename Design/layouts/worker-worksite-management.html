@@ -1,0 +1,387 @@
+<h2>Worker & Worksite Management</h2>
+<p class="subtitle">Edit workers and worksites with rules, disable/delete with temporal controls</p>
+
+<div class="mockup" style="margin-bottom: 1rem;">
+  <div class="mockup-header">Manager Dashboard - Workers List</div>
+  <div class="mockup-body" style="padding: 1.5rem; background: #f8f9fa;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <div>
+        <h3 style="margin: 0; font-size: 18px;">Workers</h3>
+        <p style="margin: 0.25rem 0 0; font-size: 13px; color: #666;">5 active workers</p>
+      </div>
+      <button class="mock-button" style="padding: 0.75rem 1.5rem; background: #007bff; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 14px;">+ Add Worker</button>
+    </div>
+
+    <!-- Worker cards -->
+    <div style="display: grid; gap: 0.75rem;">
+      <!-- Worker 1 - Active with overrides -->
+      <div style="padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #28a745;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+              <div style="font-weight: 600; font-size: 16px;">Bob Martinez</div>
+              <span style="padding: 0.25rem 0.5rem; background: #e8f5e9; color: #28a745; border-radius: 4px; font-size: 11px; font-weight: 600;">Active</span>
+              <span style="padding: 0.25rem 0.5rem; background: #fff9e6; color: #f57c00; border-radius: 4px; font-size: 11px;">Custom Rules</span>
+            </div>
+            <div style="font-size: 13px; color: #666; line-height: 1.6;">
+              <div>📧 bob.martinez@email.com • 📱 (555) 123-4567</div>
+              <div>🆔 Username: bmartinez • 🌍 Language: English, Spanish</div>
+              <div>⚙️ Override: 70 hrs/week max, Night shift approved</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="mock-button" style="padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 13px;">Edit</button>
+            <button class="mock-button" style="padding: 0.5rem 1rem; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 13px;">⋮</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Worker 2 - Active no overrides -->
+      <div style="padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #28a745;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+              <div style="font-weight: 600; font-size: 16px;">Sarah Johnson</div>
+              <span style="padding: 0.25rem 0.5rem; background: #e8f5e9; color: #28a745; border-radius: 4px; font-size: 11px; font-weight: 600;">Active</span>
+            </div>
+            <div style="font-size: 13px; color: #666; line-height: 1.6;">
+              <div>📧 sarah.j@email.com • 📱 (555) 234-5678</div>
+              <div>🆔 Username: sjohnson • 🌍 Language: English</div>
+              <div style="color: #999;">Using global defaults</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="mock-button" style="padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 13px;">Edit</button>
+            <button class="mock-button" style="padding: 0.5rem 1rem; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 13px;">⋮</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Worker 3 - Temporarily disabled -->
+      <div style="padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #ffc107; opacity: 0.75;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+              <div style="font-weight: 600; font-size: 16px;">Maria Garcia</div>
+              <span style="padding: 0.25rem 0.5rem; background: #fff9e6; color: #856404; border-radius: 4px; font-size: 11px; font-weight: 600;">Disabled Until May 30</span>
+            </div>
+            <div style="font-size: 13px; color: #666; line-height: 1.6;">
+              <div>📧 maria.g@email.com • 📱 (555) 345-6789</div>
+              <div>🆔 Username: mgarcia • 🌍 Language: Spanish, English</div>
+              <div style="color: #856404;">⚠️ Vacation - Re-enables automatically on May 30</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="mock-button" style="padding: 0.5rem 1rem; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 13px;">Enable Now</button>
+            <button class="mock-button" style="padding: 0.5rem 1rem; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 13px;">⋮</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Edit Worker - Bob Martinez</div>
+    <div class="mockup-body" style="padding: 1.5rem; background: #f8f9fa; overflow-y: auto; max-height: 600px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="margin: 0; font-size: 18px;">Edit Worker</h3>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="mock-button" style="padding: 0.5rem 1rem; background: #ffc107; color: #333; border: none; border-radius: 4px; font-size: 13px;">Disable Worker</button>
+          <button class="mock-button" style="padding: 0.5rem 1rem; background: #dc3545; color: white; border: none; border-radius: 4px; font-size: 13px;">Delete</button>
+        </div>
+      </div>
+
+      <!-- Basic Info -->
+      <div style="margin-bottom: 1.5rem; padding: 1.25rem; background: white; border-radius: 8px;">
+        <h4 style="margin: 0 0 1rem; font-size: 15px; font-weight: 600;">Basic Information</h4>
+        <div style="display: grid; gap: 1rem;">
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.25rem;">Full Name</label>
+            <input type="text" value="Bob Martinez" class="mock-input" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.25rem;">Phone</label>
+              <input type="tel" value="(555) 123-4567" class="mock-input" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.25rem;">Email</label>
+              <input type="email" value="bob.martinez@email.com" class="mock-input" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+            </div>
+          </div>
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.25rem;">Languages</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; background: #f8f9fa; border-radius: 4px; cursor: pointer;">
+                <input type="checkbox" checked style="width: 16px; height: 16px;">
+                <span style="font-size: 13px;">🇺🇸 English</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; background: #f8f9fa; border-radius: 4px; cursor: pointer;">
+                <input type="checkbox" checked style="width: 16px; height: 16px;">
+                <span style="font-size: 13px;">🇪🇸 Español</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; background: #f8f9fa; border-radius: 4px; cursor: pointer;">
+                <input type="checkbox" style="width: 16px; height: 16px;">
+                <span style="font-size: 13px;">🇫🇷 Français</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Rules -->
+      <div style="margin-bottom: 1.5rem; padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #007bff;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="margin: 0; font-size: 15px; font-weight: 600;">Custom Rules (Override Global)</h4>
+          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <input type="checkbox" checked style="width: 18px; height: 18px;">
+            <span style="font-size: 13px; font-weight: 600;">Enable Overrides</span>
+          </label>
+        </div>
+
+        <div style="display: grid; gap: 1rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.25rem;">Max Hours/Day</label>
+              <input type="number" value="14" class="mock-input" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+              <p style="font-size: 11px; color: #999; margin: 0.25rem 0 0;">Global: 16 hrs</p>
+            </div>
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.25rem;">Max Hours/Week</label>
+              <input type="number" value="70" class="mock-input" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+              <p style="font-size: 11px; color: #999; margin: 0.25rem 0 0;">Global: 60 hrs</p>
+            </div>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.5rem;">Work Days</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <label style="padding: 0.5rem 0.75rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px; cursor: pointer;">Mon</label>
+              <label style="padding: 0.5rem 0.75rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px; cursor: pointer;">Tue</label>
+              <label style="padding: 0.5rem 0.75rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px; cursor: pointer;">Wed</label>
+              <label style="padding: 0.5rem 0.75rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px; cursor: pointer;">Thu</label>
+              <label style="padding: 0.5rem 0.75rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px; cursor: pointer;">Fri</label>
+              <label style="padding: 0.5rem 0.75rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px; cursor: pointer;">Sat</label>
+              <label style="padding: 0.5rem 0.75rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px; cursor: pointer;">Sun</label>
+            </div>
+          </div>
+
+          <div>
+            <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer;">
+              <input type="checkbox" checked style="width: 18px; height: 18px;">
+              <span style="font-size: 13px; font-weight: 600;">Night shift approved (overrides global work hours)</span>
+            </label>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.5rem;">Vacation Days / Scheduled Time Off</label>
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <input type="date" value="2026-06-15" class="mock-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+              <span style="padding: 0.5rem; font-size: 13px;">to</span>
+              <input type="date" value="2026-06-20" class="mock-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+              <button class="mock-button" style="padding: 0.5rem 1rem; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 12px;">Add</button>
+            </div>
+            <div style="padding: 0.75rem; background: #f8f9fa; border-radius: 4px;">
+              <div style="font-size: 13px; margin-bottom: 0.5rem;">
+                <strong>Scheduled:</strong>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem; background: white; border-radius: 4px; font-size: 12px;">
+                <span>June 15-20, 2026 (6 days)</span>
+                <button class="mock-button" style="padding: 0.25rem 0.5rem; background: #dc3545; color: white; border: none; border-radius: 3px; font-size: 11px;">Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Save/Cancel -->
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="mock-button" style="flex: 1; padding: 0.9rem; background: #007bff; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 15px;">Save Changes</button>
+        <button class="mock-button" style="padding: 0.9rem 1.5rem; background: #6c757d; color: white; border: none; border-radius: 6px; font-size: 15px;">Cancel</button>
+      </div>
+
+      <p style="font-size: 12px; color: #666; margin-top: 1rem; text-align: center;">
+        💾 All changes will generate a log event tagged to this worker
+      </p>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">Disable Worker Dialog</div>
+    <div class="mockup-body" style="padding: 2rem; background: #fff;">
+      <div style="max-width: 400px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+          <div style="font-size: 48px; margin-bottom: 0.5rem;">⏸️</div>
+          <h3 style="margin: 0; font-size: 20px;">Disable Worker</h3>
+          <p style="margin: 0.5rem 0 0; font-size: 14px; color: #666;">Bob Martinez</p>
+        </div>
+
+        <div style="padding: 1rem; background: #fff9e6; border-radius: 6px; border-left: 3px solid #ffc107; margin-bottom: 1.5rem;">
+          <div style="font-size: 13px; color: #856404;">
+            Disabling a worker prevents them from logging in and recording time entries. Their data and history remain intact.
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.75rem;">Disable Duration</label>
+
+          <label style="display: block; margin-bottom: 0.75rem; padding: 1rem; background: #f8f9fa; border: 2px solid #007bff; border-radius: 6px; cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <input type="radio" name="duration" checked style="width: 20px; height: 20px;">
+              <div>
+                <div style="font-weight: 600; font-size: 14px;">Temporarily (specify dates)</div>
+                <div style="font-size: 12px; color: #666; margin-top: 0.25rem;">Worker will be re-enabled automatically</div>
+              </div>
+            </div>
+          </label>
+
+          <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px; margin-bottom: 0.75rem;">
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <label style="font-size: 13px;">From:</label>
+              <input type="date" value="2026-05-24" class="mock-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+              <label style="font-size: 13px;">To:</label>
+              <input type="date" value="2026-05-30" class="mock-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+            </div>
+          </div>
+
+          <label style="display: block; margin-bottom: 0.75rem; padding: 1rem; background: #f8f9fa; border: 2px solid #ddd; border-radius: 6px; cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <input type="radio" name="duration" style="width: 20px; height: 20px;">
+              <div>
+                <div style="font-weight: 600; font-size: 14px;">Indefinitely</div>
+                <div style="font-size: 12px; color: #666; margin-top: 0.25rem;">Disable until manually re-enabled</div>
+              </div>
+            </div>
+          </label>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.5rem;">Reason (optional but recommended)</label>
+          <textarea class="mock-input" placeholder="e.g., Vacation, Leave of absence, Suspended" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; min-height: 80px; font-family: inherit; resize: vertical;"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="mock-button" style="flex: 1; padding: 0.9rem; background: #ffc107; color: #333; border: none; border-radius: 6px; font-weight: bold; font-size: 15px;">Disable Worker</button>
+          <button class="mock-button" style="padding: 0.9rem 1.5rem; background: #6c757d; color: white; border: none; border-radius: 6px; font-size: 15px;">Cancel</button>
+        </div>
+
+        <div style="margin-top: 1rem; padding: 0.75rem; background: #e7f3ff; border-radius: 4px; font-size: 11px; color: #004085;">
+          ℹ️ A log event will be created with the disable action, duration, and reason (tagged to worker: Bob Martinez)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-top: 1rem;">
+  <div class="mockup-header">Manager Dashboard - Worksites List</div>
+  <div class="mockup-body" style="padding: 1.5rem; background: #f8f9fa;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <div>
+        <h3 style="margin: 0; font-size: 18px;">Worksites</h3>
+        <p style="margin: 0.25rem 0 0; font-size: 13px; color: #666;">4 active sites</p>
+      </div>
+      <button class="mock-button" style="padding: 0.75rem 1.5rem; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 14px;">+ Add Worksite</button>
+    </div>
+
+    <!-- Worksite cards -->
+    <div style="display: grid; gap: 0.75rem;">
+      <!-- Site 1 - Active with rules -->
+      <div style="padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #00897b;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+              <div style="font-weight: 600; font-size: 16px;">Simons Property</div>
+              <span style="padding: 0.25rem 0.5rem; background: #e0f2f1; color: #00897b; border-radius: 4px; font-size: 11px; font-weight: 600;">Active</span>
+              <span style="padding: 0.25rem 0.5rem; background: #fff9e6; color: #f57c00; border-radius: 4px; font-size: 11px;">Custom Rules</span>
+            </div>
+            <div style="font-size: 13px; color: #666; line-height: 1.6;">
+              <div>📍 456 Main Street, Springfield, MA 01101</div>
+              <div>🏷️ Aliases: Simons site, Main Street property</div>
+              <div>⚙️ Rules: Closed Sundays, 7AM-6PM only</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="mock-button" style="padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 13px;">Edit</button>
+            <button class="mock-button" style="padding: 0.5rem 1rem; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 13px;">⋮</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Site 2 - 24/7 operation -->
+      <div style="padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #0288d1;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+              <div style="font-weight: 600; font-size: 16px;">ACME Central Processing</div>
+              <span style="padding: 0.25rem 0.5rem; background: #e1f5fe; color: #0288d1; border-radius: 4px; font-size: 11px; font-weight: 600;">Active</span>
+              <span style="padding: 0.25rem 0.5rem; background: #e3f2fd; color: #007bff; border-radius: 4px; font-size: 11px;">24/7 Site</span>
+            </div>
+            <div style="font-size: 13px; color: #666; line-height: 1.6;">
+              <div>📍 123 Industrial Way, Springfield, MA 01102</div>
+              <div>🏷️ Aliases: ACME site, Central processing</div>
+              <div>⚙️ Rules: 24/7 operation, no time restrictions</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="mock-button" style="padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 13px;">Edit</button>
+            <button class="mock-button" style="padding: 0.5rem 1rem; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 13px;">⋮</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Site 3 - Temporarily closed -->
+      <div style="padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #ffc107; opacity: 0.75;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+              <div style="font-weight: 600; font-size: 16px;">Johnston Construction Site</div>
+              <span style="padding: 0.25rem 0.5rem; background: #fff9e6; color: #856404; border-radius: 4px; font-size: 11px; font-weight: 600;">Disabled Until Jun 1</span>
+            </div>
+            <div style="font-size: 13px; color: #666; line-height: 1.6;">
+              <div>📍 789 Oak Avenue, Springfield, MA 01103</div>
+              <div style="color: #856404;">⚠️ Temporarily closed for renovations</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="mock-button" style="padding: 0.5rem 1rem; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 13px;">Enable Now</button>
+            <button class="mock-button" style="padding: 0.5rem 1rem; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 13px;">⋮</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 2rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+  <h4>Worker & Worksite Management Features:</h4>
+  <ul>
+    <li><strong>Edit Anytime:</strong> All worker/worksite information and rules can be edited after initial setup</li>
+    <li><strong>Custom Rules Per Entity:</strong> Override global thresholds for specific workers or worksites</li>
+    <li><strong>Temporal Disable:</strong> Disable workers or worksites for specific date ranges (auto re-enable) or indefinitely</li>
+    <li><strong>Scheduled Time Off:</strong> Pre-configure worker vacation days - system won't flag missing time entries</li>
+    <li><strong>Operating Days/Hours:</strong> Set per-worksite rules for when the site is open</li>
+    <li><strong>Worksite Aliases:</strong> Map multiple ways workers might say a site name ("Simons", "Simons site", "Main Street property")</li>
+    <li><strong>All Changes Logged:</strong> Every edit, disable, enable, or delete generates a log event tagged to the affected entity</li>
+    <li><strong>Delete vs Disable:</strong> Delete removes entity permanently (with confirmation); Disable keeps history intact</li>
+  </ul>
+
+  <h4 style="margin-top: 1.5rem;">Log Events Generated:</h4>
+  <div style="padding: 1rem; background: white; border-radius: 6px; font-family: monospace; font-size: 12px; line-height: 1.8;">
+    • Worker edited (name/contact changed):<br/>
+    &nbsp;&nbsp;Tags: worker:bob-martinez, config:basic-info<br/>
+    <br/>
+    • Worker rules updated (max hours changed):<br/>
+    &nbsp;&nbsp;Tags: worker:bob-martinez, config:per-worker-rules, rule:max-hours-week<br/>
+    <br/>
+    • Worker disabled (vacation May 24-30):<br/>
+    &nbsp;&nbsp;Tags: worker:bob-martinez, action:disable<br/>
+    &nbsp;&nbsp;Details: {reason: "Vacation", until: "2026-05-30"}<br/>
+    <br/>
+    • Worksite closed (temporarily):<br/>
+    &nbsp;&nbsp;Tags: worksite:johnston-site, action:disable<br/>
+    &nbsp;&nbsp;Details: {reason: "Renovations", until: "2026-06-01"}
+  </div>
+</div>

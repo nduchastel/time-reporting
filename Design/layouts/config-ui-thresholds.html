@@ -1,0 +1,333 @@
+<h2>Configuration UI - Threshold & Rules Management</h2>
+<p class="subtitle">Manager configures validation rules with flexible overrides</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Settings - Main Rules Configuration</div>
+    <div class="mockup-body" style="padding: 1.5rem; background: #f8f9fa; overflow-y: auto; max-height: 500px;">
+      <div style="margin-bottom: 1.5rem;">
+        <h3 style="margin: 0; font-size: 18px;">Validation Rules</h3>
+        <p style="margin: 0.25rem 0 0; font-size: 13px; color: #666;">Configure thresholds and anomaly detection</p>
+      </div>
+
+      <!-- Global Defaults Section -->
+      <div style="margin-bottom: 1.5rem; padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #007bff;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="margin: 0; font-size: 16px;">🌐 Global Defaults</h4>
+          <span style="padding: 0.25rem 0.5rem; background: #e3f2fd; border-radius: 4px; font-size: 11px; color: #007bff; font-weight: 600;">REQUIRED</span>
+        </div>
+        <p style="font-size: 13px; color: #666; margin-bottom: 1rem;">Baseline rules applied to all workers unless overridden</p>
+
+        <div style="display: grid; gap: 1rem;">
+          <!-- Max hours per day -->
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.25rem;">Max Hours Per Day</label>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="number" value="16" class="mock-input" style="width: 80px; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+              <span style="font-size: 13px; color: #666;">hours</span>
+            </div>
+            <p style="font-size: 12px; color: #999; margin: 0.25rem 0 0;">Generate Review Card if exceeded</p>
+          </div>
+
+          <!-- Max hours per week -->
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.25rem;">Max Hours Per Week</label>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="number" value="60" class="mock-input" style="width: 80px; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+              <span style="font-size: 13px; color: #666;">hours</span>
+            </div>
+          </div>
+
+          <!-- Work hours window -->
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.25rem;">Normal Work Hours</label>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="time" value="05:00" class="mock-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+              <span style="font-size: 13px; color: #666;">to</span>
+              <input type="time" value="23:59" class="mock-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+            </div>
+            <p style="font-size: 12px; color: #999; margin: 0.25rem 0 0;">Flag entries outside this window</p>
+          </div>
+
+          <!-- Check-in/out pairing -->
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.25rem;">Check-in/Check-out Pairing</label>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="checkbox" checked style="width: 18px; height: 18px;">
+              <span style="font-size: 13px;">Flag unpaired check-ins/check-outs after</span>
+              <input type="number" value="24" class="mock-input" style="width: 60px; padding: 0.25rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+              <span style="font-size: 13px; color: #666;">hours</span>
+            </div>
+          </div>
+
+          <!-- Overlapping sites -->
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.5rem;">
+              <input type="checkbox" checked style="width: 18px; height: 18px; vertical-align: middle;">
+              <span style="margin-left: 0.5rem;">Flag overlapping time at different sites</span>
+            </label>
+          </div>
+
+          <!-- Pattern detection -->
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.25rem;">Pattern Anomaly Detection</label>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <input type="checkbox" checked style="width: 18px; height: 18px;">
+              <span style="font-size: 13px;">Flag if hours differ from worker average by more than</span>
+              <input type="number" value="50" class="mock-input" style="width: 60px; padding: 0.25rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+              <span style="font-size: 13px; color: #666;">%</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="checkbox" checked style="width: 18px; height: 18px;">
+              <span style="font-size: 13px;">Flag time-off declared but hours logged</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seasonal Overrides Section -->
+      <div style="margin-bottom: 1.5rem; padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #28a745;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="margin: 0; font-size: 16px;">🗓️ Seasonal Overrides</h4>
+          <button class="mock-button" style="padding: 0.4rem 0.75rem; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 12px;">+ Add Season</button>
+        </div>
+        <p style="font-size: 13px; color: #666; margin-bottom: 1rem;">Optional: Adjust thresholds by time of year</p>
+
+        <!-- Summer override -->
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px; margin-bottom: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+            <div>
+              <div style="font-weight: 600; font-size: 14px;">Summer (High Season)</div>
+              <div style="font-size: 12px; color: #666; margin-top: 0.25rem;">June 1 - August 31</div>
+            </div>
+            <button class="mock-button" style="padding: 0.25rem 0.5rem; background: #dc3545; color: white; border: none; border-radius: 4px; font-size: 11px;">Remove</button>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="display: block; font-size: 12px; color: #666; margin-bottom: 0.25rem;">Max Hours/Day</label>
+              <input type="number" value="12" class="mock-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 12px; color: #666; margin-bottom: 0.25rem;">Max Hours/Week</label>
+              <input type="number" value="70" class="mock-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Winter override -->
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+            <div>
+              <div style="font-weight: 600; font-size: 14px;">Winter (Low Season)</div>
+              <div style="font-size: 12px; color: #666; margin-top: 0.25rem;">December 1 - February 28</div>
+            </div>
+            <button class="mock-button" style="padding: 0.25rem 0.5rem; background: #dc3545; color: white; border: none; border-radius: 4px; font-size: 11px;">Remove</button>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="display: block; font-size: 12px; color: #666; margin-bottom: 0.25rem;">Max Hours/Day</label>
+              <input type="number" value="10" class="mock-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 12px; color: #666; margin-bottom: 0.25rem;">Expected Hours/Week</label>
+              <input type="number" value="40" class="mock-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+              <p style="font-size: 11px; color: #999; margin: 0.25rem 0 0;">Flag if > 50 hrs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick links to other config -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+        <button class="mock-button" style="padding: 1rem; background: white; border: 1px solid #ddd; border-radius: 6px; text-align: left; font-size: 13px;">
+          <div style="font-weight: 600; margin-bottom: 0.25rem;">🏗️ Per-Worksite Rules</div>
+          <div style="font-size: 11px; color: #666;">2 sites configured</div>
+        </button>
+        <button class="mock-button" style="padding: 1rem; background: white; border: 1px solid #ddd; border-radius: 6px; text-align: left; font-size: 13px;">
+          <div style="font-weight: 600; margin-bottom: 0.25rem;">👤 Per-Worker Rules</div>
+          <div style="font-size: 11px; color: #666;">3 workers with overrides</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">Settings - Per-Worksite Rules</div>
+    <div class="mockup-body" style="padding: 1.5rem; background: #f8f9fa; overflow-y: auto; max-height: 500px;">
+      <div style="margin-bottom: 1.5rem;">
+        <h3 style="margin: 0; font-size: 18px;">Per-Worksite Rules</h3>
+        <p style="margin: 0.25rem 0 0; font-size: 13px; color: #666;">Optional overrides for specific job sites</p>
+      </div>
+
+      <button class="mock-button" style="margin-bottom: 1rem; padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 13px;">+ Add Worksite Rules</button>
+
+      <!-- Worksite 1 -->
+      <div style="margin-bottom: 1rem; padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #00897b;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+          <div>
+            <div style="font-weight: 600; font-size: 16px;">ACME Central Processing</div>
+            <div style="font-size: 12px; color: #666; margin-top: 0.25rem;">123 Industrial Way</div>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="mock-button" style="padding: 0.4rem 0.75rem; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 11px;">Edit</button>
+            <button class="mock-button" style="padding: 0.4rem 0.75rem; background: #dc3545; color: white; border: none; border-radius: 4px; font-size: 11px;">Remove</button>
+          </div>
+        </div>
+
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+          <div style="display: grid; gap: 1rem;">
+            <!-- Operating days -->
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.5rem;">Operating Days</label>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <span style="padding: 0.4rem 0.6rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px;">Mon</span>
+                <span style="padding: 0.4rem 0.6rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px;">Tue</span>
+                <span style="padding: 0.4rem 0.6rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px;">Wed</span>
+                <span style="padding: 0.4rem 0.6rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px;">Thu</span>
+                <span style="padding: 0.4rem 0.6rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px;">Fri</span>
+                <span style="padding: 0.4rem 0.6rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px;">Sat</span>
+                <span style="padding: 0.4rem 0.6rem; background: #ddd; color: #666; border-radius: 4px; font-size: 12px;">Sun</span>
+              </div>
+              <p style="font-size: 11px; color: #999; margin: 0.5rem 0 0;">Flag entries on non-operating days</p>
+            </div>
+
+            <!-- Work hours override -->
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.5rem;">
+                <input type="checkbox" checked style="width: 16px; height: 16px; vertical-align: middle;">
+                <span style="margin-left: 0.5rem;">Override work hours</span>
+              </label>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="time" value="07:00" class="mock-input" style="padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                <span style="font-size: 12px; color: #666;">to</span>
+                <input type="time" value="18:00" class="mock-input" style="padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+              </div>
+              <p style="font-size: 11px; color: #999; margin: 0.5rem 0 0;">Standard business hours only</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Worksite 2 -->
+      <div style="margin-bottom: 1rem; padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #0288d1;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+          <div>
+            <div style="font-weight: 600; font-size: 16px;">Simons Property</div>
+            <div style="font-size: 12px; color: #666; margin-top: 0.25rem;">456 Main Street</div>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="mock-button" style="padding: 0.4rem 0.75rem; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 11px;">Edit</button>
+            <button class="mock-button" style="padding: 0.4rem 0.75rem; background: #dc3545; color: white; border: none; border-radius: 4px; font-size: 11px;">Remove</button>
+          </div>
+        </div>
+
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+          <div style="display: grid; gap: 1rem;">
+            <!-- 24/7 operation -->
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.5rem;">
+                <input type="checkbox" checked style="width: 16px; height: 16px; vertical-align: middle;">
+                <span style="margin-left: 0.5rem;">24/7 Operation - No time restrictions</span>
+              </label>
+              <p style="font-size: 11px; color: #999; margin: 0.5rem 0 0;">Late-night and early-morning work is normal</p>
+            </div>
+
+            <!-- Operating days -->
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.5rem;">Operating Days</label>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <span style="padding: 0.4rem 0.6rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px;">Mon</span>
+                <span style="padding: 0.4rem 0.6rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px;">Tue</span>
+                <span style="padding: 0.4rem 0.6rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px;">Wed</span>
+                <span style="padding: 0.4rem 0.6rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px;">Thu</span>
+                <span style="padding: 0.4rem 0.6rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px;">Fri</span>
+                <span style="padding: 0.4rem 0.6rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px;">Sat</span>
+                <span style="padding: 0.4rem 0.6rem; background: #007bff; color: white; border-radius: 4px; font-size: 12px;">Sun</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-top: 1rem;">
+  <div class="mockup-header">Settings - Per-Worker Rules</div>
+  <div class="mockup-body" style="padding: 1.5rem; background: #f8f9fa; overflow-y: auto; max-height: 400px;">
+    <div style="margin-bottom: 1.5rem;">
+      <h3 style="margin: 0; font-size: 18px;">Per-Worker Rules</h3>
+      <p style="margin: 0.25rem 0 0; font-size: 13px; color: #666;">Optional individual overrides (highest priority)</p>
+    </div>
+
+    <button class="mock-button" style="margin-bottom: 1rem; padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 13px;">+ Add Worker Override</button>
+
+    <!-- Worker 1 -->
+    <div style="margin-bottom: 1rem; padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #28a745;">
+      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+        <div>
+          <div style="font-weight: 600; font-size: 16px;">Bob Martinez</div>
+          <div style="font-size: 12px; color: #666; margin-top: 0.25rem;">Full-Time • Year-round</div>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="mock-button" style="padding: 0.4rem 0.75rem; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 11px;">Edit</button>
+          <button class="mock-button" style="padding: 0.4rem 0.75rem; background: #dc3545; color: white; border: none; border-radius: 4px; font-size: 11px;">Remove</button>
+        </div>
+      </div>
+
+      <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 0.25rem;">Max Hours/Day</label>
+            <input type="number" value="14" class="mock-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 0.25rem;">Max Hours/Week</label>
+            <input type="number" value="70" class="mock-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+          </div>
+        </div>
+        <div style="margin-top: 0.75rem;">
+          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.5rem;">
+            <input type="checkbox" checked style="width: 16px; height: 16px; vertical-align: middle;">
+            <span style="margin-left: 0.5rem;">Night shift approved for all sites</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Worker 2 -->
+    <div style="margin-bottom: 1rem; padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #ffc107;">
+      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+        <div>
+          <div style="font-weight: 600; font-size: 16px;">Maria Garcia</div>
+          <div style="font-size: 12px; color: #666; margin-top: 0.25rem;">Part-Time</div>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="mock-button" style="padding: 0.4rem 0.75rem; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 11px;">Edit</button>
+          <button class="mock-button" style="padding: 0.4rem 0.75rem; background: #dc3545; color: white; border: none; border-radius: 4px; font-size: 11px;">Remove</button>
+        </div>
+      </div>
+
+      <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 0.25rem;">Max Hours/Week</label>
+            <input type="number" value="30" class="mock-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+            <p style="font-size: 11px; color: #999; margin: 0.25rem 0 0;">Flag if exceeded</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 2rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+  <h4>Configuration System Design:</h4>
+  <ul>
+    <li><strong>Hierarchical Rules:</strong> Global → Seasonal → Worksite → Worker (most specific wins)</li>
+    <li><strong>Optional Overrides:</strong> Only global defaults are required; everything else is optional</li>
+    <li><strong>Flexible & Extensible:</strong> Easy to add/remove rules, configure thresholds per entity</li>
+    <li><strong>Review Card Generation:</strong> Each violated rule creates a Review Card for manager approval</li>
+    <li><strong>Clear Hierarchy:</strong> Visual color-coding shows rule priority (blue=global, green=seasonal, teal=worksite, worker-specific colors)</li>
+  </ul>
+</div>

@@ -1,0 +1,367 @@
+<h2>Review Cards Incoming Queue</h2>
+<p class="subtitle">Manager reviews flagged anomalies and rule violations</p>
+
+<div class="mockup" style="margin-bottom: 1rem;">
+  <div class="mockup-header">Manager Dashboard - Review Cards Queue</div>
+  <div class="mockup-body" style="padding: 1.5rem; background: #f8f9fa;">
+    <!-- Header with stats -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 1rem; background: white; border-radius: 8px;">
+      <div>
+        <h3 style="margin: 0; font-size: 18px;">Review Cards</h3>
+        <p style="margin: 0.25rem 0 0; font-size: 13px; color: #666;">Flagged anomalies and rule violations</p>
+      </div>
+      <div style="display: flex; gap: 1.5rem; font-size: 13px;">
+        <div style="text-align: center;">
+          <div style="font-size: 24px; font-weight: bold; color: #dc3545;">5</div>
+          <div style="color: #666;">Pending Review</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 24px; font-weight: bold; color: #28a745;">12</div>
+          <div style="color: #666;">Resolved Today</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter tabs -->
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 2px solid #ddd;">
+      <button class="mock-button" style="padding: 0.75rem 1.5rem; background: white; border: none; border-bottom: 3px solid #dc3545; font-weight: bold; font-size: 14px; color: #dc3545;">Pending (5)</button>
+      <button class="mock-button" style="padding: 0.75rem 1.5rem; background: transparent; border: none; font-size: 14px; color: #666;">Resolved (12)</button>
+      <button class="mock-button" style="padding: 0.75rem 1.5rem; background: transparent; border: none; font-size: 14px; color: #666;">All</button>
+    </div>
+
+    <!-- Review Cards -->
+    <div style="display: grid; gap: 1rem;">
+      <!-- Card 1: Excessive hours -->
+      <div style="padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #dc3545;">
+        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 1rem;">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+              <span style="padding: 0.4rem 0.75rem; background: #f8d7da; color: #dc3545; border-radius: 4px; font-size: 12px; font-weight: 600;">⚠️ EXCESSIVE HOURS</span>
+              <span style="font-size: 13px; color: #666;">May 23, 2026 • 2:15 PM</span>
+            </div>
+            <div style="font-weight: 600; font-size: 16px; color: #333; margin-bottom: 0.5rem;">
+              Bob Martinez worked 15 hours in one day
+            </div>
+            <div style="font-size: 14px; color: #666; line-height: 1.6;">
+              <div>📍 Worksite: <strong>Simons Property</strong></div>
+              <div>🕐 Time Entry: May 22, 2026 • 7:30 AM - 10:30 PM</div>
+              <div>⚙️ Rule Violated: <strong>Max Hours/Day</strong> (15 hrs > 16 hrs global threshold)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Related time card preview -->
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px; margin-bottom: 1rem; border-left: 3px solid #007bff;">
+          <div style="font-size: 12px; color: #666; margin-bottom: 0.5rem; font-weight: 600;">RELATED TIME CARD:</div>
+          <div style="font-size: 14px; color: #333; margin-bottom: 0.5rem;">
+            📍 Check-in: 7:30 AM - Simons Property<br/>
+            🏠 Check-out: 10:30 PM - Simons Property<br/>
+            ⏱️ Calculated: 15 hours
+          </div>
+          <div style="font-size: 12px; color: #666; font-style: italic;">
+            Voice: "I arrived at Simons at seven thirty this morning" / "Leaving Simons now"
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="mock-button" style="flex: 1; padding: 0.75rem; background: #28a745; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold;">✓ Approve with Reason</button>
+          <button class="mock-button" style="flex: 1; padding: 0.75rem; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 14px;">✏️ Edit Time Card</button>
+          <button class="mock-button" style="padding: 0.75rem 1rem; background: #6c757d; color: white; border: none; border-radius: 6px; font-size: 14px;">🎤 Audio</button>
+          <button class="mock-button" style="padding: 0.75rem 1rem; background: #dc3545; color: white; border: none; border-radius: 6px; font-size: 14px;">✕ Dismiss</button>
+        </div>
+      </div>
+
+      <!-- Card 2: Overlapping sites -->
+      <div style="padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #dc3545;">
+        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 1rem;">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+              <span style="padding: 0.4rem 0.75rem; background: #f8d7da; color: #dc3545; border-radius: 4px; font-size: 12px; font-weight: 600;">⚠️ OVERLAPPING SITES</span>
+              <span style="font-size: 13px; color: #666;">May 23, 2026 • 11:30 AM</span>
+            </div>
+            <div style="font-weight: 600; font-size: 16px; color: #333; margin-bottom: 0.5rem;">
+              Sarah Johnson checked in at two sites simultaneously
+            </div>
+            <div style="font-size: 14px; color: #666; line-height: 1.6;">
+              <div>📍 Site A: <strong>Simons Property</strong> (Checked in 8:00 AM, no check-out)</div>
+              <div>📍 Site B: <strong>ACME Central</strong> (Checked in 10:00 AM)</div>
+              <div>⚙️ Rule Violated: <strong>Cannot be at two places at once</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Related time cards preview -->
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px; margin-bottom: 1rem; border-left: 3px solid #007bff;">
+          <div style="font-size: 12px; color: #666; margin-bottom: 0.5rem; font-weight: 600;">CONFLICTING TIME CARDS:</div>
+          <div style="font-size: 14px; color: #333; margin-bottom: 0.75rem;">
+            <strong>Card #123:</strong> 📍 Check-in 8:00 AM - Simons Property (no check-out yet)<br/>
+            <strong>Card #124:</strong> 📍 Check-in 10:00 AM - ACME Central
+          </div>
+          <div style="padding: 0.75rem; background: #fff9e6; border-radius: 4px; border-left: 3px solid #ffc107;">
+            <div style="font-size: 12px; color: #856404;">
+              <strong>Likely issue:</strong> Worker forgot to check out from Simons before moving to ACME
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="mock-button" style="flex: 1; padding: 0.75rem; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 14px;">✏️ Fix Time Cards</button>
+          <button class="mock-button" style="padding: 0.75rem 1rem; background: #6c757d; color: white; border: none; border-radius: 6px; font-size: 14px;">🎤 Audio</button>
+          <button class="mock-button" style="padding: 0.75rem 1rem; background: #dc3545; color: white; border: none; border-radius: 6px; font-size: 14px;">✕ Dismiss</button>
+        </div>
+      </div>
+
+      <!-- Card 3: Missing checkout -->
+      <div style="padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #ffc107;">
+        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 1rem;">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+              <span style="padding: 0.4rem 0.75rem; background: #fff3cd; color: #856404; border-radius: 4px; font-size: 12px; font-weight: 600;">⚠️ UNPAIRED CHECK-IN</span>
+              <span style="font-size: 13px; color: #666;">May 23, 2026 • 10:00 AM</span>
+            </div>
+            <div style="font-weight: 600; font-size: 16px; color: #333; margin-bottom: 0.5rem;">
+              John Smith checked in 26 hours ago without check-out
+            </div>
+            <div style="font-size: 14px; color: #666; line-height: 1.6;">
+              <div>📍 Worksite: <strong>Hyatt on 5th Avenue</strong></div>
+              <div>🕐 Check-in: May 22, 2026 • 8:00 AM (26 hours ago)</div>
+              <div>⚙️ Rule Violated: <strong>Check-in without check-out after 24 hours</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Related time card preview -->
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px; margin-bottom: 1rem; border-left: 3px solid #007bff;">
+          <div style="font-size: 12px; color: #666; margin-bottom: 0.5rem; font-weight: 600;">TIME CARD:</div>
+          <div style="font-size: 14px; color: #333; margin-bottom: 0.5rem;">
+            📍 Check-in: May 22, 8:00 AM - Hyatt on 5th Avenue<br/>
+            🏠 Check-out: <span style="color: #dc3545; font-weight: bold;">MISSING</span>
+          </div>
+          <div style="padding: 0.75rem; background: #fff9e6; border-radius: 4px; border-left: 3px solid #ffc107;">
+            <div style="font-size: 12px; color: #856404;">
+              <strong>Likely issue:</strong> Worker forgot to record check-out
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="mock-button" style="flex: 1; padding: 0.75rem; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 14px;">✏️ Add Check-Out</button>
+          <button class="mock-button" style="padding: 0.75rem 1rem; background: #6c757d; color: white; border: none; border-radius: 6px; font-size: 14px;">🎤 Audio</button>
+          <button class="mock-button" style="padding: 0.75rem 1rem; background: #dc3545; color: white; border: none; border-radius: 6px; font-size: 14px;">✕ Dismiss</button>
+        </div>
+      </div>
+
+      <!-- Card 4: Time off conflict -->
+      <div style="padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #ffc107;">
+        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 1rem;">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+              <span style="padding: 0.4rem 0.75rem; background: #fff3cd; color: #856404; border-radius: 4px; font-size: 12px; font-weight: 600;">⚠️ TIME-OFF CONFLICT</span>
+              <span style="font-size: 13px; color: #666;">May 23, 2026 • 9:15 AM</span>
+            </div>
+            <div style="font-weight: 600; font-size: 16px; color: #333; margin-bottom: 0.5rem;">
+              Maria Garcia logged hours while marked as time-off
+            </div>
+            <div style="font-size: 14px; color: #666; line-height: 1.6;">
+              <div>📍 Worksite: <strong>ACME Central</strong></div>
+              <div>🕐 Logged: May 23, 2026 • 4 hours</div>
+              <div>🌴 Scheduled Time-Off: May 19-25, 2026</div>
+              <div>⚙️ Rule Violated: <strong>Hours logged during scheduled vacation</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Related info -->
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px; margin-bottom: 1rem; border-left: 3px solid #007bff;">
+          <div style="font-size: 12px; color: #666; margin-bottom: 0.5rem; font-weight: 600;">CONFLICT DETAILS:</div>
+          <div style="font-size: 14px; color: #333;">
+            Worker recorded: "I did 4 hours at ACME today"<br/>
+            Scheduled time-off: Vacation (May 19-25)
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="mock-button" style="flex: 1; padding: 0.75rem; background: #28a745; color: white; border: none; border-radius: 6px; font-size: 14px;">✓ Approve (Cancel Time-Off)</button>
+          <button class="mock-button" style="flex: 1; padding: 0.75rem; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 14px;">✏️ Edit Entry</button>
+          <button class="mock-button" style="padding: 0.75rem 1rem; background: #dc3545; color: white; border: none; border-radius: 6px; font-size: 14px;">✕ Dismiss</button>
+        </div>
+      </div>
+
+      <!-- Card 5: Unusual pattern -->
+      <div style="padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #17a2b8;">
+        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 1rem;">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+              <span style="padding: 0.4rem 0.75rem; background: #d1ecf1; color: #0c5460; border-radius: 4px; font-size: 12px; font-weight: 600;">ℹ️ UNUSUAL PATTERN</span>
+              <span style="font-size: 13px; color: #666;">May 23, 2026 • 8:00 AM</span>
+            </div>
+            <div style="font-weight: 600; font-size: 16px; color: #333; margin-bottom: 0.5rem;">
+              Bob Martinez hours 65% above recent average
+            </div>
+            <div style="font-size: 14px; color: #666; line-height: 1.6;">
+              <div>📊 This week: <strong>62 hours</strong></div>
+              <div>📊 4-week average: <strong>37.5 hours</strong></div>
+              <div>⚙️ Pattern Detection: <strong>+65% deviation from average</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Context -->
+        <div style="padding: 1rem; background: #d1ecf1; border-radius: 6px; margin-bottom: 1rem; border-left: 3px solid #17a2b8;">
+          <div style="font-size: 12px; color: #0c5460; line-height: 1.5;">
+            <strong>Note:</strong> This is informational - not a rule violation. Bob's custom rule allows 70 hrs/week. Flagged because the pattern is unusual for this worker. May indicate: seasonal work increase, emergency project, or data entry error.
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="mock-button" style="flex: 1; padding: 0.75rem; background: #28a745; color: white; border: none; border-radius: 6px; font-size: 14px;">✓ Acknowledge</button>
+          <button class="mock-button" style="flex: 1; padding: 0.75rem; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 14px;">📊 View Details</button>
+          <button class="mock-button" style="padding: 0.75rem 1rem; background: #dc3545; color: white; border: none; border-radius: 6px; font-size: 14px;">✕ Dismiss</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-top: 1rem;">
+  <div class="mockup-header">Approve with Justification Dialog</div>
+  <div class="mockup-body" style="padding: 2rem; background: #fff;">
+    <div style="max-width: 500px; margin: 0 auto;">
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <div style="font-size: 48px; margin-bottom: 0.5rem;">⚠️</div>
+        <h3 style="margin: 0; font-size: 20px;">Override Validation Rule</h3>
+        <p style="margin: 0.5rem 0 0; font-size: 14px; color: #666;">This action requires justification</p>
+      </div>
+
+      <!-- Rule violation summary -->
+      <div style="padding: 1.25rem; background: #f8d7da; border-radius: 8px; border-left: 4px solid #dc3545; margin-bottom: 1.5rem;">
+        <div style="font-size: 14px; color: #721c24; line-height: 1.6;">
+          <strong>Rule Violated:</strong> Max Hours/Day<br/>
+          <strong>Threshold:</strong> 16 hours<br/>
+          <strong>Actual:</strong> 15 hours<br/>
+          <strong>Worker:</strong> Bob Martinez<br/>
+          <strong>Worksite:</strong> Simons Property<br/>
+          <strong>Date:</strong> May 22, 2026
+        </div>
+      </div>
+
+      <!-- Justification -->
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 0.75rem;">
+          Justification <span style="color: #dc3545;">*</span>
+        </label>
+        <textarea placeholder="Explain why you're approving this despite the rule violation. This will be recorded in the audit log." class="mock-input" style="width: 100%; padding: 0.75rem; border: 2px solid #007bff; border-radius: 6px; font-size: 14px; min-height: 100px; font-family: inherit; resize: vertical;"></textarea>
+        <p style="font-size: 12px; color: #666; margin: 0.5rem 0 0;">
+          Required. This reason will be logged and visible in audit trails.
+        </p>
+      </div>
+
+      <!-- Common reasons (quick fill) -->
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.5rem;">Common Reasons (click to use):</label>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+          <button class="mock-button" style="padding: 0.5rem 0.75rem; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">Emergency work</button>
+          <button class="mock-button" style="padding: 0.5rem 0.75rem; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">Overtime pre-approved</button>
+          <button class="mock-button" style="padding: 0.5rem 0.75rem; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">Critical deadline</button>
+          <button class="mock-button" style="padding: 0.5rem 0.75rem; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">Weather delay makeup</button>
+        </div>
+      </div>
+
+      <!-- Warning -->
+      <div style="padding: 1rem; background: #fff9e6; border-radius: 6px; border-left: 3px solid #ffc107; margin-bottom: 1.5rem;">
+        <div style="font-size: 12px; color: #856404; line-height: 1.5;">
+          <strong>⚠️ Accountability Notice:</strong><br/>
+          This override will be recorded in the audit log with your manager ID, timestamp, and justification. The log entry will be tagged to this worker, worksite, time card, and review card for future reference.
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="mock-button" style="flex: 1; padding: 0.9rem; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 15px;">Approve with Justification</button>
+        <button class="mock-button" style="padding: 0.9rem 1.5rem; background: #6c757d; color: white; border: none; border-radius: 6px; font-size: 15px;">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 2rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+  <h4>Review Cards Queue System:</h4>
+  <ul>
+    <li><strong>Auto-Generated:</strong> Review Cards are automatically created when anomaly detection rules are triggered</li>
+    <li><strong>Linked to Time Cards:</strong> Each Review Card references one or more related Time Cards</li>
+    <li><strong>Severity Levels:</strong> Critical (red), Warning (yellow), Informational (blue)</li>
+    <li><strong>Action Options:</strong> Approve with reason, Edit Time Card, Dismiss, or custom actions per card type</li>
+    <li><strong>Override Requires Justification:</strong> Manager must provide reason when approving despite rule violation</li>
+    <li><strong>Full Audit Trail:</strong> All actions logged and tagged to worker, worksite, time cards, review cards, and rules</li>
+  </ul>
+
+  <h4 style="margin-top: 1.5rem;">Review Card Types:</h4>
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem;">
+    <div style="padding: 1rem; background: white; border-radius: 6px; border-left: 3px solid #dc3545;">
+      <div style="font-weight: 600; margin-bottom: 0.5rem; color: #dc3545;">🔴 Critical Violations</div>
+      <div style="font-size: 13px; color: #666; line-height: 1.6;">
+        • Excessive hours (>24 hrs/day)<br/>
+        • Overlapping sites<br/>
+        • Duplicate entries
+      </div>
+    </div>
+
+    <div style="padding: 1rem; background: white; border-radius: 6px; border-left: 3px solid #ffc107;">
+      <div style="font-weight: 600; margin-bottom: 0.5rem; color: #ffc107;">🟡 Warnings</div>
+      <div style="font-size: 13px; color: #666; line-height: 1.6;">
+        • Missing check-out<br/>
+        • Time-off conflicts<br/>
+        • Outside work hours
+      </div>
+    </div>
+
+    <div style="padding: 1rem; background: white; border-radius: 6px; border-left: 3px solid #17a2b8;">
+      <div style="font-weight: 600; margin-bottom: 0.5rem; color: #17a2b8;">🔵 Informational</div>
+      <div style="font-size: 13px; color: #666; line-height: 1.6;">
+        • Unusual patterns<br/>
+        • Deviation from average<br/>
+        • New worksite detected
+      </div>
+    </div>
+
+    <div style="padding: 1rem; background: white; border-radius: 6px; border-left: 3px solid #28a745;">
+      <div style="font-weight: 600; margin-bottom: 0.5rem; color: #28a745;">🟢 Resolved</div>
+      <div style="font-size: 13px; color: #666; line-height: 1.6;">
+        • Approved with reason<br/>
+        • Corrected<br/>
+        • Dismissed
+      </div>
+    </div>
+  </div>
+
+  <h4 style="margin-top: 1.5rem;">Log Event Format (Override Example):</h4>
+  <div style="padding: 1rem; background: white; border-radius: 6px; font-family: monospace; font-size: 12px; line-height: 1.8;">
+    {<br/>
+    &nbsp;&nbsp;"event_id": "log-67890",<br/>
+    &nbsp;&nbsp;"timestamp": "2026-05-23T14:30:00Z",<br/>
+    &nbsp;&nbsp;"actor": { "type": "manager", "id": "mgr-sarah", "name": "Sarah Chen" },<br/>
+    &nbsp;&nbsp;"action": "override_validation_rule",<br/>
+    &nbsp;&nbsp;"description": "Approved time card despite exceeding max hours",<br/>
+    &nbsp;&nbsp;"details": {<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;"rule_violated": "max_hours_day",<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;"threshold": 16,<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;"actual_value": 15,<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;"justification": "Emergency water main break - overtime pre-approved"<br/>
+    &nbsp;&nbsp;},<br/>
+    &nbsp;&nbsp;"tags": [<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;{ "type": "worker", "id": "bob-martinez" },<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;{ "type": "worksite", "id": "simons-property" },<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;{ "type": "time-card", "id": "tc-789" },<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;{ "type": "review-card", "id": "rc-456" },<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;{ "type": "rule", "id": "rule-max-hours-day" }<br/>
+    &nbsp;&nbsp;],<br/>
+    &nbsp;&nbsp;"before": { "status": "pending_review" },<br/>
+    &nbsp;&nbsp;"after": { "status": "approved" }<br/>
+    }
+  </div>
+</div>

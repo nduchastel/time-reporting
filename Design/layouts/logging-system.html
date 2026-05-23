@@ -1,0 +1,286 @@
+<h2>Flexible Logging System - Entity Tagging Architecture</h2>
+<p class="subtitle">Many-to-many tagging system for queryable audit trail</p>
+
+<div class="section" style="margin-bottom: 2rem;">
+  <h3>Log Event Data Model</h3>
+  <div style="padding: 1.5rem; background: white; border-radius: 8px; border-left: 4px solid #007bff;">
+    <pre style="background: #f8f9fa; padding: 1rem; border-radius: 6px; font-size: 13px; line-height: 1.6; overflow-x: auto; margin: 0;">
+{
+  "event_id": "log-12345",
+  "timestamp": "2026-05-23T18:45:23.123Z",
+  "actor": {
+    "type": "manager",
+    "id": "mgr-sarah-chen",
+    "name": "Sarah Chen"
+  },
+  "action": "override_validation_rule",
+  "description": "Approved time card despite max hours violation",
+  "details": {
+    "rule_violated": "max_hours_day",
+    "threshold": 16,
+    "actual_value": 15,
+    "override_reason": "Emergency water main break - overtime approved by site supervisor"
+  },
+  "tags": [
+    { "type": "worker", "id": "bob-martinez", "label": "Bob Martinez" },
+    { "type": "worksite", "id": "simons-property", "label": "Simons Property" },
+    { "type": "time-card", "id": "tc-789", "label": "Time Card #789" },
+    { "type": "review-card", "id": "rc-456", "label": "Review Card #456" },
+    { "type": "rule", "id": "rule-max-hours-day", "label": "Max Hours/Day Rule" },
+    { "type": "config", "id": "threshold-override", "label": "Threshold Override" }
+  ],
+  "before": { "status": "pending_review" },
+  "after": { "status": "approved", "hours": 15 }
+}
+    </pre>
+  </div>
+</div>
+
+<div class="section" style="margin-bottom: 2rem;">
+  <h3>Tag Type Categories (Extensible)</h3>
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+    <div style="padding: 1rem; background: white; border-radius: 6px; border-left: 3px solid #007bff;">
+      <div style="font-weight: 600; margin-bottom: 0.5rem; color: #007bff;">👤 People</div>
+      <div style="font-size: 13px; color: #666; line-height: 1.8;">
+        • worker<br/>
+        • manager<br/>
+        • admin
+      </div>
+    </div>
+
+    <div style="padding: 1rem; background: white; border-radius: 6px; border-left: 3px solid #28a745;">
+      <div style="font-weight: 600; margin-bottom: 0.5rem; color: #28a745;">📍 Locations</div>
+      <div style="font-size: 13px; color: #666; line-height: 1.8;">
+        • worksite<br/>
+        • region<br/>
+        • zone
+      </div>
+    </div>
+
+    <div style="padding: 1rem; background: white; border-radius: 6px; border-left: 3px solid #ffc107;">
+      <div style="font-weight: 600; margin-bottom: 0.5rem; color: #ffc107;">📋 Cards</div>
+      <div style="font-size: 13px; color: #666; line-height: 1.8;">
+        • time-card<br/>
+        • review-card<br/>
+        • time-off-card
+      </div>
+    </div>
+
+    <div style="padding: 1rem; background: white; border-radius: 6px; border-left: 3px solid #dc3545;">
+      <div style="font-weight: 600; margin-bottom: 0.5rem; color: #dc3545;">⚙️ Rules & Config</div>
+      <div style="font-size: 13px; color: #666; line-height: 1.8;">
+        • rule<br/>
+        • config<br/>
+        • threshold
+      </div>
+    </div>
+
+    <div style="padding: 1rem; background: white; border-radius: 6px; border-left: 3px solid #6c757d;">
+      <div style="font-weight: 600; margin-bottom: 0.5rem; color: #6c757d;">🔄 Actions</div>
+      <div style="font-size: 13px; color: #666; line-height: 1.8;">
+        • approval<br/>
+        • edit<br/>
+        • override<br/>
+        • delete
+      </div>
+    </div>
+
+    <div style="padding: 1rem; background: white; border-radius: 6px; border-left: 3px solid #17a2b8;">
+      <div style="font-weight: 600; margin-bottom: 0.5rem; color: #17a2b8;">🆕 Future (Extensible)</div>
+      <div style="font-size: 13px; color: #666; line-height: 1.8;">
+        • project<br/>
+        • equipment<br/>
+        • client<br/>
+        • invoice
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-bottom: 2rem;">
+  <div class="mockup-header">Audit Log Viewer - Tag-based Filtering</div>
+  <div class="mockup-body" style="padding: 1.5rem; background: #f8f9fa;">
+    <div style="margin-bottom: 1.5rem;">
+      <h3 style="margin: 0; font-size: 18px;">Audit Trail</h3>
+      <p style="margin: 0.25rem 0 0; font-size: 13px; color: #666;">Query logs by tags, date range, action type, or actor</p>
+    </div>
+
+    <!-- Filter bar -->
+    <div style="padding: 1.25rem; background: white; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #ddd;">
+      <div style="display: grid; gap: 1rem;">
+        <!-- Tag filters -->
+        <div>
+          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 0.5rem;">Filter by Tags</label>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+            <span style="padding: 0.4rem 0.75rem; background: #007bff; color: white; border-radius: 20px; font-size: 12px; display: inline-flex; align-items: center; gap: 0.5rem;">
+              👤 worker:bob-martinez
+              <span style="cursor: pointer; font-weight: bold;">×</span>
+            </span>
+            <span style="padding: 0.4rem 0.75rem; background: #28a745; color: white; border-radius: 20px; font-size: 12px; display: inline-flex; align-items: center; gap: 0.5rem;">
+              📍 worksite:simons-property
+              <span style="cursor: pointer; font-weight: bold;">×</span>
+            </span>
+            <button class="mock-button" style="padding: 0.4rem 0.75rem; background: #f8f9fa; border: 1px dashed #007bff; color: #007bff; border-radius: 20px; font-size: 12px;">+ Add Tag Filter</button>
+          </div>
+        </div>
+
+        <!-- Date & action filters -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+          <div>
+            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 0.25rem;">Date Range</label>
+            <select class="mock-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+              <option>Last 7 days</option>
+              <option>Last 30 days</option>
+              <option>This month</option>
+              <option>Custom...</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 0.25rem;">Action Type</label>
+            <select class="mock-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+              <option>All actions</option>
+              <option>Approvals</option>
+              <option>Edits</option>
+              <option>Overrides</option>
+              <option>Deletions</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 0.25rem;">Actor</label>
+            <select class="mock-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+              <option>All managers</option>
+              <option>Sarah Chen</option>
+              <option>System (automated)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 13px; color: #666;">Showing 3 events</div>
+          <button class="mock-button" style="padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 13px;">📊 Export CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log entries -->
+    <div style="display: grid; gap: 0.75rem;">
+      <!-- Event 1 -->
+      <div style="padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #ffc107;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+          <div>
+            <div style="font-weight: 600; font-size: 15px; color: #333;">Override Validation Rule</div>
+            <div style="font-size: 12px; color: #666; margin-top: 0.25rem;">
+              Manager: <strong>Sarah Chen</strong> • May 23, 2026 at 6:45 PM
+            </div>
+          </div>
+          <button class="mock-button" style="padding: 0.3rem 0.6rem; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; font-size: 11px;">View Full Details</button>
+        </div>
+
+        <div style="font-size: 14px; color: #333; margin-bottom: 0.75rem;">
+          Approved Time Card #789 despite max hours violation
+        </div>
+
+        <!-- Tags -->
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <span style="padding: 0.25rem 0.5rem; background: #e3f2fd; color: #007bff; border-radius: 4px; font-size: 11px;">👤 Bob Martinez</span>
+          <span style="padding: 0.25rem 0.5rem; background: #e8f5e9; color: #28a745; border-radius: 4px; font-size: 11px;">📍 Simons Property</span>
+          <span style="padding: 0.25rem 0.5rem; background: #fff9e6; color: #f57c00; border-radius: 4px; font-size: 11px;">📋 Time Card #789</span>
+          <span style="padding: 0.25rem 0.5rem; background: #fff9e6; color: #f57c00; border-radius: 4px; font-size: 11px;">📋 Review Card #456</span>
+          <span style="padding: 0.25rem 0.5rem; background: #f8d7da; color: #dc3545; border-radius: 4px; font-size: 11px;">⚙️ Max Hours/Day Rule</span>
+        </div>
+
+        <!-- Details -->
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px; font-size: 13px;">
+          <div style="margin-bottom: 0.5rem;"><strong>Rule violated:</strong> Max Hours/Day (15 hrs > 16 hrs)</div>
+          <div style="margin-bottom: 0.5rem;"><strong>Override reason:</strong> "Emergency water main break - overtime approved by site supervisor"</div>
+          <div><strong>Status:</strong> pending_review → approved</div>
+        </div>
+      </div>
+
+      <!-- Event 2 -->
+      <div style="padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #007bff;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+          <div>
+            <div style="font-weight: 600; font-size: 15px; color: #333;">Worker Configuration Updated</div>
+            <div style="font-size: 12px; color: #666; margin-top: 0.25rem;">
+              Manager: <strong>Sarah Chen</strong> • May 23, 2026 at 2:15 PM
+            </div>
+          </div>
+          <button class="mock-button" style="padding: 0.3rem 0.6rem; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; font-size: 11px;">View Full Details</button>
+        </div>
+
+        <div style="font-size: 14px; color: #333; margin-bottom: 0.75rem;">
+          Changed max hours/week for Bob Martinez
+        </div>
+
+        <!-- Tags -->
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <span style="padding: 0.25rem 0.5rem; background: #e3f2fd; color: #007bff; border-radius: 4px; font-size: 11px;">👤 Bob Martinez</span>
+          <span style="padding: 0.25rem 0.5rem; background: #f8d7da; color: #dc3545; border-radius: 4px; font-size: 11px;">⚙️ Per-Worker Rules</span>
+          <span style="padding: 0.25rem 0.5rem; background: #f8d7da; color: #dc3545; border-radius: 4px; font-size: 11px;">⚙️ Max Hours/Week Threshold</span>
+        </div>
+
+        <!-- Details -->
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px; font-size: 13px;">
+          <div><strong>Changed:</strong> max_hours_week: 60 → 70</div>
+        </div>
+      </div>
+
+      <!-- Event 3 -->
+      <div style="padding: 1.25rem; background: white; border-radius: 8px; border-left: 4px solid #28a745;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+          <div>
+            <div style="font-weight: 600; font-size: 15px; color: #333;">Worksite Created</div>
+            <div style="font-size: 12px; color: #666; margin-top: 0.25rem;">
+              Manager: <strong>Sarah Chen</strong> • May 22, 2026 at 10:30 AM
+            </div>
+          </div>
+          <button class="mock-button" style="padding: 0.3rem 0.6rem; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; font-size: 11px;">View Full Details</button>
+        </div>
+
+        <div style="font-size: 14px; color: #333; margin-bottom: 0.75rem;">
+          Added new worksite: Hyatt on 5th Avenue
+        </div>
+
+        <!-- Tags -->
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <span style="padding: 0.25rem 0.5rem; background: #e8f5e9; color: #28a745; border-radius: 4px; font-size: 11px;">📍 Hyatt on 5th Avenue</span>
+          <span style="padding: 0.25rem 0.5rem; background: #f8d7da; color: #dc3545; border-radius: 4px; font-size: 11px;">⚙️ Worksite Configuration</span>
+        </div>
+
+        <!-- Details -->
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px; font-size: 13px;">
+          <div style="margin-bottom: 0.5rem;"><strong>Address:</strong> 123 5th Avenue, Springfield</div>
+          <div style="margin-bottom: 0.5rem;"><strong>Aliases:</strong> Hyatt site, 5th Ave hotel</div>
+          <div><strong>Operating days:</strong> Mon-Sun (24/7)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 2rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+  <h4>Logging System Design Principles:</h4>
+  <ul>
+    <li><strong>Many-to-Many Tags:</strong> Each log event can be tagged with unlimited entities (workers, worksites, cards, rules, etc.)</li>
+    <li><strong>Extensible Tag Types:</strong> New tag types can be added without schema changes (equipment, projects, clients, invoices)</li>
+    <li><strong>Queryable:</strong> Filter logs by any combination of tags, date ranges, actions, or actors</li>
+    <li><strong>Complete Audit Trail:</strong> Before/after state capture for all changes</li>
+    <li><strong>Compliance-Ready:</strong> Export logs for labor audits, disputes, or payroll verification</li>
+    <li><strong>Performance:</strong> Tag index enables fast lookups: "Show all events for worker X" or "Show all config changes"</li>
+  </ul>
+
+  <h4 style="margin-top: 1.5rem;">Example Queries:</h4>
+  <div style="padding: 1rem; background: white; border-radius: 6px; font-family: monospace; font-size: 13px; line-height: 1.8;">
+    • Get all events for Bob Martinez:<br/>
+    &nbsp;&nbsp;<code>tags contains "worker:bob-martinez"</code><br/><br/>
+    • Get all overtime overrides:<br/>
+    &nbsp;&nbsp;<code>action = "override_validation_rule" AND tags contains "rule:max-hours-day"</code><br/><br/>
+    • Get all changes to Simons Property config:<br/>
+    &nbsp;&nbsp;<code>tags contains "worksite:simons-property" AND tags contains "config"</code><br/><br/>
+    • Get all events involving multiple workers:<br/>
+    &nbsp;&nbsp;<code>tags contains "worker:*" (count > 1)</code><br/><br/>
+    • Get all deletions in last 30 days:<br/>
+    &nbsp;&nbsp;<code>action = "delete" AND timestamp > "30 days ago"</code>
+  </div>
+</div>

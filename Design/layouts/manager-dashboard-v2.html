@@ -1,0 +1,335 @@
+<h2>Manager Dashboard - Which layout works best?</h2>
+<p class="subtitle">Considering you need to review entries, track worker status, and manage worksites</p>
+
+<div class="options">
+  <div class="option" data-choice="timeline" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Timeline View - Chronological Feed</h3>
+      <p><strong>See all entries as they come in, review in order</strong></p>
+      <div class="mockup" style="margin-top: 1rem;">
+        <div class="mockup-header">TimeTracker Manager - Timeline</div>
+        <div class="mockup-body" style="padding: 1rem; background: #f8f9fa;">
+          <!-- Top bar with filters and stats -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 1rem; background: white; border-radius: 8px;">
+            <div>
+              <h3 style="margin: 0; font-size: 18px;">Today's Activity</h3>
+              <p style="margin: 0.25rem 0 0; font-size: 13px; color: #666;">Friday, May 23, 2026</p>
+            </div>
+            <div style="display: flex; gap: 1rem; font-size: 13px;">
+              <div style="text-align: center;">
+                <div style="font-size: 20px; font-weight: bold; color: #28a745;">4/5</div>
+                <div style="color: #666;">Workers Active</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="font-size: 20px; font-weight: bold; color: #ffc107;">3</div>
+                <div style="color: #666;">Need Review</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline entries -->
+          <div style="space-y: 0.75rem;">
+            <div style="margin-bottom: 0.75rem; padding: 1rem; background: white; border-left: 3px solid #ffc107; border-radius: 4px;">
+              <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                  <div style="font-weight: bold; color: #333;">John Smith</div>
+                  <div style="font-size: 13px; color: #666; margin-top: 0.25rem;">📍 Check In - 11:42 AM</div>
+                  <div style="font-size: 13px; margin-top: 0.5rem;"><strong>Site:</strong> ACME Central Processing</div>
+                  <div style="font-size: 12px; color: #666; margin-top: 0.25rem; font-style: italic;">"Just arrived at ACME..."</div>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                  <span style="padding: 0.25rem 0.5rem; background: #fff3cd; border-radius: 4px; font-size: 11px; color: #856404;">⚠ New Site</span>
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+                <button class="mock-button" style="flex: 1; padding: 0.5rem; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 12px;">✓ Approve</button>
+                <button class="mock-button" style="flex: 1; padding: 0.5rem; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 12px;">🎤 Audio</button>
+                <button class="mock-button" style="flex: 1; padding: 0.5rem; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 12px;">✏️ Edit</button>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 0.75rem; padding: 1rem; background: white; border-left: 3px solid #00897b; border-radius: 4px; opacity: 0.7;">
+              <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                  <div style="font-weight: bold; color: #333;">Sarah Johnson</div>
+                  <div style="font-size: 13px; color: #666; margin-top: 0.25rem;">🏠 Check Out - 11:15 AM</div>
+                  <div style="font-size: 13px; margin-top: 0.5rem;"><strong>Site:</strong> Simons Property</div>
+                  <div style="font-size: 13px;"><strong>Duration:</strong> 3h 45m</div>
+                </div>
+                <span style="padding: 0.25rem 0.5rem; background: #e8f5e9; border-radius: 4px; font-size: 11px; color: #2e7d32;">✓ Approved</span>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 0.75rem; padding: 1rem; background: white; border-left: 3px solid #dc3545; border-radius: 4px;">
+              <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                  <div style="font-weight: bold; color: #333;">Bob Martinez</div>
+                  <div style="font-size: 13px; color: #666; margin-top: 0.25rem;">⏱️ Log Hours - 10:30 AM</div>
+                  <div style="font-size: 13px; margin-top: 0.5rem;"><strong>Site:</strong> Hyatt on 5th Ave</div>
+                  <div style="font-size: 13px;"><strong>Workers:</strong> Bob, John</div>
+                  <div style="font-size: 13px;"><strong>Duration:</strong> 4 hours each</div>
+                </div>
+                <span style="padding: 0.25rem 0.5rem; background: #f8d7da; border-radius: 4px; font-size: 11px; color: #721c24;">⚠ Low Confidence</span>
+              </div>
+              <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+                <button class="mock-button" style="flex: 1; padding: 0.5rem; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 12px;">✓ Approve</button>
+                <button class="mock-button" style="flex: 1; padding: 0.5rem; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 12px;">🎤 Audio</button>
+                <button class="mock-button" style="flex: 1; padding: 0.5rem; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 12px;">✏️ Edit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pros-cons" style="margin-top: 1rem;">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>See activity as it happens</li>
+            <li>Quick inline review/approve</li>
+            <li>Simple mental model</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>Hard to see per-worker status at a glance</li>
+            <li>Mixing approved and pending</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="worker-grid" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Worker Grid - Status Overview</h3>
+      <p><strong>See each worker's current status, drill down to entries</strong></p>
+      <div class="mockup" style="margin-top: 1rem;">
+        <div class="mockup-header">TimeTracker Manager - Workers</div>
+        <div class="mockup-body" style="padding: 1rem; background: #f8f9fa;">
+          <!-- Top bar -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 1rem; background: white; border-radius: 8px;">
+            <div>
+              <h3 style="margin: 0; font-size: 18px;">Team Status</h3>
+              <p style="margin: 0.25rem 0 0; font-size: 13px; color: #666;">Week of May 19 - 23</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="mock-button" style="padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 13px;">📅 This Week</button>
+              <button class="mock-button" style="padding: 0.5rem 1rem; background: white; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;">📊 Export</button>
+            </div>
+          </div>
+
+          <!-- Worker cards grid -->
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+            <div style="padding: 1rem; background: white; border-radius: 8px; border-left: 3px solid #ffc107;">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                <div>
+                  <div style="font-weight: bold; font-size: 15px;">John Smith</div>
+                  <div style="font-size: 12px; color: #666; margin-top: 0.25rem;">📍 Checked In - ACME</div>
+                </div>
+                <span style="padding: 0.25rem 0.5rem; background: #fff3cd; border-radius: 4px; font-size: 11px; color: #856404;">1 Review</span>
+              </div>
+              <div style="font-size: 13px; line-height: 1.6;">
+                <div><strong>This Week:</strong> 32.5 hrs</div>
+                <div style="color: #666;">Mon-Thu: Complete ✓</div>
+                <div style="color: #666;">Fri: In progress...</div>
+              </div>
+              <button class="mock-button" style="width: 100%; margin-top: 0.75rem; padding: 0.5rem; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 12px;">View Details →</button>
+            </div>
+
+            <div style="padding: 1rem; background: white; border-radius: 8px; border-left: 3px solid #28a745;">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                <div>
+                  <div style="font-weight: bold; font-size: 15px;">Sarah Johnson</div>
+                  <div style="font-size: 12px; color: #666; margin-top: 0.25rem;">✓ All Complete</div>
+                </div>
+                <span style="padding: 0.25rem 0.5rem; background: #e8f5e9; border-radius: 4px; font-size: 11px; color: #2e7d32;">✓ OK</span>
+              </div>
+              <div style="font-size: 13px; line-height: 1.6;">
+                <div><strong>This Week:</strong> 40.0 hrs</div>
+                <div style="color: #666;">Mon-Fri: Complete ✓</div>
+              </div>
+              <button class="mock-button" style="width: 100%; margin-top: 0.75rem; padding: 0.5rem; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 12px;">View Details →</button>
+            </div>
+
+            <div style="padding: 1rem; background: white; border-radius: 8px; border-left: 3px solid #dc3545;">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                <div>
+                  <div style="font-weight: bold; font-size: 15px;">Bob Martinez</div>
+                  <div style="font-size: 12px; color: #dc3545; margin-top: 0.25rem;">⚠ Missing Thu, Fri</div>
+                </div>
+                <span style="padding: 0.25rem 0.5rem; background: #f8d7da; border-radius: 4px; font-size: 11px; color: #721c24;">2 Missing</span>
+              </div>
+              <div style="font-size: 13px; line-height: 1.6;">
+                <div><strong>This Week:</strong> 24.0 hrs</div>
+                <div style="color: #666;">Mon-Wed: Complete ✓</div>
+                <div style="color: #dc3545;">Thu-Fri: No entries</div>
+              </div>
+              <button class="mock-button" style="width: 100%; margin-top: 0.75rem; padding: 0.5rem; background: #dc3545; color: white; border: none; border-radius: 4px; font-size: 12px;">Remind Worker</button>
+            </div>
+
+            <div style="padding: 1rem; background: white; border-radius: 8px; border-left: 3px solid #f57c00;">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                <div>
+                  <div style="font-weight: bold; font-size: 15px;">Maria Garcia</div>
+                  <div style="font-size: 12px; color: #666; margin-top: 0.25rem;">🌴 Time Off</div>
+                </div>
+                <span style="padding: 0.25rem 0.5rem; background: #fff9e6; border-radius: 4px; font-size: 11px; color: #856404;">OFF</span>
+              </div>
+              <div style="font-size: 13px; line-height: 1.6;">
+                <div><strong>This Week:</strong> 0.0 hrs</div>
+                <div style="color: #666;">Mon-Fri: Vacation</div>
+                <div style="color: #666;">Returns: May 26</div>
+              </div>
+              <button class="mock-button" style="width: 100%; margin-top: 0.75rem; padding: 0.5rem; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 12px;">View Details →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pros-cons" style="margin-top: 1rem;">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>Instant overview of team status</li>
+            <li>Quickly spot who's missing entries</li>
+            <li>Weekly hours visible at a glance</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>Requires clicking into details to review entries</li>
+            <li>Two-step process (overview → detail)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="split" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Split View - Workers + Timeline</h3>
+      <p><strong>Combine both: select worker on left, see their timeline on right</strong></p>
+      <div class="mockup" style="margin-top: 1rem;">
+        <div class="mockup-header">TimeTracker Manager - Split View</div>
+        <div class="mockup-body" style="padding: 0; background: #f8f9fa; display: flex; height: 400px;">
+          <!-- Left sidebar - worker list -->
+          <div style="width: 35%; border-right: 1px solid #ddd; padding: 1rem; background: white; overflow-y: auto;">
+            <div style="margin-bottom: 1rem;">
+              <h3 style="margin: 0; font-size: 16px;">Team</h3>
+              <p style="margin: 0.25rem 0 0; font-size: 12px; color: #666;">May 23, 2026</p>
+            </div>
+
+            <div style="margin-bottom: 0.5rem; padding: 0.75rem; background: #e3f2fd; border-left: 3px solid #007bff; border-radius: 4px; cursor: pointer;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: bold; font-size: 14px;">John Smith</div>
+                  <div style="font-size: 11px; color: #666; margin-top: 0.25rem;">32.5 hrs this week</div>
+                </div>
+                <span style="padding: 0.25rem 0.4rem; background: #ffc107; border-radius: 4px; font-size: 11px; color: white; font-weight: bold;">1</span>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 0.5rem; padding: 0.75rem; background: white; border-left: 3px solid transparent; border-radius: 4px; cursor: pointer; opacity: 0.7;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: bold; font-size: 14px;">Sarah Johnson</div>
+                  <div style="font-size: 11px; color: #666; margin-top: 0.25rem;">40.0 hrs this week</div>
+                </div>
+                <span style="padding: 0.25rem 0.4rem; background: #28a745; border-radius: 50%; font-size: 11px; color: white;">✓</span>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 0.5rem; padding: 0.75rem; background: white; border-left: 3px solid transparent; border-radius: 4px; cursor: pointer; opacity: 0.7;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: bold; font-size: 14px;">Bob Martinez</div>
+                  <div style="font-size: 11px; color: #dc3545; margin-top: 0.25rem;">24.0 hrs - 2 missing</div>
+                </div>
+                <span style="padding: 0.25rem 0.4rem; background: #dc3545; border-radius: 4px; font-size: 11px; color: white; font-weight: bold;">2</span>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 0.5rem; padding: 0.75rem; background: white; border-left: 3px solid transparent; border-radius: 4px; cursor: pointer; opacity: 0.7;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: bold; font-size: 14px;">Maria Garcia</div>
+                  <div style="font-size: 11px; color: #666; margin-top: 0.25rem;">🌴 Time Off</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right panel - selected worker's timeline -->
+          <div style="flex: 1; padding: 1rem; overflow-y: auto;">
+            <div style="margin-bottom: 1rem;">
+              <h3 style="margin: 0; font-size: 16px;">John Smith - This Week</h3>
+              <div style="display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 12px;">
+                <span><strong>Total:</strong> 32.5 hrs</span>
+                <span><strong>To Review:</strong> 1</span>
+              </div>
+            </div>
+
+            <!-- Timeline entries -->
+            <div style="margin-bottom: 0.75rem; padding: 1rem; background: white; border-left: 3px solid #ffc107; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+              <div style="font-size: 13px; font-weight: bold; color: #666; margin-bottom: 0.5rem;">TODAY - May 23</div>
+              <div style="font-size: 13px; color: #666;">📍 11:42 AM - Check In</div>
+              <div style="font-size: 13px; margin-top: 0.25rem;"><strong>Site:</strong> ACME Central Processing</div>
+              <div style="margin-top: 0.5rem; padding: 0.5rem; background: #fff3cd; border-radius: 4px; font-size: 12px;">
+                ⚠ New worksite - needs approval
+              </div>
+              <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+                <button class="mock-button" style="flex: 1; padding: 0.5rem; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 12px;">✓ Approve</button>
+                <button class="mock-button" style="padding: 0.5rem 0.75rem; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 12px;">🎤</button>
+                <button class="mock-button" style="padding: 0.5rem 0.75rem; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 12px;">✏️</button>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 0.75rem; padding: 1rem; background: white; border-left: 3px solid #28a745; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); opacity: 0.7;">
+              <div style="font-size: 13px; font-weight: bold; color: #666; margin-bottom: 0.5rem;">THU - May 22</div>
+              <div style="font-size: 13px; color: #666;">📍 7:30 AM - Check In</div>
+              <div style="font-size: 13px; color: #666;">🏠 5:15 PM - Check Out</div>
+              <div style="font-size: 13px; margin-top: 0.25rem;"><strong>Site:</strong> Simons Property</div>
+              <div style="font-size: 13px;"><strong>Duration:</strong> 9h 45m</div>
+              <div style="margin-top: 0.5rem; padding: 0.5rem; background: #e8f5e9; border-radius: 4px; font-size: 12px; color: #2e7d32;">
+                ✓ Approved
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pros-cons" style="margin-top: 1rem;">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>Best of both worlds</li>
+            <li>Quick worker overview + detailed timeline</li>
+            <li>Single screen for all management tasks</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>More complex layout</li>
+            <li>Might be cramped on smaller screens</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 2rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+  <h4>My Recommendation: Option C (Split View)</h4>
+  <p>For managing a small construction crew, I'd recommend the split view because:</p>
+  <ul>
+    <li><strong>Quick triage</strong> - See who needs attention (badges on worker names) and click to review</li>
+    <li><strong>Context preserved</strong> - Review entries while still seeing team status</li>
+    <li><strong>Efficient workflow</strong> - Approve entries for one worker, move to next, all on one screen</li>
+    <li><strong>Desktop-friendly</strong> - Managers likely using laptop/desktop, can take advantage of screen space</li>
+  </ul>
+  <p>Option A (timeline) works if entries are infrequent. Option B (grid) works if you mostly check status and rarely drill down.</p>
+</div>
