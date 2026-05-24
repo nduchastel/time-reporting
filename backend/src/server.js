@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import timeCardsRouter from './routes/timeCards.js';
+import authRouter from './routes/auth.js';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api', timeCardsRouter);
+app.use('/api/auth', authRouter);
 
 // Error handler
 app.use((err, req, res, next) => {
