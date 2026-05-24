@@ -4,8 +4,8 @@ import RecordButton from './RecordButton';
 
 const ACTION_TYPES = [
   { type: 'IN', label: 'Check IN', emoji: '📍', color: 'bg-teal-500' },
-  { type: 'OUT', label: 'Check OUT', emoji: '🏠', color: 'bg-blue-500' },
-  { type: 'HOURS', label: 'Hours Worked', emoji: '⏱️', color: 'bg-purple-500' },
+  { type: 'OUT', label: 'Check OUT', emoji: '🏠', color: 'bg-green-500' },
+  { type: 'HOURS', label: 'Hours Worked', emoji: '⏱️', color: 'bg-blue-500' },
   { type: 'OFF', label: 'Time OFF', emoji: '🌴', color: 'bg-orange-500' },
 ];
 
@@ -14,11 +14,45 @@ export default function WorkerUI() {
   const [transcription, setTranscription] = useState('');
   const [extractedData, setExtractedData] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
 
   const currentAction = ACTION_TYPES[currentScreen];
 
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && currentScreen < ACTION_TYPES.length - 1) {
+      setCurrentScreen(currentScreen + 1);
+    }
+    if (isRightSwipe && currentScreen > 0) {
+      setCurrentScreen(currentScreen - 1);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div
+      className="min-h-screen bg-gray-50"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       {/* Header with swipe dots */}
       <div className="bg-white shadow p-4">
         <div className="flex justify-center gap-2">
