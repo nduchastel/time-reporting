@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Option B: Bottom Bar (DevTools Style)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f3f4f6;
+            padding: 20px;
+            padding-bottom: 70px; /* Space for debug bar */
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-height: 600px;
+            position: relative;
+        }
+        .header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            padding: 40px 20px;
+            text-align: center;
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+        h1 { font-size: 24px; margin-bottom: 8px; }
+        .subtitle { opacity: 0.9; font-size: 14px; }
+        .content {
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .record-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #dc2626;
+            border: none;
+            color: white;
+            font-size: 48px;
+            cursor: pointer;
+            box-shadow: 0 8px 16px rgba(220, 38, 38, 0.3);
+            margin: 20px auto;
+            display: block;
+            transition: transform 0.2s;
+        }
+        .record-button:hover { transform: scale(1.05); }
+        .record-button:active { transform: scale(0.95); }
+        .info {
+            background: #fef3c7;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px;
+            border-left: 4px solid #f59e0b;
+        }
+        .info-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+        .info-text {
+            color: #78350f;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Debug Bar (Always visible at bottom) */
+        .debug-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1f2937;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease-out;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+        }
+        .debug-bar:hover {
+            background: #374151;
+        }
+        .debug-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-size: 14px;
+        }
+        .debug-icon {
+            font-size: 18px;
+        }
+        .debug-badge {
+            background: #dc2626;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .debug-chevron {
+            color: #9ca3af;
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
+
+        /* Debug Panel (Expands upward) */
+        .debug-panel {
+            position: fixed;
+            bottom: 48px; /* Above the bar */
+            left: 0;
+            right: 0;
+            background: #111827;
+            max-height: 0;
+            overflow: hidden;
+            z-index: 99;
+            transition: max-height 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
+        }
+        .debug-panel.expanded {
+            max-height: 400px;
+        }
+        .debug-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #374151;
+            background: #1f2937;
+            flex-shrink: 0;
+        }
+        .debug-panel-title {
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .debug-panel-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .debug-button {
+            background: #374151;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.2s;
+        }
+        .debug-button:hover { background: #4b5563; }
+        .debug-logs {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #10b981;
+            line-height: 1.6;
+        }
+        .log-entry {
+            margin-bottom: 8px;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease-out;
+            z-index: 400;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Rotate chevron when expanded */
+        .debug-bar.expanded .debug-chevron {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⏱️ Time OFF</h1>
+            <div class="subtitle">Option B: Bottom Bar (DevTools Style)</div>
+        </div>
+        <div class="content">
+            <p style="color: #6b7280; margin-bottom: 20px;">Tap the record button and describe your time:</p>
+            <button class="record-button">⏺</button>
+            <p style="color: #6b7280; font-size: 14px;">Tap to record</p>
+        </div>
+        <div class="info">
+            <div class="info-title">🐛 Debug Bar (Bottom)</div>
+            <div class="info-text">
+                • Always visible at bottom of screen<br>
+                • Shows log count badge<br>
+                • Click to expand/collapse<br>
+                • Expands upward like DevTools
+            </div>
+        </div>
+    </div>
+
+    <!-- Debug Bar (Collapsed) -->
+    <div class="debug-bar" id="debugBar">
+        <div class="debug-bar-left">
+            <span class="debug-icon">🐛</span>
+            <span>Debug</span>
+            <span class="debug-badge">6 logs</span>
+        </div>
+        <span class="debug-chevron">▲</span>
+    </div>
+
+    <!-- Debug Panel (Expands upward) -->
+    <div class="debug-panel" id="debugPanel">
+        <div class="debug-panel-header">
+            <div class="debug-panel-title">
+                🐛 Debug Log
+            </div>
+            <div class="debug-panel-actions">
+                <button class="debug-button" id="copyBtn">
+                    📋 Copy
+                </button>
+            </div>
+        </div>
+        <div class="debug-logs" id="debugLogs"></div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">Logs copied to clipboard!</div>
+
+    <script>
+        const debugBar = document.getElementById('debugBar');
+        const debugPanel = document.getElementById('debugPanel');
+        const debugLogs = document.getElementById('debugLogs');
+        const copyBtn = document.getElementById('copyBtn');
+        const toast = document.getElementById('toast');
+        let expanded = false;
+
+        // Sample logs
+        const logs = [
+            '[11:23:45 AM] 🎤 Requesting microphone access',
+            '[11:23:46 AM] ✅ Microphone granted',
+            '[11:23:47 AM] 📼 MediaRecorder created: {"mimeType":"audio/mp4"}',
+            '[11:23:50 AM] ⏹️ Recording stopped',
+            '[11:23:51 AM] 📤 Sending to backend: {"url":"https://...","workerId":"..."}',
+            '[11:23:53 AM] ✅ Success!: {"transcription":"I worked 8 hours","confidence":"high"}'
+        ];
+
+        // Render logs
+        logs.forEach(log => {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = log;
+            debugLogs.appendChild(entry);
+        });
+
+        // Toggle debug panel
+        debugBar.addEventListener('click', () => {
+            expanded = !expanded;
+            debugBar.classList.toggle('expanded');
+            debugPanel.classList.toggle('expanded');
+        });
+
+        // Copy logs
+        copyBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Don't trigger bar click
+            const logsText = logs.join('\n');
+            navigator.clipboard.writeText(logsText).then(() => {
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -16,6 +16,7 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
   const [recordingTime, setRecordingTime] = useState(0);
   const [error, setError] = useState(null);
   const [debugLogs, setDebugLogs] = useState([]);
+  const [debugExpanded, setDebugExpanded] = useState(false);
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -249,69 +250,110 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
   const showWarning = isRecording && recordingTime >= WARNING_TIME;
   const remainingTime = MAX_RECORDING_TIME - recordingTime;
 
+  const copyLogsToClipboard = () => {
+    const logsText = debugLogs.join('\n');
+    navigator.clipboard.writeText(logsText).then(() => {
+      // Optional: show a brief success indicator
+      console.log('Logs copied to clipboard');
+    });
+  };
+
   return (
-    <div className="text-center my-6">
-      {/* Debug Panel */}
-      {debugLogs.length > 0 && (
-        <div className="mb-4 p-3 bg-gray-900 text-green-400 rounded-lg text-left font-mono text-xs max-h-64 overflow-y-auto">
-          <div className="flex justify-between items-center mb-2">
-            <span className="font-bold text-white">🐛 Debug Log</span>
+    <>
+      <div className="text-center my-6">
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-700 text-sm">{error}</p>
             <button
-              onClick={() => setDebugLogs([])}
-              className="text-gray-400 hover:text-white text-xs"
+              onClick={() => setError(null)}
+              className="mt-2 text-red-600 underline text-sm"
             >
-              Clear
+              Dismiss
             </button>
-          </div>
-          {debugLogs.map((log, i) => (
-            <div key={i} className="mb-1 break-all">{log}</div>
-          ))}
-        </div>
-      )}
-
-      {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700 text-sm">{error}</p>
-          <button
-            onClick={() => setError(null)}
-            className="mt-2 text-red-600 underline text-sm"
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
-
-      <button
-        onClick={handleRecord}
-        disabled={isProcessing}
-        aria-label={isProcessing ? 'Processing...' : isRecording ? 'Tap to stop recording' : 'Tap to record'}
-        className={`w-24 h-24 rounded-full shadow-xl mx-auto flex items-center justify-center ${
-          isRecording ? 'bg-red-500 animate-pulse' : 'bg-red-600'
-        } ${isProcessing ? 'opacity-50' : ''}`}
-        style={{ fontSize: '48px' }}
-      >
-        <span className="text-white">
-          {isProcessing ? '⏳' : isRecording ? '⏹' : '⏺'}
-        </span>
-      </button>
-
-      <div className="mt-4">
-        {isRecording && (
-          <div className="mb-2">
-            <p className={`text-lg font-bold ${showWarning ? 'text-red-600' : 'text-gray-700'}`}>
-              {showWarning ? `${remainingTime}s remaining` : `${recordingTime}s`}
-            </p>
           </div>
         )}
 
-        <p className="text-gray-700 font-medium text-base">
-          {isProcessing
-            ? 'Processing...'
-            : isRecording
-              ? 'Recording... Tap to stop'
-              : 'Tap to record'}
-        </p>
+        <button
+          onClick={handleRecord}
+          disabled={isProcessing}
+          aria-label={isProcessing ? 'Processing...' : isRecording ? 'Tap to stop recording' : 'Tap to record'}
+          className={`w-24 h-24 rounded-full shadow-xl mx-auto flex items-center justify-center ${
+            isRecording ? 'bg-red-500 animate-pulse' : 'bg-red-600'
+          } ${isProcessing ? 'opacity-50' : ''}`}
+          style={{ fontSize: '48px' }}
+        >
+          <span className="text-white">
+            {isProcessing ? '⏳' : isRecording ? '⏹' : '⏺'}
+          </span>
+        </button>
+
+        <div className="mt-4">
+          {isRecording && (
+            <div className="mb-2">
+              <p className={`text-lg font-bold ${showWarning ? 'text-red-600' : 'text-gray-700'}`}>
+                {showWarning ? `${remainingTime}s remaining` : `${recordingTime}s`}
+              </p>
+            </div>
+          )}
+
+          <p className="text-gray-700 font-medium text-base">
+            {isProcessing
+              ? 'Processing...'
+              : isRecording
+                ? 'Recording... Tap to stop'
+                : 'Tap to record'}
+          </p>
+        </div>
       </div>
-    </div>
+
+      {/* Debug Bar (Bottom) - DevTools Style */}
+      {debugLogs.length > 0 && (
+        <>
+          {/* Debug Bar */}
+          <div
+            onClick={() => setDebugExpanded(!debugExpanded)}
+            className={`fixed bottom-0 left-0 right-0 bg-gray-800 h-12 flex items-center justify-between px-5 cursor-pointer z-50 transition-colors hover:bg-gray-700 shadow-lg ${debugExpanded ? 'shadow-2xl' : ''}`}
+          >
+            <div className="flex items-center gap-2 text-white text-sm">
+              <span className="text-lg">🐛</span>
+              <span>Debug</span>
+              <span className="bg-red-600 text-white px-2 py-0.5 rounded-full text-xs font-semibold">
+                {debugLogs.length} logs
+              </span>
+            </div>
+            <span className={`text-gray-400 text-xl transition-transform ${debugExpanded ? 'rotate-180' : ''}`}>
+              ▲
+            </span>
+          </div>
+
+          {/* Debug Panel (Expands upward) */}
+          <div
+            className={`fixed left-0 right-0 bg-gray-900 z-40 transition-all duration-300 ease-out overflow-hidden shadow-2xl ${
+              debugExpanded ? 'bottom-12 max-h-96' : 'bottom-12 max-h-0'
+            }`}
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-700 bg-gray-800">
+              <div className="text-white font-semibold text-base flex items-center gap-2">
+                🐛 Debug Log
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  copyLogsToClipboard();
+                }}
+                className="bg-gray-700 text-white px-3 py-1.5 rounded text-xs hover:bg-gray-600 transition-colors flex items-center gap-1"
+              >
+                📋 Copy
+              </button>
+            </div>
+            <div className="overflow-y-auto px-5 py-4 font-mono text-xs text-green-400 leading-relaxed" style={{ maxHeight: 'calc(24rem - 3.5rem)' }}>
+              {debugLogs.map((log, i) => (
+                <div key={i} className="mb-2 break-all">{log}</div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </>
   );
 }

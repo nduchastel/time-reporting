@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Window Options - Side by Side</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f3f4f6;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .options-container {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+        .option {
+            flex: 1;
+            min-width: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .option-header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+        .option-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .option-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 700px;
+            border: none;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .instructions {
+            background: white;
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .instructions h2 {
+            color: #1f2937;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+        .instructions ul {
+            list-style-position: inside;
+            color: #4b5563;
+            line-height: 1.8;
+        }
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        .recommendation {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin-top: 16px;
+            border-radius: 4px;
+        }
+        .recommendation strong {
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug Window Design Options</h1>
+
+    <div class="instructions">
+        <h2>📋 How to Compare</h2>
+        <ul>
+            <li><strong>Option A (Left):</strong> Click the 🐛 button in bottom-right corner to open modal</li>
+            <li><strong>Option B (Right):</strong> Click the bottom bar to expand/collapse</li>
+            <li>Try the Copy button in each option</li>
+            <li>Try clicking outside the modal (Option A) or collapsing the bar (Option B)</li>
+            <li>Consider which feels more natural for debugging during development</li>
+        </ul>
+        <div class="recommendation">
+            <strong>💡 Recommendation:</strong> Option B (Bottom Bar) is recommended because it's always visible, shows log count even when collapsed, and mimics familiar browser DevTools behavior.
+        </div>
+    </div>
+
+    <div class="options-container">
+        <div class="option">
+            <div class="option-header">
+                <div class="option-title">Option A: Floating Button</div>
+                <div class="option-subtitle">FAB + Modal Overlay</div>
+            </div>
+            <div class="iframe-container">
+                <iframe src="debug-option-a.html"></iframe>
+            </div>
+        </div>
+
+        <div class="option">
+            <div class="option-header">
+                <div class="option-title">Option B: Bottom Bar</div>
+                <div class="option-subtitle">DevTools Style</div>
+            </div>
+            <div class="iframe-container">
+                <iframe src="debug-option-b.html"></iframe>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
