@@ -63,27 +63,16 @@ See [Design Document](Design/2026-05-23-construction-time-tracking-design.md) fo
 
 ---
 
-## Project Status
+## Development Phases
 
-**Current Phase:** Phase 2 - Voice Recording & Transcription (In Progress)
+The project is organized into three phases. Each phase has detailed documentation with technical decisions and implementation plans:
 
-Development is organized into phases. See detailed status and task breakdowns:
-
-- **[Phase 1](docs/phase1-decisions.md)** - MVP Architecture & Testing ✅ COMPLETE
-- **[Phase 2](docs/phase2-implementation-plan.md)** - Voice Recording & AI Integration 🔄 IN PROGRESS (7/9 tasks)
+- **[Phase 1](docs/phase1-decisions.md)** - MVP Architecture & Testing
+- **[Phase 2](docs/phase2-implementation-plan.md)** - Voice Recording & AI Integration
   - [Technical Decisions](docs/phase2-decisions.md)
-- **[Phase 3](docs/phase3-plan.md)** - Worker History & Manager Dashboard 📋 PLANNED
+- **[Phase 3](docs/phase3-plan.md)** - Worker History & Manager Dashboard
 
-**Latest accomplishments:**
-- ✅ Real voice recording (MediaRecorder API)
-- ✅ Whisper transcription integrated
-- ✅ GPT extraction with validation
-- ✅ Review-before-submit workflow
-- ✅ Multilingual support (English, French, Spanish - auto-detected)
-- ✅ Error handling and user feedback
-- ✅ Deployed to production (Vercel + Railway)
-
-**Production URLs:**
+**Production deployment:**
 - Worker App: https://time-reporting-dun.vercel.app
 - Backend API: https://time-reporting-production.up.railway.app
 
