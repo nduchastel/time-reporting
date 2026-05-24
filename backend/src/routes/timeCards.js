@@ -238,17 +238,21 @@ router.post('/time-cards/voice', upload.single('audio'), async (req, res, next) 
       }
     }
 
-    // Step 4.5: Auto-capture time for IN/OUT actions
-    // For check-in/check-out, use current server time (in HH:MM format) if not mentioned
+    // Step 4.5: Auto-capture time for IN/OUT actions ONLY if reporting TODAY
+    // If worker says "yesterday" or mentions a past date, GPT should extract the time (or null if not mentioned)
+    // If worker is reporting RIGHT NOW (date is today), auto-fill with server timestamp
     let startTime = extracted.start_time;
     let endTime = extracted.end_time;
 
-    if (actionType === 'IN' && !startTime) {
+    const today = new Date().toISOString().split('T')[0];
+    const isReportingToday = extracted.date === today;
+
+    if (actionType === 'IN' && !startTime && isReportingToday) {
       const now = new Date();
       startTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     }
 
-    if (actionType === 'OUT' && !endTime) {
+    if (actionType === 'OUT' && !endTime && isReportingToday) {
       const now = new Date();
       endTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     }

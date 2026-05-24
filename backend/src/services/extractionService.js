@@ -19,6 +19,11 @@ const SYSTEM_PROMPT = `Extract time entry data from transcription. Return JSON:
   "notes": "any special circumstances or null"
 }
 
+Date handling:
+- If worker says "yesterday", calculate yesterday's date from provided "today's date"
+- If worker says "today" or no date mentioned, use provided date
+- Always extract times if mentioned (e.g., "from 9AM to 4PM" -> start_time="09:00", end_time="16:00")
+
 Confidence rules:
 - high: Clear, complete information
 - medium: Ambiguous or conflicting info, or multiple workers mentioned
