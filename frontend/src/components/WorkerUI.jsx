@@ -1,6 +1,7 @@
 // src/components/WorkerUI.jsx
 import { useState } from 'react';
 import RecordButton from './RecordButton';
+import './WorkerUI.css';
 
 const ACTION_TYPES = [
   { type: 'IN', label: 'Check IN', emoji: '📍', color: 'bg-teal-500' },
@@ -16,6 +17,7 @@ export default function WorkerUI() {
   const [isRecording, setIsRecording] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+  const [slideDirection, setSlideDirection] = useState('');
 
   const currentAction = ACTION_TYPES[currentScreen];
 
@@ -39,10 +41,14 @@ export default function WorkerUI() {
     const isRightSwipe = distance < -minSwipeDistance;
 
     if (isLeftSwipe && currentScreen < ACTION_TYPES.length - 1) {
+      setSlideDirection('slide-in-right');
       setCurrentScreen(currentScreen + 1);
+      setTimeout(() => setSlideDirection(''), 300);
     }
     if (isRightSwipe && currentScreen > 0) {
+      setSlideDirection('slide-in-left');
       setCurrentScreen(currentScreen - 1);
+      setTimeout(() => setSlideDirection(''), 300);
     }
   };
 
@@ -70,7 +76,7 @@ export default function WorkerUI() {
       </div>
 
       {/* Action screen */}
-      <div className={`${currentAction.color} py-8 px-4 text-center text-white`}>
+      <div className={`${currentAction.color} py-8 px-4 text-center text-white ${slideDirection}`}>
         <div className="text-6xl mb-4">{currentAction.emoji}</div>
         <h1 className="text-3xl font-bold">{currentAction.label}</h1>
       </div>
