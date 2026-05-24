@@ -15,11 +15,20 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
   const [isProcessing, setIsProcessing] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [error, setError] = useState(null);
+  const [debugLogs, setDebugLogs] = useState([]);
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const timerRef = useRef(null);
   const streamRef = useRef(null);
+
+  // Debug logging helper
+  const addDebugLog = (message, data = null) => {
+    const timestamp = new Date().toLocaleTimeString();
+    const logEntry = `[${timestamp}] ${message}${data ? ': ' + JSON.stringify(data) : ''}`;
+    console.log(logEntry, data);
+    setDebugLogs(prev => [...prev.slice(-10), logEntry]); // Keep last 10 logs
+  };
 
   // Recording timer
   useEffect(() => {
@@ -53,33 +62,50 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
   const handleStart = async () => {
     try {
       setError(null);
+      addDebugLog('🎤 Requesting microphone access');
 
       // Request microphone access
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
+      addDebugLog('✅ Microphone granted');
 
       // Create MediaRecorder with browser's default format
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
+      addDebugLog('📼 MediaRecorder created', {
+        mimeType: mediaRecorder.mimeType,
+        state: mediaRecorder.state
+      });
+
       // Collect audio data
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
+          addDebugLog(`📊 Audio chunk: ${event.data.size} bytes`);
         }
       };
 
       // Handle recording completion
       mediaRecorder.onstop = async () => {
+        addDebugLog('⏹️ Recording stopped');
+
         // Stop all tracks
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(track => track.stop());
+          addDebugLog('🔇 Audio tracks stopped');
         }
 
         // Create audio blob
         const audioBlob = new Blob(audioChunksRef.current, {
           type: mediaRecorder.mimeType || 'audio/webm'
+        });
+
+        addDebugLog('📦 Audio blob created', {
+          size: audioBlob.size,
+          type: audioBlob.type,
+          chunks: audioChunksRef.current.length
         });
 
         // Process the audio
@@ -89,9 +115,13 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
       // Start recording
       mediaRecorder.start();
       setIsRecording(true);
+      addDebugLog('🔴 Recording started');
 
     } catch (err) {
-      console.error('Recording error:', err);
+      addDebugLog('❌ Recording error', {
+        name: err.name,
+        message: err.message
+      });
 
       if (err.name === 'NotAllowedError') {
         setError('Microphone access denied. Enable in browser settings.');
@@ -104,9 +134,13 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
   };
 
   const handleStop = () => {
+    addDebugLog('🛑 Stop requested');
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      addDebugLog(`📝 MediaRecorder state: ${mediaRecorderRef.current.state}`);
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+    } else {
+      addDebugLog('⚠️ Cannot stop - MediaRecorder inactive or null');
     }
   };
 
@@ -115,11 +149,18 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
     setError(null);
 
     try {
-      console.log('Sending audio to backend:', {
+      addDebugLog('🚀 Starting upload', {
         size: audioBlob.size,
         type: audioBlob.type,
         duration: recordingTime
       });
+
+      // Check for zero-size blob
+      if (audioBlob.size === 0) {
+        addDebugLog('❌ Empty audio blob!');
+        setError('Recording was empty. Please try again.');
+        return;
+      }
 
       // Create FormData for multipart upload
       const formData = new FormData();
@@ -127,17 +168,28 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
       formData.append('workerId', TEMP_WORKER_ID);
       formData.append('actionType', actionType);
 
+      addDebugLog('📤 Sending to backend', {
+        url: `${API_URL}/api/time-cards/voice`,
+        workerId: TEMP_WORKER_ID,
+        actionType
+      });
+
       // Send to backend
       const response = await fetch(`${API_URL}/api/time-cards/voice`, {
         method: 'POST',
         body: formData,
       });
 
+      addDebugLog('📥 Response received', {
+        status: response.status,
+        ok: response.ok
+      });
+
       const data = await response.json();
 
       if (!response.ok) {
         // Handle error response
-        console.error('Backend error:', data);
+        addDebugLog('❌ Backend error', data);
 
         const errorMessages = {
           'TRANSCRIPTION_FAILED': 'Could not transcribe audio. Please speak clearly and try again.',
@@ -151,13 +203,19 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
       }
 
       // Success! Show transcription and extracted data
-      console.log('Backend response:', data);
+      addDebugLog('✅ Success!', {
+        transcription: data.transcription?.substring(0, 50),
+        confidence: data.extractedData?.confidence
+      });
 
       onTranscription(data.transcription);
       onExtractedData(data.extractedData);
 
     } catch (err) {
-      console.error('Network error:', err);
+      addDebugLog('❌ Processing error', {
+        name: err.name,
+        message: err.message
+      });
 
       if (err.name === 'TypeError' && err.message.includes('fetch')) {
         setError('Network error. Check your connection and try again.');
@@ -166,6 +224,7 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
       }
     } finally {
       setIsProcessing(false);
+      addDebugLog('🏁 Processing complete');
     }
   };
 
@@ -182,6 +241,24 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
 
   return (
     <div className="text-center my-6">
+      {/* Debug Panel */}
+      {debugLogs.length > 0 && (
+        <div className="mb-4 p-3 bg-gray-900 text-green-400 rounded-lg text-left font-mono text-xs max-h-64 overflow-y-auto">
+          <div className="flex justify-between items-center mb-2">
+            <span className="font-bold text-white">🐛 Debug Log</span>
+            <button
+              onClick={() => setDebugLogs([])}
+              className="text-gray-400 hover:text-white text-xs"
+            >
+              Clear
+            </button>
+          </div>
+          {debugLogs.map((log, i) => (
+            <div key={i} className="mb-1 break-all">{log}</div>
+          ))}
+        </div>
+      )}
+
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-red-700 text-sm">{error}</p>
