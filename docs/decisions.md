@@ -33,3 +33,23 @@
 - **Choice:** Using Node.js native `--watch` flag for development
 - **Rationale:** Built-in hot reload without external dependencies (nodemon)
 - **Alternative considered:** nodemon (extra dependency, but more mature)
+
+## Task 2: Database Schema
+
+**Date:** 2026-05-23
+
+### Decision 1: Manual Supabase migrations
+- **Choice:** Manual SQL execution in Supabase dashboard
+- **Rationale:** Simple for MVP, no migration tool overhead, Supabase UI makes this easy
+- **Alternative considered:** Automated migrations with a tool like node-pg-migrate
+- **Future:** Consider migration tool if team grows or deployments become frequent
+
+### Decision 2: JSONB for flexible fields
+- **Choice:** JSONB for disabled_range, custom_rules, extracted_data
+- **Rationale:** Schema flexibility without migrations, good PostgreSQL support, queryable
+- **Alternative considered:** Separate tables (over-engineering for MVP)
+
+### Decision 3: UUID primary keys
+- **Choice:** UUID over auto-increment integers
+- **Rationale:** No collision risk, better for distributed systems, harder to enumerate
+- **Alternative considered:** BIGSERIAL (simpler but exposes record count)
