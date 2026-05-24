@@ -164,3 +164,31 @@
 - **Choice:** Mock must support `.insert(data).select().single()` chain
 - **Rationale:** Matches Supabase's fluent API, returns inserted record
 - **Implementation:** Insert saves data, subsequent select/single returns it with generated ID
+
+## Task 7: Frontend Project Setup
+
+**Date:** 2026-05-23
+
+### Decision 1: Vite over Create React App
+- **Choice:** Vite for build tooling
+- **Rationale:** Much faster dev server, faster builds, modern ESM-based, better DX
+- **Alternative considered:** Create React App (slower, deprecated), Next.js (overkill for PWA)
+
+### Decision 2: Tailwind CSS for styling
+- **Choice:** Tailwind utility-first CSS
+- **Rationale:** Fast prototyping, consistent design, small bundle size, mobile-first
+- **Alternative considered:** CSS-in-JS (runtime cost), Bootstrap (less flexible)
+
+### Decision 3: Vitest over Jest for frontend
+- **Choice:** Vitest for testing
+- **Rationale:** Native Vite integration, faster, better ESM support, same API as Jest
+- **Alternative considered:** Jest (requires complex config for Vite)
+
+### Decision 4: Custom action type colors
+- **Choice:** Defined 4 action colors in Tailwind config
+- **Rationale:** Consistent with design mockups, easy to reference, semantic naming
+- **Colors:**
+  - IN: Teal (#00897b)
+  - OUT: Green (#28a745)
+  - HOURS: Blue (#0288d1)
+  - OFF: Orange (#f57c00)
