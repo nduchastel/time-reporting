@@ -3,6 +3,10 @@ import express from 'express';
 import { supabase } from '../db/supabase.js';
 import { verifySecret, issueToken } from '../services/authService.js';
 
+// Equal-timing dummy: forces a bcrypt compare on the not-found branch
+// so attackers can't enumerate valid phones/usernames via response timing.
+const TIMING_EQUALIZER_HASH = '$2a$10$CwTycUXWue0Thq9StjUM0uJ8.ABeTQDUz5JeJZTmUkn0Vt9P9Q3eW';
+
 const router = express.Router();
 
 router.post('/worker/login', async (req, res, next) => {
@@ -17,7 +21,8 @@ router.post('/worker/login', async (req, res, next) => {
       .eq('phone', phone)
       .single();
 
-    if (!worker || worker.status !== 'active') {
+    if (!worker || worker.status !== 'active' || !worker.pin) {
+      await verifySecret(String(pin), TIMING_EQUALIZER_HASH);
       return res.status(401).json({ error: 'INVALID_CREDENTIALS', message: 'Invalid phone or PIN' });
     }
     if (!(await verifySecret(String(pin), worker.pin))) {
@@ -43,7 +48,8 @@ router.post('/manager/login', async (req, res, next) => {
       .eq('username', username)
       .single();
 
-    if (!user || user.status !== 'active' || !['manager', 'admin'].includes(user.role)) {
+    if (!user || user.status !== 'active' || !['manager', 'admin'].includes(user.role) || !user.password_hash) {
+      await verifySecret(password, TIMING_EQUALIZER_HASH);
       return res.status(401).json({ error: 'INVALID_CREDENTIALS', message: 'Invalid username or password' });
     }
     if (!(await verifySecret(password, user.password_hash))) {

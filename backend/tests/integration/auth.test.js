@@ -57,3 +57,57 @@ describe('POST /api/auth/manager/login', () => {
     expect(r.body.user.role).toBe('manager');
   });
 });
+
+import express from 'express';
+import { requireAuth } from '../../src/middleware/requireAuth.js';
+
+describe('requireAuth middleware', () => {
+  function makeApp(roles) {
+    const a = express();
+    a.use(express.json());
+    a.get('/protected', requireAuth(roles), (req, res) => res.json({ ok: true, user: req.user }));
+    return a;
+  }
+
+  it('401 when no Authorization header', async () => {
+    const r = await request(makeApp(['manager'])).get('/protected');
+    expect(r.status).toBe(401);
+    expect(r.body.error).toBe('UNAUTHORIZED');
+  });
+
+  it('401 on malformed Authorization header', async () => {
+    const r = await request(makeApp(['manager'])).get('/protected').set('Authorization', 'Token xyz');
+    expect(r.status).toBe(401);
+  });
+
+  it('401 on expired token', async () => {
+    const jwt = (await import('jsonwebtoken')).default;
+    const token = jwt.sign({ sub: 'm1', role: 'manager' }, process.env.JWT_SECRET, { expiresIn: '-1s' });
+    const r = await request(makeApp(['manager'])).get('/protected').set('Authorization', `Bearer ${token}`);
+    expect(r.status).toBe(401);
+    expect(r.body.error).toBe('INVALID_TOKEN');
+  });
+
+  it('403 on wrong role', async () => {
+    const { issueToken } = await import('../../src/services/authService.js');
+    const token = issueToken({ sub: 'w1', role: 'worker' });
+    const r = await request(makeApp(['manager'])).get('/protected').set('Authorization', `Bearer ${token}`);
+    expect(r.status).toBe(403);
+    expect(r.body.error).toBe('FORBIDDEN');
+  });
+
+  it('200 with user attached on valid token in allowedRoles', async () => {
+    const { issueToken } = await import('../../src/services/authService.js');
+    const token = issueToken({ sub: 'm1', role: 'manager' });
+    const r = await request(makeApp(['manager'])).get('/protected').set('Authorization', `Bearer ${token}`);
+    expect(r.status).toBe(200);
+    expect(r.body.user).toMatchObject({ sub: 'm1', role: 'manager' });
+  });
+
+  it('case-insensitive Bearer prefix', async () => {
+    const { issueToken } = await import('../../src/services/authService.js');
+    const token = issueToken({ sub: 'm1', role: 'manager' });
+    const r = await request(makeApp(['manager'])).get('/protected').set('Authorization', `bearer ${token}`);
+    expect(r.status).toBe(200);
+  });
+});
