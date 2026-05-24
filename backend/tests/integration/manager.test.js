@@ -21,10 +21,40 @@ describe('manager routes', () => {
     expect(r.status).toBe(403);
   });
 
-  it('approves a time card', async () => {
+  it('approves a time card and propagates status + approver', async () => {
     const r = await request(app)
       .post('/api/manager/time-cards/tc1/approve')
       .set('Authorization', `Bearer ${managerToken}`);
     expect(r.status).toBe(200);
+    expect(r.body.status).toBe('approved');
+    expect(r.body.approved_by).toBe('m1');
+    expect(r.body.approved_at).toBeTruthy();
+  });
+
+  it('PATCH only honors fields in the EDITABLE allowlist', async () => {
+    const r = await request(app)
+      .patch('/api/manager/time-cards/tc2')
+      .set('Authorization', `Bearer ${managerToken}`)
+      .send({
+        hours: 7.5,                        // allowed
+        worker_id: 'attacker-uuid',        // disallowed - must be stripped
+        status: 'approved',                // disallowed - must be stripped (route forces 'edited')
+        transcription: 'tampered',         // disallowed
+      });
+    expect(r.status).toBe(200);
+    expect(r.body.status).toBe('edited');                  // route status wins
+    expect(r.body.hours).toBe(7.5);                        // allowed field persisted
+    expect(r.body.worker_id).not.toBe('attacker-uuid');    // disallowed field stripped
+    expect(r.body.transcription).not.toBe('tampered');     // disallowed field stripped
+  });
+
+  it('flags a card with notes', async () => {
+    const r = await request(app)
+      .post('/api/manager/time-cards/tc3/flag')
+      .set('Authorization', `Bearer ${managerToken}`)
+      .send({ notes: 'duplicate entry' });
+    expect(r.status).toBe(200);
+    expect(r.body.status).toBe('flagged');
+    expect(r.body.notes).toBe('duplicate entry');
   });
 });
