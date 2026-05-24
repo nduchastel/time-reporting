@@ -53,3 +53,22 @@
 - **Choice:** UUID over auto-increment integers
 - **Rationale:** No collision risk, better for distributed systems, harder to enumerate
 - **Alternative considered:** BIGSERIAL (simpler but exposes record count)
+
+## Task 3: Mock Transcription Fixtures
+
+**Date:** 2026-05-23
+
+### Decision 1: Comprehensive test fixture strategy
+- **Choice:** 17 test cases across 3 categories (good/bad/edge)
+- **Rationale:** Test extraction logic without OpenAI costs, predictable test behavior, fast execution
+- **Coverage:** High confidence (6), low/medium confidence (6), edge cases (5)
+
+### Decision 2: Fixtures include expected output
+- **Choice:** Each fixture has both input text and expected extraction
+- **Rationale:** Makes test assertions clear, documents expected behavior, enables mock implementation
+- **Alternative considered:** Only provide input text (harder to validate)
+
+### Decision 3: Mock strategy cuts off voice-to-text
+- **Choice:** Provide pre-transcribed text, skip Whisper API entirely in tests
+- **Rationale:** Focus on extraction logic, avoid API costs in tests, deterministic results
+- **Alternative considered:** Record actual audio files (expensive, slow, non-deterministic)
