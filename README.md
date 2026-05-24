@@ -1,95 +1,93 @@
 # Time Reporting System
 
-A voice-based time tracking application for construction workers with AI-powered transcription and manager dashboard.
+A voice-based time tracking application for construction workers with AI-powered transcription and manager review dashboard.
 
 ## Overview
 
-This system allows construction workers to record time entries via voice on their mobile phones, with automatic transcription and data extraction. Managers review entries through a web dashboard with anomaly detection and flexible rule configuration.
+Workers record time entries by speaking naturally into their mobile phone ("I worked 8 hours at Simons Property today"). The system uses OpenAI Whisper for transcription and GPT-4o-mini for structured data extraction. Managers review and approve entries through a web dashboard.
 
-## Key Features
+**Key Benefits:**
+- No forms, no typing - just speak
+- Works in any language (auto-detection)
+- Progressive Web App (no app store required)
+- Manager oversight with approval workflow
+- Low cost (~$5-10/month total)
 
-- **Voice-Based Entry:** Workers speak naturally ("I worked 8 hours at Simons Property") instead of filling forms
-- **Multi-Language Support:** English, French, Spanish (planned)
-- **Progressive Web App:** Works on iOS and Android without app store requirements
-- **AI Transcription:** OpenAI Whisper with context-aware accuracy (planned)
-- **Data Extraction:** GPT-4o-mini extracts structured time card data
-- **Comprehensive Test Coverage:** 18/18 tests passing (15 backend, 3 frontend)
-- **Mock Transcription Testing:** 17 test scenarios covering good/bad/edge cases
+---
 
-## Project Structure
+## Architecture
+
+### System Components
 
 ```
-time-reporting/
-├── backend/
-│   ├── src/
-│   │   ├── db/
-│   │   │   ├── supabase.js              # Database client
-│   │   │   ├── migrations/              # SQL migrations
-│   │   │   └── seed.js                  # Test data
-│   │   ├── routes/
-│   │   │   └── timeCards.js             # REST API endpoints
-│   │   ├── services/
-│   │   │   ├── extractionService.js     # GPT-4o-mini extraction
-│   │   │   └── timeCardService.js       # CRUD operations
-│   │   └── server.js                    # Express server
-│   ├── tests/
-│   │   ├── fixtures/
-│   │   │   ├── transcriptions.js        # 17 mock transcriptions
-│   │   │   └── testCases.js             # Test helpers
-│   │   ├── unit/                        # 12 unit tests
-│   │   └── integration/                 # 3 integration tests
-│   └── package.json
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── WorkerUI.jsx             # Main interface (4 screens)
-│   │   │   └── RecordButton.jsx         # Recording controls
-│   │   ├── test/                        # Test setup
-│   │   └── App.jsx
-│   └── package.json
-├── docs/
-│   ├── implementation-plan.md           # Detailed task breakdown
-│   └── decisions.md                     # 30+ technical decisions
-└── Design/
-    ├── 2026-05-23-construction-time-tracking-design.md
-    └── layouts/                         # 8 HTML mockups
+┌─────────────────┐
+│  Worker Mobile  │  Progressive Web App (React + Vite)
+│   (iOS/Android) │  Voice recording → Display results
+└────────┬────────┘
+         │ HTTPS
+         ▼
+┌─────────────────┐
+│  Backend API    │  Node.js + Express
+│   (Railway)     │  Audio upload → Transcribe → Extract → Store
+└────────┬────────┘
+         │
+    ┌────┴────┬──────────┬────────────┐
+    ▼         ▼          ▼            ▼
+┌─────────┐ ┌──────┐ ┌───────┐ ┌──────────┐
+│Supabase │ │Whisper│ │ GPT-4o│ │ Supabase │
+│ Storage │ │  API  │ │  mini │ │   DB     │
+│ (audio) │ │(voice→│ │(text→ │ │(Postgres)│
+│         │ │ text) │ │ data) │ │          │
+└─────────┘ └──────┘ └───────┘ └──────────┘
 ```
 
-## Technology Stack
+### Technology Stack
 
-**Implemented:**
-- **Frontend:** React 19.2.6, Vite 8.0.14, Tailwind CSS 4.3.0
-- **Backend:** Node.js 22.x, Express 5.1.0
-- **Database:** Supabase PostgreSQL (schema ready, not deployed)
-- **AI:** OpenAI GPT-4o-mini for extraction (mocked in tests)
-- **Testing:** Vitest 4.1.7, Supertest, @testing-library/react
+**Frontend:** React 19, Vite 8, Tailwind CSS 4  
+**Backend:** Node.js 22, Express 5  
+**Database:** Supabase (PostgreSQL)  
+**AI:** OpenAI Whisper (transcription), GPT-4o-mini (extraction)  
+**Hosting:** Vercel (frontend), Railway (backend)
 
-**Planned:**
-- **Audio Transcription:** OpenAI Whisper API
-- **Hosting:** Vercel (frontend), Railway (backend), Supabase (database)
-- **Estimated Cost:** $5/month + usage (~$0.15-0.31/month for AI)
+### Data Flow
 
-## Current Status
+1. **Worker records voice** (MediaRecorder API, 60s max)
+2. **Upload to backend** (multipart/form-data, audio file + worker ID)
+3. **Transcribe audio** (Whisper API → text)
+4. **Extract structured data** (GPT-4o-mini → JSON: worksite, hours, date, confidence)
+5. **Validate & review** (Worker reviews transcription and extracted data)
+6. **Submit** (Worker confirms → Save to database)
+7. **Manager review** (Future: Approve/Edit/Flag entries)
 
-**Phase 1 MVP: COMPLETE ✅**
+See [Design Document](Design/2026-05-23-construction-time-tracking-design.md) for full architecture details.
 
-- ✅ Backend API with Express server
-- ✅ Database schema and migrations
-- ✅ GPT-4o-mini extraction service
-- ✅ Time card CRUD operations
-- ✅ REST API endpoints (POST/GET /api/time-cards)
-- ✅ Worker mobile UI (4 action screens)
-- ✅ Recording interface with mock simulation
-- ✅ **18/18 tests passing**
-- ✅ **30+ technical decisions documented**
+---
 
-**Next Phase: Deployment & Integration**
-- [ ] Deploy backend to Railway
-- [ ] Deploy frontend to Vercel
-- [ ] Set up Supabase database
-- [ ] Integrate real audio recording (MediaRecorder API)
-- [ ] Connect frontend to backend API
-- [ ] Add Whisper API transcription
+## Project Status
+
+**Current Phase:** Phase 2 - Voice Recording & Transcription (In Progress)
+
+Development is organized into phases. See detailed status and task breakdowns:
+
+- **[Phase 1](docs/phase1-decisions.md)** - MVP Architecture & Testing ✅ COMPLETE
+- **[Phase 2](docs/phase2-implementation-plan.md)** - Voice Recording & AI Integration 🔄 IN PROGRESS (7/9 tasks)
+  - [Technical Decisions](docs/phase2-decisions.md)
+- **[Phase 3](docs/phase3-plan.md)** - Worker History & Manager Dashboard 📋 PLANNED
+
+**Latest accomplishments:**
+- ✅ Real voice recording (MediaRecorder API)
+- ✅ Whisper transcription integrated
+- ✅ GPT extraction with validation
+- ✅ Review-before-submit workflow
+- ✅ Multilingual support (English, French, Spanish - auto-detected)
+- ✅ Error handling and user feedback
+- ✅ Deployed to production (Vercel + Railway)
+
+**Production URLs:**
+- Worker App: https://time-reporting-dun.vercel.app
+- Backend API: https://time-reporting-production.up.railway.app
+
+---
 
 ## Getting Started
 
@@ -97,175 +95,270 @@ time-reporting/
 
 - Node.js 22.x or higher
 - npm 10.x or higher
-- Supabase account (for deployment)
-- OpenAI API key (for deployment)
+- Supabase account (database)
+- OpenAI API key (AI services)
 
 ### Local Development
 
-**Backend:**
+**1. Clone and install:**
 
 ```bash
-cd backend
-npm install
+git clone https://github.com/nduchastel/time-reporting.git
+cd time-reporting
 
-# Create .env file
-cat > .env << EOF
+# Install backend dependencies
+cd backend && npm install
+
+# Install frontend dependencies
+cd ../frontend && npm install
+```
+
+**2. Configure environment:**
+
+Backend `.env`:
+```bash
 PORT=3001
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
 OPENAI_API_KEY=sk-your-key
 NODE_ENV=development
-EOF
-
-# Run tests
-npm test                  # All tests
-npm run test:unit         # Unit tests only
-npm run test:integration  # Integration tests only
-
-# Start dev server
-npm run dev               # Runs on port 3001
 ```
 
-**Frontend:**
-
+Frontend `.env`:
 ```bash
-cd frontend
-npm install
-
-# Run tests
-npm test
-
-# Start dev server
-npm run dev               # Runs on port 5173
+VITE_API_URL=http://localhost:3001
 ```
 
-### Database Setup
+**3. Set up database:**
 
-1. Create Supabase project at https://supabase.com
-2. Go to SQL Editor
-3. Run migration: `backend/src/db/migrations/001_initial_schema.sql`
-4. Seed test data: `node backend/src/db/seed.js`
-
-See `backend/src/db/README.md` for details.
-
-## Testing
-
-**Backend Tests (15 tests):**
-- Mock transcription fixtures (17 scenarios)
-- Extraction service tests (4 tests)
-- Time card service tests (2 tests)
-- Integration tests (3 tests)
-- Complete OpenAI and Supabase mocking
-
-**Frontend Tests (3 tests):**
-- WorkerUI component rendering
-- 4 action type screens
-- Recording button functionality
-
-**Run all tests:**
 ```bash
-# Backend
+# In Supabase SQL Editor, run:
+# 1. backend/src/db/migrations/001_initial_schema.sql
+# 2. node backend/src/db/seed.js (creates test data)
+```
+
+See [Database README](backend/src/db/README.md) for schema details.
+
+**4. Run locally:**
+
+```bash
+# Terminal 1 - Backend
+cd backend && npm run dev  # http://localhost:3001
+
+# Terminal 2 - Frontend
+cd frontend && npm run dev  # http://localhost:5173
+```
+
+### Testing
+
+```bash
+# Backend tests (15 tests)
 cd backend && npm test
 
-# Frontend  
+# Frontend tests (3 tests)
 cd frontend && npm test
-
-# Both
-cd backend && npm test && cd ../frontend && npm test
 ```
+
+See test coverage and mock strategy in [Phase 1 Decisions](docs/phase1-decisions.md#decision-12-mock-transcription-strategy).
+
+---
 
 ## API Documentation
 
+### POST /api/time-cards/voice
+
+Upload audio, transcribe, extract data (does NOT save - returns for review).
+
+**Request:** `multipart/form-data`
+- `audio` - Audio file (webm/mp4/wav, max 10MB)
+- `workerId` - UUID
+- `actionType` - IN/OUT/HOURS/OFF
+
+**Response (200):**
+```json
+{
+  "transcription": "I worked 8 hours at Simons Property",
+  "extractedData": {
+    "action_type": "HOURS",
+    "hours": 8,
+    "worksite": "Simons Property",
+    "date": "2026-05-24",
+    "confidence": "high"
+  },
+  "processedData": { /* ... data for submission ... */ }
+}
+```
+
 ### POST /api/time-cards
 
-Create a time card from voice transcription.
+Save time card (after worker reviews and submits).
 
 **Request:**
 ```json
 {
   "workerId": "uuid",
-  "transcription": "I worked 8 hours at Simons Property",
-  "audioUrl": "https://storage/audio.webm"
+  "worksiteId": "uuid",
+  "actionType": "HOURS",
+  "date": "2026-05-24",
+  "hours": 8,
+  "transcription": "...",
+  "extractedData": { /* ... */ }
 }
 ```
 
-**Response (201):**
-```json
-{
-  "id": "uuid",
-  "worker_id": "uuid",
-  "worksite_id": "uuid",
-  "action_type": "HOURS",
-  "date": "2026-05-23",
-  "hours": 8,
-  "transcription": "I worked 8 hours at Simons Property",
-  "extracted_data": {
-    "action_type": "HOURS",
-    "hours": 8,
-    "worksite": "Simons Property",
-    "confidence": "high"
-  },
-  "confidence": "high",
-  "status": "pending",
-  "created_at": "2026-05-23T10:00:00Z"
-}
-```
+**Response (201):** Created time card object.
 
 ### GET /api/time-cards
 
 Retrieve time cards with filters.
 
-**Query Parameters:**
-- `workerId` - Filter by worker UUID
-- `status` - Filter by status (pending/approved/edited/flagged)
-- `startDate` - Filter by date range (YYYY-MM-DD)
-- `endDate` - Filter by date range (YYYY-MM-DD)
+**Query params:** `workerId`, `status`, `startDate`, `endDate`
 
-**Response (200):**
-```json
-[
-  {
-    "id": "uuid",
-    "worker_id": "uuid",
-    "action_type": "HOURS",
-    "hours": 8,
-    "confidence": "high",
-    "workers": { "name": "Bob Martinez" },
-    "worksites": { "name": "Simons Property" }
-  }
-]
+**Response (200):** Array of time cards with joined worker/worksite data.
+
+---
+
+## Key Design Decisions
+
+All architectural decisions are documented in phase-specific files:
+
+**Phase 1 ([details](docs/phase1-decisions.md)):**
+- ES Modules over CommonJS
+- Vitest over Jest
+- Express over Fastify
+- Supabase PostgreSQL
+- Mock transcription strategy for testing
+
+**Phase 2 ([details](docs/phase2-decisions.md)):**
+- Browser default audio format (no conversion)
+- 60-second recording limit
+- Low-confidence rejection
+- Auto-capture time for IN/OUT actions
+- Review-before-submit workflow
+
+**Phase 3 ([details](docs/phase3-plan.md)):**
+- Supabase Storage for audio files
+- Last 5 entries for worker history
+- Username/password authentication for managers
+- Manager dashboard in same React app
+
+---
+
+## Database Schema
+
+**Core tables:**
+- `workers` - Employee records (name, phone, language, PIN)
+- `worksites` - Job site locations
+- `time_cards` - Time entries with approval workflow
+
+**Key fields in time_cards:**
+- `transcription` - Original voice-to-text
+- `extracted_data` - GPT output (JSON)
+- `confidence` - high/medium/low
+- `status` - pending/approved/edited/flagged
+- `created_at` - When worker submitted
+- `date`, `start_time`, `end_time` - When work happened
+
+See [schema SQL](backend/src/db/migrations/001_initial_schema.sql) for full details.
+
+---
+
+## Project Structure
+
+```
+time-reporting/
+├── backend/               # Node.js + Express API
+│   ├── src/
+│   │   ├── db/           # Database migrations, seed data
+│   │   ├── routes/       # REST API endpoints
+│   │   ├── services/     # Business logic (extraction, transcription)
+│   │   └── server.js     # Express app entry point
+│   └── tests/            # Vitest unit and integration tests
+├── frontend/             # React PWA
+│   ├── src/
+│   │   ├── components/   # UI components (WorkerUI, RecordButton)
+│   │   └── App.jsx       # Main app entry point
+│   └── tests/            # React Testing Library tests
+├── docs/                 # Phase plans and technical decisions
+├── Design/               # Original design specs and mockups
+└── README.md             # This file
 ```
 
-## Design Documentation
+---
 
-Complete design specification: `Design/2026-05-23-construction-time-tracking-design.md`
+## Deployment
 
-Includes:
-- System architecture and data models
-- AI processing pipeline (Whisper + GPT)
-- User workflows and edge cases
-- Cost estimates (~$5.15-5.31/month total)
-- 6-week implementation roadmap
+**Automated deployment on push to `main`:**
 
-## Technical Decisions
+- **Frontend:** Vercel (auto-deploy from GitHub)
+- **Backend:** Railway (auto-deploy from GitHub)
+- **Database:** Supabase (manually provisioned)
 
-All architectural decisions documented in `docs/decisions.md`:
-- ES Modules vs CommonJS
-- Vitest vs Jest
-- Express vs Fastify
-- GPT-4o-mini for extraction
-- Supabase query builder
-- Mock transcription strategy
-- And 24 more decisions...
+**Environment variables:**
+
+Set in Railway (backend):
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `OPENAI_API_KEY`
+- `PORT` (auto-set by Railway)
+
+Set in Vercel (frontend):
+- `VITE_API_URL` (Railway backend URL)
+
+**No package-lock.json committed** - Each platform generates its own to avoid npm proxy conflicts.
+
+---
+
+## Cost Estimate
+
+**Monthly costs (production):**
+- Vercel: Free (Hobby plan)
+- Railway: $5/month (Hobby plan)
+- Supabase: Free (includes 500MB DB + 1GB storage)
+- OpenAI API: ~$0.15-0.50/month (depends on usage)
+  - Whisper: $0.006/minute
+  - GPT-4o-mini: $0.15/$0.60 per 1M tokens (input/output)
+
+**Total: ~$5-10/month** for small team usage.
+
+See [Design Doc](Design/2026-05-23-construction-time-tracking-design.md#cost-analysis) for detailed breakdown.
+
+---
+
+## Future Roadmap
+
+**Phase 3 (Planned):**
+- Worker history view (last 5 entries)
+- Worker onboarding with PIN authentication
+- Manager dashboard (review, approve, edit, flag)
+- Reports and analytics
+- Audio file storage and playback
+
+**Phase 4 (Ideas):**
+- Geolocation verification
+- Payroll system integration
+- Push notifications for managers
+- Team/crew management
+- Offline support with sync
+
+See [Phase 3 Plan](docs/phase3-plan.md) for full details.
+
+---
+
+## Contributing
+
+This is currently a personal project. If you'd like to contribute, please open an issue first to discuss proposed changes.
+
+---
 
 ## License
 
 TBD
 
-## Contributors
+---
 
-- Nicolas Duchastel de Montrouge (@nduchastel)
+## Contact
 
-## Support
+Nicolas Duchastel de Montrouge ([@nduchastel](https://github.com/nduchastel))
 
 For questions or issues, please open a GitHub issue.
