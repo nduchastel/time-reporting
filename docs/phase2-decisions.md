@@ -284,17 +284,168 @@ Phase 2 doesn't have worker authentication (PIN system is Phase 3):
 
 ---
 
+## Decision 7: File Upload Library Choice
+
+**Date:** 2026-05-24  
+**Status:** ✅ DECIDED
+
+**Context:**  
+Need to handle multipart/form-data file uploads in Express:
+- Audio files from frontend (webm, mp4, wav)
+- Need temporary storage during processing
+- Need file validation (size, type)
+
+**Options Considered:**
+1. **Multer** - Most popular, well-maintained
+2. **Busboy** - Lower-level, more control
+3. **Formidable** - Alternative to Multer
+4. **Express built-in** - No native multipart support
+
+**Decision:** Use Multer (Option 1)
+
+**Rationale:**
+- Industry standard for Express file uploads
+- Simple API: `upload.single('audio')`
+- Built-in validation (fileSize, fileFilter)
+- Automatic cleanup on error
+- Well-documented and maintained
+
+**Implementation:**
+```javascript
+const upload = multer({
+  dest: '/tmp/uploads/',
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (req, file, cb) => {
+    const allowed = ['audio/webm', 'audio/mp4', 'audio/wav'];
+    cb(null, allowed.includes(file.mimetype));
+  }
+});
+
+router.post('/voice', upload.single('audio'), handler);
+```
+
+**Trade-offs:**
+- Pro: Simple, reliable, widely used
+- Pro: Good error handling
+- Con: Adds dependency (not a concern)
+- Acceptable: Standard choice for this use case
+
+---
+
+## Decision 8: Temporary File Cleanup Strategy
+
+**Date:** 2026-05-24  
+**Status:** ✅ DECIDED
+
+**Context:**  
+Multer saves uploaded files to `/tmp/uploads/`:
+- Files persist after request completes
+- Could fill disk if not cleaned up
+- Need cleanup even on error
+
+**Options Considered:**
+1. **Manual cleanup** - `fs.unlink()` in finally block
+2. **Middleware cleanup** - Global cleanup middleware
+3. **Memory storage** - Store in RAM instead of disk
+4. **Cron job** - Periodic cleanup of old files
+
+**Decision:** Manual cleanup in finally block (Option 1)
+
+**Rationale:**
+- Guaranteed cleanup (finally runs even on error)
+- Simple and explicit
+- No orphaned files
+- Immediate disk reclaim
+
+**Implementation:**
+```javascript
+let audioFilePath = null;
+try {
+  audioFilePath = req.file.path;
+  // ... process audio
+} finally {
+  if (audioFilePath) {
+    fs.unlink(audioFilePath, (err) => {
+      if (err) console.error('Cleanup failed:', err);
+    });
+  }
+}
+```
+
+**Trade-offs:**
+- Pro: Reliable, no leaked files
+- Pro: Works even if handler crashes
+- Con: Slight code repetition per endpoint
+- Acceptable: Only one audio endpoint
+
+---
+
+## Decision 9: Error Response Structure
+
+**Date:** 2026-05-24  
+**Status:** ✅ DECIDED
+
+**Context:**  
+Voice endpoint has multiple failure points:
+- Missing fields (workerId, audio, actionType)
+- Worker not found
+- Whisper API failure
+- GPT extraction failure
+- Database error
+
+Frontend needs to show user-friendly errors.
+
+**Options Considered:**
+1. **HTTP status only** - Use status codes (400, 404, 500)
+2. **Error codes** - Structured error objects
+3. **Mixed approach** - Status + error code + message
+
+**Decision:** Structured error codes (Option 2 with status)
+
+**Rationale:**
+- Frontend can map error codes to user messages
+- Consistent error handling across endpoints
+- Allows localization (Phase 3)
+- Details field for debugging
+
+**Implementation:**
+```json
+{
+  "error": "TRANSCRIPTION_FAILED",
+  "message": "Could not transcribe audio",
+  "details": "Whisper API timeout"
+}
+```
+
+Error codes:
+- `MISSING_WORKER_ID` (400)
+- `MISSING_ACTION_TYPE` (400)
+- `MISSING_AUDIO` (400)
+- `WORKER_NOT_FOUND` (404)
+- `TRANSCRIPTION_FAILED` (500)
+- `EXTRACTION_FAILED` (500)
+- `DATABASE_ERROR` (500)
+
+**Trade-offs:**
+- Pro: Structured, consistent
+- Pro: Easy to test
+- Pro: Frontend has clear signals
+- Con: More verbose than plain strings
+- Acceptable: Better UX is worth it
+
+---
+
 ## Future Decisions (To Be Made)
 
-### Decision 7: Real-time vs Batch Processing
+### Decision 10: Real-time vs Batch Processing
 **Status:** TBD  
 **Question:** Process audio immediately or queue for later?
 
-### Decision 8: Offline Support Strategy  
+### Decision 11: Offline Support Strategy  
 **Status:** TBD (Phase 3)  
 **Question:** Cache audio locally if offline, sync when online?
 
-### Decision 9: Audio Quality Validation
+### Decision 12: Audio Quality Validation
 **Status:** TBD  
 **Question:** Validate audio quality before upload (duration, volume, etc.)?
 
@@ -303,3 +454,4 @@ Phase 2 doesn't have worker authentication (PIN system is Phase 3):
 ## Revision History
 
 - 2026-05-24: Created decision log, documented Decisions 1-6
+- 2026-05-24: Added Decisions 7-9 (file upload, cleanup, error structure)
