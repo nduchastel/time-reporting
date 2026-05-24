@@ -1,5 +1,12 @@
+# Dependencies
 node_modules/
 .vite/
+
+# Environment variables (secrets)
+.env
+.env.local
+.env.*.local
+**/.env
 
 # Package lock files - let each platform (Railway, Vercel, local) generate its own
 # Prevents Salesforce npm proxy conflicts
@@ -7,3 +14,19 @@ package-lock.json
 **/package-lock.json
 yarn.lock
 pnpm-lock.yaml
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+*.log
