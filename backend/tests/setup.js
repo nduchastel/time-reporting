@@ -61,8 +61,9 @@ vi.mock('../src/db/supabase.js', () => {
       from: vi.fn((table) => {
         let insertedData = null;
 
+        let lastSelectFields = '*';
         const mockChain = {
-          select: vi.fn((fields = '*') => mockChain),
+          select: vi.fn((fields = '*') => { lastSelectFields = fields; return mockChain; }),
           eq: vi.fn(() => mockChain),
           ilike: vi.fn(() => mockChain),
           gte: vi.fn(() => mockChain),
@@ -70,10 +71,20 @@ vi.mock('../src/db/supabase.js', () => {
           order: vi.fn(() => mockChain),
           limit: vi.fn(() => mockChain),
           single: vi.fn(async () => {
-            // If we have inserted data, return it
+            // Apply select() projection to the returned data so tests can verify
+            // that sensitive fields are excluded from the response.
+            const project = (row) => {
+              if (!row || lastSelectFields === '*' || lastSelectFields.includes('*')) return row;
+              const fields = lastSelectFields.split(',').map((f) => f.trim().split('(')[0].trim());
+              const out = {};
+              for (const f of fields) if (f in row) out[f] = row[f];
+              return out;
+            };
+            // If we have inserted data, return it (projected)
             if (insertedData) {
+              const idDefault = table === 'workers' ? 'test-worker-id' : 'test-timecard-id';
               return {
-                data: { id: 'test-timecard-id', ...insertedData },
+                data: project({ id: insertedData.id || idDefault, ...insertedData }),
                 error: null
               };
             }

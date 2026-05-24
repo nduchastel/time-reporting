@@ -69,4 +69,40 @@ describe('manager workers', () => {
     const r = await request(app).post('/api/manager/workers').set('Authorization', `Bearer ${managerToken}`).send({});
     expect(r.status).toBe(400);
   });
+
+  it('creates a worker and never returns pin or password_hash', async () => {
+    const r = await request(app).post('/api/manager/workers').set('Authorization', `Bearer ${managerToken}`)
+      .send({ name: 'New', phone: '+1-555-0199', language: 'en', pin: '4321' });
+    expect(r.status).toBe(201);
+    expect(r.body).not.toHaveProperty('pin');
+    expect(r.body).not.toHaveProperty('password_hash');
+  });
+
+  it('rejects invalid PIN (non-numeric or wrong length)', async () => {
+    const r = await request(app).post('/api/manager/workers').set('Authorization', `Bearer ${managerToken}`)
+      .send({ name: 'X', phone: '+1', pin: 'abcd' });
+    expect(r.status).toBe(400);
+    expect(r.body.error).toBe('INVALID_PIN');
+  });
+
+  it('rejects invalid language', async () => {
+    const r = await request(app).post('/api/manager/workers').set('Authorization', `Bearer ${managerToken}`)
+      .send({ name: 'X', phone: '+1', language: 'de' });
+    expect(r.status).toBe(400);
+    expect(r.body.error).toBe('INVALID_LANGUAGE');
+  });
+
+  it('forces role=worker on POST regardless of body input (no privilege escalation)', async () => {
+    const r = await request(app).post('/api/manager/workers').set('Authorization', `Bearer ${managerToken}`)
+      .send({ name: 'Sneaky', phone: '+1-555-0200', role: 'admin' });
+    expect(r.status).toBe(201);
+    expect(r.body.role).toBe('worker');
+  });
+
+  it('PATCH does not honor role field (privilege escalation guard)', async () => {
+    const r = await request(app).patch('/api/manager/workers/wid1').set('Authorization', `Bearer ${managerToken}`)
+      .send({ role: 'admin', name: 'Promoted' });
+    expect(r.status).toBe(200);
+    expect(r.body.role).not.toBe('admin');
+  });
 });

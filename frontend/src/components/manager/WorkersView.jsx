@@ -51,11 +51,6 @@ export default function WorkersView() {
                 <option value="en">English</option><option value="fr">Français</option><option value="es">Español</option>
               </select>
             </label>
-            <label className="block text-sm">Role
-              <select name="role" defaultValue={editing.role || 'worker'} className="w-full border rounded px-2 py-1 mb-2">
-                <option value="worker">Worker</option><option value="manager">Manager</option>
-              </select>
-            </label>
             <label className="block text-sm">PIN (4–6 digits, leave blank to keep existing)
               <input name="pin" inputMode="numeric" pattern="[0-9]*" minLength={4} maxLength={6} className="w-full border rounded px-2 py-1 mb-2" />
             </label>
