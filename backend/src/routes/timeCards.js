@@ -6,6 +6,7 @@ import path from 'path';
 import { extractTimeCardData } from '../services/extractionService.js';
 import { createTimeCard, getTimeCards } from '../services/timeCardService.js';
 import { transcribeAudio } from '../services/whisperService.js';
+import { uploadAudio } from '../services/storageService.js';
 import { supabase } from '../db/supabase.js';
 
 const router = express.Router();
@@ -257,6 +258,18 @@ router.post('/time-cards/voice', upload.single('audio'), async (req, res, next) 
       endTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     }
 
+    // Step 4.6: Upload audio to Supabase Storage (best-effort)
+    let audioUrl = null;
+    try {
+      audioUrl = await uploadAudio({
+        localPath: audioFilePath,
+        mimeType: audioFile.mimetype,
+        workerId,
+      });
+    } catch (e) {
+      console.error('Audio upload failed, continuing without URL:', e.message);
+    }
+
     // Step 5: Return extracted data for user review (DON'T save yet)
     // User will click Submit to save via POST /api/time-cards
     res.status(200).json({
@@ -273,7 +286,7 @@ router.post('/time-cards/voice', upload.single('audio'), async (req, res, next) 
         endTime,
         transcription,
         extractedData: extracted,
-        audioUrl: null
+        audioUrl
       }
     });
 

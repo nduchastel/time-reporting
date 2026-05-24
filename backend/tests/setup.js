@@ -107,6 +107,14 @@ vi.mock('../src/db/supabase.js', () => {
         };
         return mockChain;
       })
+    },
+    supabaseAdmin: {
+      storage: {
+        from: vi.fn(() => ({
+          upload: vi.fn(async () => ({ data: { path: 'mock/path' }, error: null })),
+          createSignedUrl: vi.fn(async () => ({ data: { signedUrl: 'https://mock-signed.example' }, error: null })),
+        })),
+      },
     }
   };
 });
