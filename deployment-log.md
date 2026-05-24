@@ -102,13 +102,46 @@ Time: ~25 minutes (including troubleshooting)
 5. Add environment variable (VITE_API_URL)
 6. Deploy and test on mobile
 
-### Status: Waiting for user to create Vercel project...
+### 3.1 Vercel Project Created ✅
+- Project name: time-reporting
+- Root directory: frontend
+- Framework: Vite (auto-detected)
+- Build command: npm run build
+- Output directory: dist
+
+### 3.2 Environment Variables Added ✅
+- VITE_API_URL=https://time-reporting-production.up.railway.app
+
+### 3.3 Package Lock Fix ✅
+- Issue: Frontend package-lock.json had Salesforce npm proxies
+- Fix: Deleted package-lock.json, let Vercel regenerate with public npm
+
+### 3.4 Deployment Success ✅
+- Deployment ID: (latest from commit 3476eb8)
+- Production URL: https://time-reporting-dun.vercel.app
+- Additional domains:
+  - time-repor-git-5c28b3-nicolas-duchastel-de-montrouge-s-projects.vercel.app
+  - time-reporting-bapdy5zfu.vercel.app
+- Build time: 29s
+- Status: Ready / Production
+- Preview shows: Check IN screen (teal) ✅
+
+**Step 3 Complete:** Vercel frontend deployed successfully! ✅
+Time: ~20 minutes (including troubleshooting)
 
 ---
 
-## Step 4: Integration Testing (30 min) - PENDING
+## Step 4: Integration Testing (30 min) - STARTING
 
-Status: Not started
+**Goal:** Verify end-to-end flow works
+
+### 4.1 Service URLs Summary
+- **Frontend (Vercel):** https://time-reporting-dun.vercel.app
+- **Backend (Railway):** https://time-reporting-production.up.railway.app
+- **Database (Supabase):** https://trpbghxkyczloskgvpzz.supabase.co
+
+### 4.2 Basic Tests - IN PROGRESS
+Testing components...
 
 ---
 
