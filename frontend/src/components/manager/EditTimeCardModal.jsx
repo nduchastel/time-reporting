@@ -1,5 +1,5 @@
 // frontend/src/components/manager/EditTimeCardModal.jsx
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function EditTimeCardModal({ card, onClose, onSave }) {
   const [hours, setHours] = useState(card.hours ?? '');
@@ -7,6 +7,15 @@ export default function EditTimeCardModal({ card, onClose, onSave }) {
   const [start, setStart] = useState(card.start_time ?? '');
   const [end,   setEnd  ] = useState(card.end_time ?? '');
   const [notes, setNotes] = useState(card.notes ?? '');
+  const firstFieldRef = useRef(null);
+
+  // Esc closes; first input gets focus on mount.
+  useEffect(() => {
+    firstFieldRef.current?.focus();
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
   const save = (e) => {
     e.preventDefault();
@@ -17,10 +26,16 @@ export default function EditTimeCardModal({ card, onClose, onSave }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="edit-time-card-title"
+    >
       <form onSubmit={save} className="bg-white rounded-lg p-5 w-full max-w-md" onClick={(e)=>e.stopPropagation()}>
-        <h3 className="text-lg font-bold mb-3">Edit time card</h3>
-        <label className="block text-sm">Hours<input type="number" step="0.25" value={hours} onChange={(e)=>setHours(e.target.value)} className="w-full border rounded px-2 py-1 mb-2" /></label>
+        <h3 id="edit-time-card-title" className="text-lg font-bold mb-3">Edit time card</h3>
+        <label className="block text-sm">Hours<input ref={firstFieldRef} type="number" step="0.25" value={hours} onChange={(e)=>setHours(e.target.value)} className="w-full border rounded px-2 py-1 mb-2" /></label>
         <label className="block text-sm">Date<input type="date" value={date} onChange={(e)=>setDate(e.target.value)} className="w-full border rounded px-2 py-1 mb-2" /></label>
         <label className="block text-sm">Start<input type="time" value={start} onChange={(e)=>setStart(e.target.value)} className="w-full border rounded px-2 py-1 mb-2" /></label>
         <label className="block text-sm">End<input type="time" value={end} onChange={(e)=>setEnd(e.target.value)} className="w-full border rounded px-2 py-1 mb-2" /></label>

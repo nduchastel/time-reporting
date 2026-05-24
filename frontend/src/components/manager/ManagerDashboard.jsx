@@ -1,6 +1,6 @@
 // frontend/src/components/manager/ManagerDashboard.jsx
-import { useEffect, useState, useCallback } from 'react';
-import { apiFetch, getManagerSession } from '../../lib/auth';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { apiFetch, getManagerSession, clearManagerSession } from '../../lib/auth';
 import TimeCardCard from './TimeCardCard';
 import EditTimeCardModal from './EditTimeCardModal';
 
@@ -10,12 +10,35 @@ export default function ManagerDashboard() {
   const [cards, setCards] = useState([]);
   const [statusFilter, setStatusFilter] = useState('pending');
   const [editing, setEditing] = useState(null);
+  const [error, setError] = useState(null);
   const session = getManagerSession();
+  // Monotonic request id — older inflight responses are ignored when a newer one is dispatched.
+  const requestIdRef = useRef(0);
+
+  // 401 → wipe session and bounce to login.
+  const handleAuthError = (e) => {
+    if (e?.status === 401) {
+      clearManagerSession();
+      window.location.reload();
+      return true;
+    }
+    return false;
+  };
 
   const load = useCallback(async () => {
-    const data = await apiFetch(`/api/manager/time-cards?status=${statusFilter}&limit=50`, { token: session.token });
-    setCards(data);
-  }, [statusFilter, session.token]);
+    if (!session?.token) return;
+    const reqId = ++requestIdRef.current;
+    try {
+      const data = await apiFetch(`/api/manager/time-cards?status=${statusFilter}&limit=50`, { token: session.token });
+      // Drop response if a newer request has been dispatched (filter changed, or post-mutation reload).
+      if (reqId !== requestIdRef.current) return;
+      setCards(data);
+      setError(null);
+    } catch (e) {
+      if (handleAuthError(e)) return;
+      if (reqId === requestIdRef.current) setError(e.message || 'Failed to load time cards');
+    }
+  }, [statusFilter, session?.token]);
 
   useEffect(() => {
     load();
@@ -23,12 +46,20 @@ export default function ManagerDashboard() {
     return () => clearInterval(id);
   }, [load]);
 
-  const approve = async (c) => { await apiFetch(`/api/manager/time-cards/${c.id}/approve`, { method: 'POST', token: session.token }); load(); };
-  const flag    = async (c) => { await apiFetch(`/api/manager/time-cards/${c.id}/flag`,    { method: 'POST', token: session.token }); load(); };
-  const saveEdit = async (fields) => {
-    await apiFetch(`/api/manager/time-cards/${editing.id}`, { method: 'PATCH', token: session.token, body: JSON.stringify(fields) });
-    setEditing(null); load();
+  const mutate = async (fn) => {
+    try { await fn(); load(); }
+    catch (e) {
+      if (handleAuthError(e)) return;
+      setError(e.message || 'Action failed');
+    }
   };
+
+  const approve  = (c) => mutate(() => apiFetch(`/api/manager/time-cards/${c.id}/approve`, { method: 'POST', token: session.token }));
+  const flag     = (c) => mutate(() => apiFetch(`/api/manager/time-cards/${c.id}/flag`,    { method: 'POST', token: session.token }));
+  const saveEdit = (fields) => mutate(async () => {
+    await apiFetch(`/api/manager/time-cards/${editing.id}`, { method: 'PATCH', token: session.token, body: JSON.stringify(fields) });
+    setEditing(null);
+  });
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
@@ -41,7 +72,8 @@ export default function ManagerDashboard() {
           <option value="flagged">Flagged</option>
         </select>
       </div>
-      {cards.length === 0 && <p className="text-gray-500">Nothing to show.</p>}
+      {error && <p role="alert" className="mb-3 p-2 bg-red-50 text-red-700 text-sm rounded">{error}</p>}
+      {cards.length === 0 && !error && <p className="text-gray-500">Nothing to show.</p>}
       <div className="space-y-3">
         {cards.map((c) => (
           <TimeCardCard key={c.id} card={c} onApprove={approve} onFlag={flag} onEdit={setEditing} />
