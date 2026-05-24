@@ -98,6 +98,7 @@ export default function WorkerUI() {
           onExtractedData={setExtractedData}
           isRecording={isRecording}
           setIsRecording={setIsRecording}
+          actionType={currentAction.type}
         />
 
         {/* Transcription preview */}

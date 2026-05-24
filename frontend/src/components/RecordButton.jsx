@@ -4,7 +4,14 @@ import { useState, useRef, useEffect } from 'react';
 const MAX_RECORDING_TIME = 60; // seconds
 const WARNING_TIME = 50; // show warning at 50 seconds
 
-export default function RecordButton({ onTranscription, onExtractedData, isRecording, setIsRecording }) {
+// API configuration
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+// TODO Phase 3: Replace with real worker authentication
+// For Phase 2 testing: Use Bob Martinez (seed data worker)
+const TEMP_WORKER_ID = '913da062-eca3-4cd9-a74b-96e7428dc540';
+
+export default function RecordButton({ onTranscription, onExtractedData, isRecording, setIsRecording, actionType }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [error, setError] = useState(null);
@@ -105,29 +112,58 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
 
   const processAudio = async (audioBlob) => {
     setIsProcessing(true);
+    setError(null);
 
     try {
-      // TODO Task 3: Send audio to backend API
-      // For now, still using mock data
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      onTranscription("I worked 8 hours at Simons Property");
-      onExtractedData({
-        action_type: "HOURS",
-        hours: 8,
-        worksite: "Simons Property",
-        confidence: "high"
-      });
-
-      console.log('Audio recorded:', {
+      console.log('Sending audio to backend:', {
         size: audioBlob.size,
         type: audioBlob.type,
         duration: recordingTime
       });
 
+      // Create FormData for multipart upload
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
+      formData.append('workerId', TEMP_WORKER_ID);
+      formData.append('actionType', actionType);
+
+      // Send to backend
+      const response = await fetch(`${API_URL}/api/time-cards/voice`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle error response
+        console.error('Backend error:', data);
+
+        const errorMessages = {
+          'TRANSCRIPTION_FAILED': 'Could not transcribe audio. Please speak clearly and try again.',
+          'EXTRACTION_FAILED': 'Could not understand entry. Please mention worksite and hours.',
+          'DATABASE_ERROR': 'Could not save entry. Please try again.',
+          'WORKER_NOT_FOUND': 'Worker not found. Please contact manager.',
+        };
+
+        setError(errorMessages[data.error] || data.message || 'An error occurred. Please try again.');
+        return;
+      }
+
+      // Success! Show transcription and extracted data
+      console.log('Backend response:', data);
+
+      onTranscription(data.transcription);
+      onExtractedData(data.extractedData);
+
     } catch (err) {
-      console.error('Processing error:', err);
-      setError('Could not process recording. Please try again.');
+      console.error('Network error:', err);
+
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        setError('Network error. Check your connection and try again.');
+      } else {
+        setError('Could not process recording. Please try again.');
+      }
     } finally {
       setIsProcessing(false);
     }
