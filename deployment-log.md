@@ -59,13 +59,50 @@ Time: ~10 minutes
 6. Add environment variables (CRITICAL)
 7. Deploy and get Railway URL
 
-### Status: Waiting for user to create Railway project...
+### 2.1 Railway Project Created ✅
+- Project name: daring-cooperation
+- Repository: nduchastel/time-reporting
+- Root directory: backend
+- Domain: time-reporting-production.up.railway.app
+- Port: 3001
+
+### 2.2 Environment Variables ✅
+All 5 variables added:
+- SUPABASE_URL
+- SUPABASE_ANON_KEY
+- OPENAI_API_KEY (secured in Railway, not in code)
+- PORT=3001
+- NODE_ENV=production
+
+### 2.3 Deployment Issues & Fix ✅
+- **Issue:** npm ci failed due to Salesforce internal npm proxy in package-lock.json
+- **Fix:** Railway diagnostic created PR to remove package-lock.json (merged)
+- **Result:** Build successful with public npm registry
+
+### 2.4 Backend Live ✅
+- URL: https://time-reporting-production.up.railway.app
+- Health check: `{"status":"ok","timestamp":"2026-05-24T02:16:51.851Z"}`
+- Node version: 22.22.3
+- Status: ACTIVE
+
+**Step 2 Complete:** Railway backend deployed successfully! ✅
+Time: ~25 minutes (including troubleshooting)
 
 ---
 
-## Step 3: Vercel Frontend Deployment (15 min) - PENDING
+## Step 3: Vercel Frontend Deployment (15 min) - STARTING
 
-Status: Not started
+**Goal:** Deploy React PWA with link to Railway backend
+
+### Actions Required:
+1. Go to https://vercel.com
+2. Sign in with GitHub account (nduchastel)
+3. Click "New Project" → Import `nduchastel/time-reporting`
+4. Configure build settings
+5. Add environment variable (VITE_API_URL)
+6. Deploy and test on mobile
+
+### Status: Waiting for user to create Vercel project...
 
 ---
 
