@@ -31,14 +31,14 @@ Workers record time entries by speaking naturally into their mobile phone ("I wo
         │   (Railway)     │  Audio upload → Transcribe → Extract → Store
         └────────┬────────┘
                  │
-        ┌────────┴────────┬────────┬────────┐
-        ▼                 ▼        ▼        ▼
-  ┌──────────┐      ┌──────────┐ ┌──────────┐ ┌──────────┐
-  │Supabase  │      │ Whisper  │ │  GPT-4o  │ │Supabase  │
-  │ Storage  │      │   API    │ │   mini   │ │   DB     │
-  │ (audio)  │      │ voice to │ │  text to │ │(Postgres)│
-  │          │      │   text   │ │   data   │ │          │
-  └──────────┘      └──────────┘ └──────────┘ └──────────┘
+        ┌────────┴────────┬────────────┬────────────┐
+        ▼                 ▼            ▼            ▼
+  ┌──────────┐    ┌───────────┐   ┌──────────┐   ┌──────────┐
+  │ Supabase │    │ Whisper   │   │  GPT-4o  │   │ Supabase │
+  │ Storage  │    │   API     │   │   mini   │   │   DB     │
+  │ (audio)  │    │ voice to  │   │  text to │   │(Postgres)│
+  │          │    │   text    │   │   data   │   │          │
+  └──────────┘    └───────────┘   └──────────┘   └──────────┘
 ```
 
 ### Technology Stack
