@@ -125,3 +125,42 @@
 - **Choice:** Create a self-referencing chain object with a `then` method for promise resolution
 - **Rationale:** Allows chaining multiple filter methods (eq, gte, lte) before resolution
 - **Alternative considered:** Nested function returns (harder to read and maintain)
+
+## Task 6: API Routes
+
+**Date:** 2026-05-23
+
+### Decision 1: Express Router for route organization
+- **Choice:** Separate router file (`routes/timeCards.js`)
+- **Rationale:** Better organization, easier to test, follows Express best practices
+- **Alternative considered:** All routes in server.js (cluttered)
+
+### Decision 2: Fuzzy worksite matching with ILIKE
+- **Choice:** Use PostgreSQL `ILIKE` with wildcards: `ILIKE '%${extracted.worksite}%'`
+- **Rationale:** Handles variations ("Simons" matches "Simons Property"), case-insensitive
+- **Alternative considered:** Exact match (too strict), separate fuzzy matching service (over-engineering)
+
+### Decision 3: 201 Created for POST, 200 OK for GET
+- **Choice:** RESTful status codes
+- **Rationale:** Standard HTTP semantics, clear intent
+- **Alternative considered:** Always 200 (less semantic)
+
+### Decision 4: Central error handler middleware
+- **Choice:** Express error middleware at end of server.js
+- **Rationale:** Consistent error responses, logging in one place, catch all errors
+- **Alternative considered:** Try/catch in each route (repetitive)
+
+### Decision 5: Integration tests mock services, not HTTP
+- **Choice:** Tests still use mocked OpenAI/Supabase (via service layer)
+- **Rationale:** Fast tests, no external dependencies, deterministic
+- **Alternative considered:** Real database in tests (slow, needs setup)
+
+### Decision 6: Global test setup file with vitest.config.js
+- **Choice:** Central `tests/setup.js` loaded via vitest config
+- **Rationale:** DRY - single mock definition for all tests, no duplication
+- **Alternative considered:** Per-file mocks (repetitive, harder to maintain)
+
+### Decision 7: Insert with select chaining pattern
+- **Choice:** Mock must support `.insert(data).select().single()` chain
+- **Rationale:** Matches Supabase's fluent API, returns inserted record
+- **Implementation:** Insert saves data, subsequent select/single returns it with generated ID
