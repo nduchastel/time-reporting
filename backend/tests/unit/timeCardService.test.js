@@ -8,6 +8,7 @@ vi.mock('../../src/db/supabase.js', () => {
       eq: vi.fn(() => chain),
       gte: vi.fn(() => chain),
       lte: vi.fn(() => chain),
+      limit: vi.fn(() => chain),
       then: vi.fn((resolve) => resolve({ data: [], error: null }))
     };
     return chain;

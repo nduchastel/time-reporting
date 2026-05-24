@@ -36,6 +36,9 @@ export async function createTimeCard({
   return data;
 }
 
+const DEFAULT_LIMIT = 100;
+const MAX_LIMIT = 1000;
+
 export async function getTimeCards({ workerId, status, startDate, endDate, limit }) {
   let query = supabase
     .from('time_cards')
@@ -46,7 +49,11 @@ export async function getTimeCards({ workerId, status, startDate, endDate, limit
   if (status) query = query.eq('status', status);
   if (startDate) query = query.gte('date', startDate);
   if (endDate) query = query.lte('date', endDate);
-  if (limit) query = query.limit(Number(limit));
+
+  // Always apply a bounded limit. Prevents unbounded reads / DoS.
+  const parsed = parseInt(limit, 10);
+  const safeLimit = Math.min(Math.max(Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_LIMIT, 1), MAX_LIMIT);
+  query = query.limit(safeLimit);
 
   const { data, error } = await query;
   if (error) throw error;

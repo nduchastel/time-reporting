@@ -98,6 +98,7 @@ router.post('/time-cards', async (req, res, next) => {
   }
 });
 
+// TODO(Task 10): protect with requireAuth + ownership check (workers see own only).
 router.get('/time-cards', async (req, res, next) => {
   try {
     const { workerId, status, startDate, endDate, limit } = req.query;

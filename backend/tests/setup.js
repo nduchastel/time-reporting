@@ -68,6 +68,7 @@ vi.mock('../src/db/supabase.js', () => {
           gte: vi.fn(() => mockChain),
           lte: vi.fn(() => mockChain),
           order: vi.fn(() => mockChain),
+          limit: vi.fn(() => mockChain),
           single: vi.fn(async () => {
             // If we have inserted data, return it
             if (insertedData) {
