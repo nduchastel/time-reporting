@@ -147,6 +147,9 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
   const processAudio = async (audioBlob) => {
     setIsProcessing(true);
     setError(null);
+    // Clear old data when starting new processing
+    onTranscription('');
+    onExtractedData(null);
 
     try {
       addDebugLog('🚀 Starting upload', {
@@ -158,7 +161,7 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
       // Check for zero-size blob
       if (audioBlob.size === 0) {
         addDebugLog('❌ Empty audio blob!');
-        setError('Recording was empty. Please try again.');
+        setError('Heard nothing! Record again.');
         return;
       }
 
@@ -192,12 +195,12 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
         addDebugLog('❌ Backend error', data);
 
         const errorMessages = {
-          'TRANSCRIPTION_FAILED': 'Could not transcribe audio. Please speak clearly and try again.',
-          'EXTRACTION_FAILED': 'Could not understand entry. Please mention worksite and hours.',
-          'LOW_CONFIDENCE': 'Could not clearly understand your entry. Please speak clearly and mention the worksite and hours worked.',
+          'TRANSCRIPTION_FAILED': 'Heard nothing! Record again.',
+          'EXTRACTION_FAILED': 'Unclear. Mention worksite and hours.',
+          'LOW_CONFIDENCE': 'Unclear. Mention worksite and hours.',
           'MISSING_HOURS': 'Please mention how many hours you worked.',
-          'DATABASE_ERROR': 'Could not save entry. Please try again.',
-          'WORKER_NOT_FOUND': 'Worker not found. Please contact manager.',
+          'DATABASE_ERROR': 'Save failed. Try again.',
+          'WORKER_NOT_FOUND': 'Worker not found. Contact manager.',
         };
 
         setError(errorMessages[data.error] || data.message || 'An error occurred. Please try again.');
@@ -220,9 +223,9 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
       });
 
       if (err.name === 'TypeError' && err.message.includes('fetch')) {
-        setError('Network error. Check your connection and try again.');
+        setError('Network error. Check connection.');
       } else {
-        setError('Could not process recording. Please try again.');
+        setError('Processing failed. Try again.');
       }
     } finally {
       setIsProcessing(false);
