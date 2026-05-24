@@ -192,3 +192,37 @@
   - OUT: Green (#28a745)
   - HOURS: Blue (#0288d1)
   - OFF: Orange (#f57c00)
+
+## Task 8: Worker UI Component
+
+**Date:** 2026-05-23
+
+### Decision 1: Component composition over monolithic UI
+- **Choice:** Separate WorkerUI and RecordButton components
+- **Rationale:** Better testability, reusability, single responsibility principle
+- **Alternative considered:** Single giant component (hard to test/maintain)
+
+### Decision 2: useState for local state management
+- **Choice:** React useState hooks, no Redux/Zustand yet
+- **Rationale:** Simple state, contained to one screen, no cross-component sharing needed
+- **Alternative considered:** Context API (overkill), Redux (over-engineering for MVP)
+
+### Decision 3: Mock recording for now
+- **Choice:** RecordButton simulates with setTimeout, returns mock data
+- **Rationale:** Focus on UI/UX first, real audio recording is Phase 2
+- **Alternative considered:** Implement MediaRecorder now (scope creep)
+
+### Decision 4: Swipe dots not swipe gesture
+- **Choice:** Clickable dots for screen navigation
+- **Rationale:** Easier to implement, works on desktop too, better accessibility
+- **Alternative considered:** Touch swipe gestures (more complex, mobile-only, harder to test)
+
+### Decision 5: Large touch targets for field use
+- **Choice:** 80px (20x20) record button, large text (text-lg/text-base)
+- **Rationale:** Easy to tap with gloves, readable in sunlight on construction sites
+- **Alternative considered:** Smaller UI (harder to use in field conditions)
+
+### Decision 6: Tailwind v4 with @tailwindcss/postcss
+- **Choice:** Upgraded to Tailwind v4, installed separate PostCSS plugin
+- **Rationale:** Tailwind v4 split PostCSS functionality into separate package
+- **Alternative considered:** Downgrade to v3 (miss new features)
