@@ -58,3 +58,15 @@ describe('manager routes', () => {
     expect(r.body.notes).toBe('duplicate entry');
   });
 });
+
+describe('manager workers', () => {
+  it('lists workers', async () => {
+    const r = await request(app).get('/api/manager/workers').set('Authorization', `Bearer ${managerToken}`);
+    expect(r.status).toBe(200);
+  });
+
+  it('rejects worker creation without name', async () => {
+    const r = await request(app).post('/api/manager/workers').set('Authorization', `Bearer ${managerToken}`).send({});
+    expect(r.status).toBe(400);
+  });
+});
