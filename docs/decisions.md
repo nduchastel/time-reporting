@@ -96,3 +96,32 @@
 - **Choice:** Mock entire OpenAI client, match transcription text to fixture expected output
 - **Rationale:** Fast tests, no API costs, deterministic behavior, enables CI/CD
 - **Alternative considered:** Real API calls in tests (slow, expensive, flaky)
+
+## Task 5: Time Card Service
+
+**Date:** 2026-05-23
+
+### Decision 1: Supabase query builder over raw SQL
+- **Choice:** Use Supabase JavaScript client query builder
+- **Rationale:** Type-safe, chainable, handles parameterization, easier to mock in tests
+- **Alternative considered:** Raw SQL queries (more control but less safe)
+
+### Decision 2: Snake_case for database, camelCase for JavaScript
+- **Choice:** Convert between naming conventions at service layer
+- **Rationale:** Follow PostgreSQL conventions in DB, JavaScript conventions in code
+- **Example:** `worker_id` in DB becomes `workerId` in function parameters
+
+### Decision 3: Include related data in getTimeCards
+- **Choice:** Select workers and worksites with join: `select('*, workers(name), worksites(name)')`
+- **Rationale:** Reduce round trips, common use case is to display worker/site names
+- **Alternative considered:** Separate queries (more round trips)
+
+### Decision 4: Filter by query parameters, not body
+- **Choice:** `getTimeCards({ workerId, status, ... })` as function params
+- **Rationale:** RESTful pattern, easier to test, clear API contract
+- **Alternative considered:** Single filter object (less explicit)
+
+### Decision 5: Chainable mock pattern for Supabase queries
+- **Choice:** Create a self-referencing chain object with a `then` method for promise resolution
+- **Rationale:** Allows chaining multiple filter methods (eq, gte, lte) before resolution
+- **Alternative considered:** Nested function returns (harder to read and maintain)
