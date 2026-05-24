@@ -203,6 +203,27 @@ router.post('/time-cards/voice', upload.single('audio'), async (req, res, next) 
       });
     }
 
+    // Step 3.5: Validate extracted data quality
+    // Reject if confidence is low OR missing critical info
+    if (extracted.confidence === 'low') {
+      return res.status(400).json({
+        error: 'LOW_CONFIDENCE',
+        message: 'Could not clearly understand your entry. Please speak clearly and mention the worksite and hours worked.',
+        transcription,
+        extractedData: extracted
+      });
+    }
+
+    // For HOURS and OFF actions, hours must be present
+    if ((actionType === 'HOURS' || actionType === 'OFF') && !extracted.hours) {
+      return res.status(400).json({
+        error: 'MISSING_HOURS',
+        message: 'Please mention how many hours you worked.',
+        transcription,
+        extractedData: extracted
+      });
+    }
+
     // Step 4: Find or create worksite (if mentioned)
     let worksiteId = null;
     if (extracted.worksite) {

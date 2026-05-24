@@ -194,6 +194,8 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
         const errorMessages = {
           'TRANSCRIPTION_FAILED': 'Could not transcribe audio. Please speak clearly and try again.',
           'EXTRACTION_FAILED': 'Could not understand entry. Please mention worksite and hours.',
+          'LOW_CONFIDENCE': 'Could not clearly understand your entry. Please speak clearly and mention the worksite and hours worked.',
+          'MISSING_HOURS': 'Please mention how many hours you worked.',
           'DATABASE_ERROR': 'Could not save entry. Please try again.',
           'WORKER_NOT_FOUND': 'Worker not found. Please contact manager.',
         };
