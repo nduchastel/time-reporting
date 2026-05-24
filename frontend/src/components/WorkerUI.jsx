@@ -124,7 +124,13 @@ export default function WorkerUI() {
               <button className="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold">
                 Submit
               </button>
-              <button className="px-6 bg-gray-400 text-white py-3 rounded-lg">
+              <button
+                onClick={() => {
+                  setTranscription('');
+                  setExtractedData(null);
+                }}
+                className="px-6 bg-gray-400 text-white py-3 rounded-lg"
+              >
                 Re-record
               </button>
             </div>
