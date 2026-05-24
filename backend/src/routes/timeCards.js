@@ -11,8 +11,24 @@ import { supabase } from '../db/supabase.js';
 const router = express.Router();
 
 // Configure multer for audio file uploads
+const storage = multer.diskStorage({
+  destination: '/tmp/uploads/',
+  filename: (req, file, cb) => {
+    // Preserve file extension for Whisper API
+    const ext = file.mimetype === 'audio/webm' ? '.webm'
+              : file.mimetype === 'audio/mp4' ? '.mp4'
+              : file.mimetype === 'audio/wav' ? '.wav'
+              : file.mimetype === 'audio/mpeg' ? '.mp3'
+              : file.mimetype === 'audio/m4a' ? '.m4a'
+              : '.audio';
+
+    const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(7)}${ext}`;
+    cb(null, uniqueName);
+  }
+});
+
 const upload = multer({
-  dest: '/tmp/uploads/', // Temporary storage
+  storage,
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB max (60s at high quality ~= 2-3MB)
   },
