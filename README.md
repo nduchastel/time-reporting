@@ -80,75 +80,22 @@ The project is organized into three phases. Each phase has detailed documentatio
 
 ## Getting Started
 
-### Prerequisites
-
-- Node.js 22.x or higher
-- npm 10.x or higher
-- Supabase account (database)
-- OpenAI API key (AI services)
-
-### Local Development
-
-**1. Clone and install:**
+### Quick Start
 
 ```bash
+# Clone and install
 git clone https://github.com/nduchastel/time-reporting.git
 cd time-reporting
-
-# Install backend dependencies
 cd backend && npm install
-
-# Install frontend dependencies
 cd ../frontend && npm install
 ```
 
-**2. Configure environment:**
-
-Backend `.env`:
-```bash
-PORT=3001
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key
-OPENAI_API_KEY=sk-your-key
-NODE_ENV=development
-```
-
-Frontend `.env`:
-```bash
-VITE_API_URL=http://localhost:3001
-```
-
-**3. Set up database:**
-
-```bash
-# In Supabase SQL Editor, run:
-# 1. backend/src/db/migrations/001_initial_schema.sql
-# 2. node backend/src/db/seed.js (creates test data)
-```
-
-See [Database README](backend/src/db/README.md) for schema details.
-
-**4. Run locally:**
-
-```bash
-# Terminal 1 - Backend
-cd backend && npm run dev  # http://localhost:3001
-
-# Terminal 2 - Frontend
-cd frontend && npm run dev  # http://localhost:5173
-```
-
-### Testing
-
-```bash
-# Backend tests (15 tests)
-cd backend && npm test
-
-# Frontend tests (3 tests)
-cd frontend && npm test
-```
-
-See test coverage and mock strategy in [Phase 1 Decisions](docs/phase1-decisions.md#decision-12-mock-transcription-strategy).
+**Full setup guide:** See [Development Guide](docs/development/) for complete instructions including:
+- [Local Setup](docs/development/local-setup.md) - Step-by-step environment configuration
+- [Development Modes](docs/development/development-modes.md) - Real API vs Mock mode (with diagrams)
+- Database setup and seed data
+- OpenAI API configuration
+- Troubleshooting common issues
 
 ---
 
