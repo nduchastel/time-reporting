@@ -25,5 +25,6 @@ export async function apiFetch(path, { token, ...init } = {}) {
     err.status = r.status; err.code = body.error;
     throw err;
   }
-  return r.json();
+  if (r.status === 204) return null;
+  return r.json().catch(() => null);
 }
