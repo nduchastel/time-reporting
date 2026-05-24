@@ -1,0 +1,56 @@
+// src/services/extractionService.js
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+const SYSTEM_PROMPT = `Extract time entry data from transcription. Return JSON:
+{
+  "action_type": "IN|OUT|HOURS|OFF",
+  "worker": "full name or null",
+  "worksite": "site name or null",
+  "hours": number or null,
+  "start_time": "HH:MM or null",
+  "end_time": "HH:MM or null",
+  "date": "YYYY-MM-DD or null (defaults to provided date)",
+  "confidence": "high|medium|low",
+  "additional_workers": ["name1", "name2"] or [],
+  "notes": "any special circumstances or null"
+}
+
+Confidence rules:
+- high: Clear, complete information
+- medium: Ambiguous or conflicting info, or multiple workers mentioned
+- low: Missing critical info, garbled text, or vague references`;
+
+export async function extractTimeCardData({ transcription, workerName, date }) {
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        {
+          role: 'user',
+          content: `Transcription: "${transcription}"
+Worker name: "${workerName}"
+Today's date: "${date}"`
+        }
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0.1
+    });
+
+    const extracted = JSON.parse(response.choices[0].message.content);
+
+    // Ensure date defaults to provided date if not specified
+    if (!extracted.date) {
+      extracted.date = date;
+    }
+
+    return extracted;
+  } catch (error) {
+    console.error('Extraction failed:', error);
+    throw new Error(`Failed to extract data: ${error.message}`);
+  }
+}

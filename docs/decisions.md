@@ -72,3 +72,27 @@
 - **Choice:** Provide pre-transcribed text, skip Whisper API entirely in tests
 - **Rationale:** Focus on extraction logic, avoid API costs in tests, deterministic results
 - **Alternative considered:** Record actual audio files (expensive, slow, non-deterministic)
+
+## Task 4: Extraction Service
+
+**Date:** 2026-05-23
+
+### Decision 1: GPT-4o-mini for extraction
+- **Choice:** gpt-4o-mini model
+- **Rationale:** Cheaper than GPT-4 ($0.15/$0.60 per 1M tokens), fast, sufficient for structured extraction
+- **Alternative considered:** GPT-3.5-turbo (less capable), GPT-4 (overkill + expensive)
+
+### Decision 2: JSON mode for structured output
+- **Choice:** `response_format: { type: 'json_object' }`
+- **Rationale:** Guarantees valid JSON response, reduces parsing errors
+- **Alternative considered:** Parsing markdown code blocks (fragile)
+
+### Decision 3: Low temperature (0.1) for consistency
+- **Choice:** temperature = 0.1
+- **Rationale:** Extraction should be deterministic, not creative
+- **Alternative considered:** 0.0 (too rigid), 0.5 (too random)
+
+### Decision 4: Complete OpenAI mocking in tests
+- **Choice:** Mock entire OpenAI client, match transcription text to fixture expected output
+- **Rationale:** Fast tests, no API costs, deterministic behavior, enables CI/CD
+- **Alternative considered:** Real API calls in tests (slow, expensive, flaky)
