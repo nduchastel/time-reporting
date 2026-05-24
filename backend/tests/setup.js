@@ -97,6 +97,10 @@ vi.mock('../src/db/supabase.js', () => {
             insertedData = data;
             return mockChain;
           }),
+          update: vi.fn((patch) => {
+            insertedData = { id: insertedData?.id || 'test-timecard-id', ...(insertedData || {}), ...patch };
+            return mockChain;
+          }),
           // For GET queries that don't call .single()
           then: vi.fn(async (resolve) => {
             const result = {

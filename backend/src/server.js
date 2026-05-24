@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import timeCardsRouter from './routes/timeCards.js';
 import authRouter from './routes/auth.js';
+import managerRouter from './routes/manager.js';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.get('/health', (req, res) => {
 
 app.use('/api', timeCardsRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/manager', managerRouter);
 
 // Error handler
 app.use((err, req, res, next) => {

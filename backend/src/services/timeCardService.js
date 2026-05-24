@@ -59,3 +59,17 @@ export async function getTimeCards({ workerId, status, startDate, endDate, limit
   if (error) throw error;
   return data;
 }
+
+export async function updateTimeCard({ id, fields, approverId, status }) {
+  const patch = { ...fields, updated_at: new Date().toISOString() };
+  if (status)     patch.status      = status;
+  if (approverId) { patch.approved_by = approverId; patch.approved_at = new Date().toISOString(); }
+  const { data, error } = await supabase
+    .from('time_cards')
+    .update(patch)
+    .eq('id', id)
+    .select('*, workers(name), worksites(name)')
+    .single();
+  if (error) throw error;
+  return data;
+}
