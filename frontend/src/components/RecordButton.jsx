@@ -29,21 +29,22 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
   };
 
   return (
-    <div className="text-center">
+    <div className="text-center my-6">
       <button
         onClick={handleRecord}
         disabled={isProcessing}
         aria-label={isProcessing ? 'Processing...' : isRecording ? 'Tap to stop recording' : 'Tap to record'}
-        className={`w-20 h-20 rounded-full shadow-lg ${
-          isRecording ? 'bg-red-500' : 'bg-blue-600'
+        className={`w-24 h-24 rounded-full shadow-xl mx-auto flex items-center justify-center ${
+          isRecording ? 'bg-red-500' : 'bg-red-600'
         } ${isProcessing ? 'opacity-50' : ''}`}
+        style={{ fontSize: '48px' }}
       >
-        <span className="text-white text-3xl">
+        <span className="text-white">
           {isProcessing ? '⏳' : isRecording ? '⏹' : '⏺'}
         </span>
       </button>
-      <p className="mt-2 text-gray-600">
-        {isProcessing ? 'Processing...' : isRecording ? 'Tap to stop' : 'Tap to record'}
+      <p className="mt-4 text-gray-700 font-medium text-base">
+        {isProcessing ? 'Processing...' : isRecording ? 'Recording... Tap to stop' : 'Tap to record'}
       </p>
     </div>
   );
