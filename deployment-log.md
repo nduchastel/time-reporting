@@ -208,9 +208,39 @@ Time: ~10 minutes
 
 ---
 
-## Notes and Issues
+## Post-Deployment Fixes
 
-(None yet)
+### Issue 1: Incorrect Action Colors ✅ FIXED
+**Reported:** 2026-05-24 (user testing on phone)
+**Problem:** 
+- OUT screen was blue (should be green)
+- HOURS screen was purple (should be blue)
+
+**Root Cause:** Incorrect color assignments in ACTION_TYPES array
+
+**Fix:** Updated WorkerUI.jsx colors to match design spec:
+- IN: teal-500 ✅
+- OUT: green-500 (was blue-500)
+- HOURS: blue-500 (was purple-500)  
+- OFF: orange-500 ✅
+
+**Commit:** 13a6aa4
+
+### Issue 2: No Swipe Navigation ✅ FIXED
+**Reported:** 2026-05-24 (user testing on phone)
+**Problem:** Could not swipe left/right to change action screens on mobile
+
+**Root Cause:** Only dots were clickable, no touch gesture detection
+
+**Fix:** Added touch event handlers (onTouchStart, onTouchMove, onTouchEnd):
+- Swipe left: next screen
+- Swipe right: previous screen
+- Minimum swipe distance: 50px
+- Prevents swiping past first/last screen
+
+**Commit:** 13a6aa4
+
+**Status:** Both fixes deployed, Vercel redeploying now
 
 ---
 
