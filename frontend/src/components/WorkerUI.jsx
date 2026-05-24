@@ -72,12 +72,12 @@ export default function WorkerUI() {
         throw new Error('Failed to submit');
       }
 
-      // Show success toast
+      // Show success toast for 3 seconds
       setSubmitSuccess(true);
-      setTimeout(() => setSubmitSuccess(false), 3000);
 
-      // Clear form after successful submit
+      // Clear toast and form after 3 seconds
       setTimeout(() => {
+        setSubmitSuccess(false);
         setTranscription('');
         setExtractedData(null);
         setProcessedData(null);
