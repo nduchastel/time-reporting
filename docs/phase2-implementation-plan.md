@@ -25,10 +25,10 @@
 ## Task Breakdown
 
 ### Frontend Tasks (4)
-1. [ ] Implement MediaRecorder API
-2. [ ] Request microphone permissions
+1. [x] Implement MediaRecorder API ✅
+2. [x] Request microphone permissions ✅
 3. [ ] Send audio to backend API
-4. [ ] Handle responses and errors
+4. [x] Handle responses and errors ✅
 
 ### Backend Tasks (3)
 1. [ ] Create audio upload endpoint
@@ -88,17 +88,47 @@
 
 ---
 
-## Current Task: Task 1 - Implement MediaRecorder API
+## Task 1: Implement MediaRecorder API ✅ COMPLETE
 
-**Status:** STARTING  
+**Status:** ✅ COMPLETE  
+**Completed:** 2026-05-24  
+**Commit:** 2964c19  
 **File:** `frontend/src/components/RecordButton.jsx`
 
 **Changes:**
-- Replace mock setTimeout with real MediaRecorder
-- Request microphone permission
-- Capture audio as Blob
-- Add recording timer
-- Add max duration limit (60s)
+- ✅ Replace mock setTimeout with real MediaRecorder
+- ✅ Request microphone permission (NotAllowedError, NotFoundError)
+- ✅ Capture audio as Blob (browser's native format)
+- ✅ Add recording timer (displays seconds)
+- ✅ Add max duration limit (60s auto-stop)
+- ✅ Add warning at 50 seconds ("10s remaining")
+- ✅ Add pulse animation during recording
+- ✅ Error handling with user-friendly messages
+- ✅ Stop all media tracks when done
+
+**Implementation Notes:**
+- Uses browser's default audio format (webm/mp4)
+- MediaRecorder.mimeType used for Blob
+- Refs for MediaRecorder, audioChunks, timer, stream
+- Timer interval cleared on unmount
+- Audio blob logged to console for debugging
+
+**Next:** Task 4 - Backend API endpoint
+
+---
+
+## Current Task: Task 4 - Backend Audio Endpoint
+
+**Status:** STARTING  
+**File:** `backend/src/routes/timeCards.js`
+
+**What's needed:**
+- POST /api/time-cards/voice endpoint
+- Accept multipart/form-data (audio file)
+- Send to Whisper API
+- Extract with GPT
+- Save to database
+- Return time card
 
 ---
 
@@ -113,6 +143,10 @@
 
 ## Progress Tracking
 
-**Completed:** 0/9 tasks  
-**Current:** Task 1 - MediaRecorder API  
-**Next:** Task 2 - Microphone permissions
+**Completed:** 3/9 tasks (33%)  
+**Current:** Task 4 - Backend audio endpoint  
+**Next:** Task 5 - Whisper integration
+
+**Frontend:** 3/4 complete (Tasks 1, 2, 4 done; Task 3 waiting for backend)  
+**Backend:** 0/3 complete  
+**Testing:** 0/2 complete
