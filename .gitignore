@@ -1,2 +1,9 @@
 node_modules/
 .vite/
+
+# Package lock files - let each platform (Railway, Vercel, local) generate its own
+# Prevents Salesforce npm proxy conflicts
+package-lock.json
+**/package-lock.json
+yarn.lock
+pnpm-lock.yaml
