@@ -222,8 +222,9 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
         message: err.message
       });
 
-      if (err.name === 'TypeError' && err.message.includes('fetch')) {
-        setError('Network error. Check connection.');
+      // TypeError with 'Load failed' or 'fetch' = network issue
+      if (err.name === 'TypeError' && (err.message.includes('fetch') || err.message.includes('Load failed') || err.message.includes('Network request failed'))) {
+        setError('Network issue. Check connection.');
       } else {
         setError('Processing failed. Try again.');
       }
