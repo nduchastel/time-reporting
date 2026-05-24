@@ -238,6 +238,21 @@ router.post('/time-cards/voice', upload.single('audio'), async (req, res, next) 
       }
     }
 
+    // Step 4.5: Auto-capture time for IN/OUT actions
+    // For check-in/check-out, use current server time (in HH:MM format) if not mentioned
+    let startTime = extracted.start_time;
+    let endTime = extracted.end_time;
+
+    if (actionType === 'IN' && !startTime) {
+      const now = new Date();
+      startTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+
+    if (actionType === 'OUT' && !endTime) {
+      const now = new Date();
+      endTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+
     // Step 5: Create time card in database
     let timeCard;
     try {
@@ -247,8 +262,8 @@ router.post('/time-cards/voice', upload.single('audio'), async (req, res, next) 
         actionType: extracted.action_type || actionType,
         date: extracted.date,
         hours: extracted.hours,
-        startTime: extracted.start_time,
-        endTime: extracted.end_time,
+        startTime,
+        endTime,
         transcription,
         extractedData: extracted,
         audioUrl: null // TODO Phase 3: Store in Supabase Storage
