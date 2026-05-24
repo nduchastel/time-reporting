@@ -1,15 +1,12 @@
 // src/components/RecordButton.jsx
 import { useState, useRef, useEffect } from 'react';
+import { getWorkerSession } from '../lib/auth';
 
 const MAX_RECORDING_TIME = 60; // seconds
 const WARNING_TIME = 50; // show warning at 50 seconds
 
 // API configuration
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-
-// TODO Phase 3: Replace with real worker authentication
-// For Phase 2 testing: Use Bob Martinez (seed data worker)
-const TEMP_WORKER_ID = '913da062-eca3-4cd9-a74b-96e7428dc540';
 
 export default function RecordButton({ onTranscription, onExtractedData, isRecording, setIsRecording, actionType, onProcessedData }) {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -166,15 +163,22 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
         return;
       }
 
+      // Get worker session for auth
+      const session = getWorkerSession();
+      if (!session?.token) {
+        setError('Please sign in again.');
+        return;
+      }
+
       // Create FormData for multipart upload
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
-      formData.append('workerId', TEMP_WORKER_ID);
+      formData.append('workerId', session.id);
       formData.append('actionType', actionType);
 
       addDebugLog('📤 Sending to backend', {
         url: `${API_URL}/api/time-cards/voice`,
-        workerId: TEMP_WORKER_ID,
+        workerId: session.id,
         actionType
       });
 
@@ -182,6 +186,7 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
       const response = await fetch(`${API_URL}/api/time-cards/voice`, {
         method: 'POST',
         body: formData,
+        headers: { Authorization: `Bearer ${session.token}` },
       });
 
       addDebugLog('📥 Response received', {
