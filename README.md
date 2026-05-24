@@ -182,20 +182,26 @@ All architectural decisions are documented in phase-specific files:
 
 ## Database Schema
 
-**Core tables:**
-- `workers` - Employee records (name, phone, language, PIN)
-- `worksites` - Job site locations
-- `time_cards` - Time entries with approval workflow
+**Three core tables:**
 
-**Key fields in time_cards:**
-- `transcription` - Original voice-to-text
-- `extracted_data` - GPT output (JSON)
-- `confidence` - high/medium/low
-- `status` - pending/approved/edited/flagged
-- `created_at` - When worker submitted
-- `date`, `start_time`, `end_time` - When work happened
+| Table | Purpose |
+|-------|---------|
+| `workers` | Employee records with language preferences |
+| `worksites` | Job site locations |
+| `time_cards` | Time entries with approval workflow |
 
-See [schema SQL](backend/src/db/migrations/001_initial_schema.sql) for full details.
+**Key concepts:**
+- Worker speaks → Whisper transcribes → GPT extracts → Database stores
+- Submission time (`created_at`) vs work time (`date`, `start_time`, `end_time`)
+- Approval workflow: pending → approved/edited/flagged
+- Audit trail: original transcription + extracted data preserved
+
+**Full documentation:** See [Database Schema Guide](docs/database-schema.md) for complete details including:
+- Schema diagram with relationships
+- All fields and constraints
+- Action types (IN/OUT/HOURS/OFF)
+- Approval workflow
+- Common queries and indexes
 
 ---
 
