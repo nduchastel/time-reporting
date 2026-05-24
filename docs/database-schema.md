@@ -486,7 +486,9 @@ See [Database README](../backend/src/db/README.md) for seed data details.
 
 ---
 
-## Phase 3 Additions (Planned)
+## Phase 3 Additions (Applied)
+
+Migration applied: 002_phase3_auth_and_indexes.sql
 
 ### New worker fields:
 - `role` TEXT - 'worker' | 'manager' | 'admin'
