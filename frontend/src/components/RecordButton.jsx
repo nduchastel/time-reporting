@@ -11,7 +11,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 // For Phase 2 testing: Use Bob Martinez (seed data worker)
 const TEMP_WORKER_ID = '913da062-eca3-4cd9-a74b-96e7428dc540';
 
-export default function RecordButton({ onTranscription, onExtractedData, isRecording, setIsRecording, actionType }) {
+export default function RecordButton({ onTranscription, onExtractedData, isRecording, setIsRecording, actionType, onProcessedData }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [error, setError] = useState(null);
@@ -207,14 +207,18 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
         return;
       }
 
-      // Success! Show transcription and extracted data
-      addDebugLog('✅ Success!', {
+      // Success! Show transcription and extracted data (NOT saved yet)
+      addDebugLog('✅ Transcription complete', {
         transcription: data.transcription?.substring(0, 50),
         confidence: data.extractedData?.confidence
       });
 
       onTranscription(data.transcription);
       onExtractedData(data.extractedData);
+      // Pass processed data to parent for Submit button
+      if (onProcessedData) {
+        onProcessedData(data.processedData);
+      }
 
     } catch (err) {
       addDebugLog('❌ Processing error', {

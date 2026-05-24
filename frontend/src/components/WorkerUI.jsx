@@ -10,11 +10,16 @@ const ACTION_TYPES = [
   { type: 'OFF', label: 'Time OFF', emoji: '🌴', color: 'bg-orange-500' },
 ];
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 export default function WorkerUI() {
   const [currentScreen, setCurrentScreen] = useState(0);
   const [transcription, setTranscription] = useState('');
   const [extractedData, setExtractedData] = useState(null);
+  const [processedData, setProcessedData] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [slideDirection, setSlideDirection] = useState('');
@@ -50,6 +55,44 @@ export default function WorkerUI() {
       setCurrentScreen(currentScreen - 1);
       setTimeout(() => setSlideDirection(''), 300);
     }
+  };
+
+  const handleSubmit = async () => {
+    if (!processedData) return;
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(`${API_URL}/api/time-cards`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(processedData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit');
+      }
+
+      // Show success toast
+      setSubmitSuccess(true);
+      setTimeout(() => setSubmitSuccess(false), 3000);
+
+      // Clear form after successful submit
+      setTimeout(() => {
+        setTranscription('');
+        setExtractedData(null);
+        setProcessedData(null);
+      }, 3000);
+    } catch (error) {
+      alert('Submit failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRerecord = () => {
+    // Keep transcription and extracted data visible as reference
+    // Only clear processedData so Submit won't work until new recording
+    setProcessedData(null);
   };
 
   return (
@@ -92,10 +135,18 @@ export default function WorkerUI() {
           </p>
         </div>
 
+        {/* Success toast */}
+        {submitSuccess && (
+          <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in">
+            ✓ Time card submitted!
+          </div>
+        )}
+
         {/* Record button */}
         <RecordButton
           onTranscription={setTranscription}
           onExtractedData={setExtractedData}
+          onProcessedData={setProcessedData}
           isRecording={isRecording}
           setIsRecording={setIsRecording}
           actionType={currentAction.type}
@@ -121,14 +172,15 @@ export default function WorkerUI() {
             </div>
 
             <div className="mt-4 flex gap-2">
-              <button className="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold">
-                Submit
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting || !processedData}
+                className="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold disabled:opacity-50"
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit'}
               </button>
               <button
-                onClick={() => {
-                  setTranscription('');
-                  setExtractedData(null);
-                }}
+                onClick={handleRerecord}
                 className="px-6 bg-gray-400 text-white py-3 rounded-lg"
               >
                 Re-record

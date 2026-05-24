@@ -257,10 +257,13 @@ router.post('/time-cards/voice', upload.single('audio'), async (req, res, next) 
       endTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     }
 
-    // Step 5: Create time card in database
-    let timeCard;
-    try {
-      timeCard = await createTimeCard({
+    // Step 5: Return extracted data for user review (DON'T save yet)
+    // User will click Submit to save via POST /api/time-cards
+    res.status(200).json({
+      transcription,
+      extractedData: extracted,
+      // Include processed values for frontend to submit
+      processedData: {
         workerId,
         worksiteId,
         actionType: extracted.action_type || actionType,
@@ -270,23 +273,8 @@ router.post('/time-cards/voice', upload.single('audio'), async (req, res, next) 
         endTime,
         transcription,
         extractedData: extracted,
-        audioUrl: null // TODO Phase 3: Store in Supabase Storage
-      });
-      console.log('Time card created:', timeCard.id);
-    } catch (error) {
-      console.error('Database save failed:', error);
-      return res.status(500).json({
-        error: 'DATABASE_ERROR',
-        message: 'Could not save time card',
-        details: error.message
-      });
-    }
-
-    // Success response
-    res.status(201).json({
-      timeCard,
-      transcription,
-      extractedData: extracted
+        audioUrl: null
+      }
     });
 
   } catch (error) {
