@@ -20,25 +20,25 @@ Workers record time entries by speaking naturally into their mobile phone ("I wo
 ### System Components
 
 ```
-┌─────────────────┐
-│  Worker Mobile  │  Progressive Web App (React + Vite)
-│   (iOS/Android) │  Voice recording → Display results
-└────────┬────────┘
-         │ HTTPS
-         ▼
-┌─────────────────┐
-│  Backend API    │  Node.js + Express
-│   (Railway)     │  Audio upload → Transcribe → Extract → Store
-└────────┬────────┘
-         │
-    ┌────┴────┬──────────┬────────────┐
-    ▼         ▼          ▼            ▼
-┌───────────┐ ┌──────────┐ ┌──────────┐ ┌───────────┐
-│ Supabase  │ │ Whisper  │ │  GPT-4o  │ │ Supabase  │
-│  Storage  │ │   API    │ │   mini   │ │    DB     │
-│  (audio)  │ │ (voice → │ │ (text →  │ │(Postgres) │
-│           │ │   text)  │ │   data)  │ │           │
-└───────────┘ └──────────┘ └──────────┘ └───────────┘
+        ┌─────────────────┐
+        │  Worker Mobile  │  Progressive Web App (React + Vite)
+        │   (iOS/Android) │  Voice recording → Display results
+        └────────┬────────┘
+                 │ HTTPS
+                 ▼
+        ┌─────────────────┐
+        │  Backend API    │  Node.js + Express
+        │   (Railway)     │  Audio upload → Transcribe → Extract → Store
+        └────────┬────────┘
+                 │
+        ┌────────┼────────┬────────┬────────┐
+        ▼        ▼        ▼        ▼        ▼
+  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
+  │Supabase  │ │ Whisper  │ │  GPT-4o  │ │Supabase  │
+  │ Storage  │ │   API    │ │   mini   │ │   DB     │
+  │ (audio)  │ │ voice to │ │  text to │ │(Postgres)│
+  │          │ │   text   │ │   data   │ │          │
+  └──────────┘ └──────────┘ └──────────┘ └──────────┘
 ```
 
 ### Technology Stack
