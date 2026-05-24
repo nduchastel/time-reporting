@@ -1,4 +1,7 @@
+import dotenv from 'dotenv';
 import { supabase } from './supabase.js';
+
+dotenv.config();
 
 export async function seedDatabase() {
   // Insert test worker
