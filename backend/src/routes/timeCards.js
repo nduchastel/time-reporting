@@ -100,13 +100,14 @@ router.post('/time-cards', async (req, res, next) => {
 
 router.get('/time-cards', async (req, res, next) => {
   try {
-    const { workerId, status, startDate, endDate } = req.query;
+    const { workerId, status, startDate, endDate, limit } = req.query;
 
     const timeCards = await getTimeCards({
       workerId,
       status,
       startDate,
-      endDate
+      endDate,
+      limit
     });
 
     res.json(timeCards);

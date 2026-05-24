@@ -36,7 +36,7 @@ export async function createTimeCard({
   return data;
 }
 
-export async function getTimeCards({ workerId, status, startDate, endDate }) {
+export async function getTimeCards({ workerId, status, startDate, endDate, limit }) {
   let query = supabase
     .from('time_cards')
     .select('*, workers(name), worksites(name)')
@@ -46,6 +46,7 @@ export async function getTimeCards({ workerId, status, startDate, endDate }) {
   if (status) query = query.eq('status', status);
   if (startDate) query = query.gte('date', startDate);
   if (endDate) query = query.lte('date', endDate);
+  if (limit) query = query.limit(Number(limit));
 
   const { data, error } = await query;
   if (error) throw error;

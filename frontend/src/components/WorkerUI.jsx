@@ -1,6 +1,7 @@
 // src/components/WorkerUI.jsx
 import { useState } from 'react';
 import RecordButton from './RecordButton';
+import WorkerHistory from './WorkerHistory';
 import './WorkerUI.css';
 
 const ACTION_TYPES = [
@@ -23,6 +24,7 @@ export default function WorkerUI() {
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [slideDirection, setSlideDirection] = useState('');
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const currentAction = ACTION_TYPES[currentScreen];
 
@@ -103,8 +105,13 @@ export default function WorkerUI() {
       onTouchEnd={onTouchEnd}
     >
       {/* Header with swipe dots */}
-      <div className="bg-white shadow p-4">
-        <div className="flex justify-center gap-2">
+      <div className="bg-white shadow p-4 flex items-center">
+        <button
+          onClick={() => setHistoryOpen(true)}
+          aria-label="View history"
+          className="text-2xl"
+        >🕘</button>
+        <div className="flex justify-center gap-2 flex-1">
           {ACTION_TYPES.map((_, index) => (
             <button
               key={index}
@@ -116,6 +123,7 @@ export default function WorkerUI() {
             />
           ))}
         </div>
+        <span className="w-8" /> {/* spacer to keep dots centered */}
       </div>
 
       {/* Action screen */}
@@ -189,6 +197,7 @@ export default function WorkerUI() {
           </div>
         )}
       </div>
+      <WorkerHistory open={historyOpen} onClose={() => setHistoryOpen(false)} />
     </div>
   );
 }
