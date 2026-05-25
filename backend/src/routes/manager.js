@@ -110,6 +110,49 @@ router.post('/workers', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+router.get('/reports/summary', async (req, res, next) => {
+  try {
+    const { startDate, endDate } = req.query;
+    const cards = await getTimeCards({ startDate, endDate, limit: 5000 });
+    const byWorker = new Map();
+    const bySite = new Map();
+    let flaggedCount = 0;
+    for (const c of cards) {
+      if (c.status === 'flagged') flaggedCount++;
+      const wKey = c.workers?.name || 'Unknown';
+      const sKey = c.worksites?.name || 'Unassigned';
+      const hours = Number(c.hours) || 0;
+      byWorker.set(wKey, (byWorker.get(wKey) || 0) + hours);
+      bySite.set(sKey,   (bySite.get(sKey)   || 0) + hours);
+    }
+    res.json({
+      byWorker:   [...byWorker].map(([name, hours]) => ({ name, hours })).sort((a,b)=>b.hours-a.hours),
+      byWorksite: [...bySite].map(([name, hours]) => ({ name, hours })).sort((a,b)=>b.hours-a.hours),
+      total: cards.reduce((s, c) => s + (Number(c.hours) || 0), 0),
+      flaggedCount,
+      count: cards.length,
+    });
+  } catch (e) { next(e); }
+});
+
+router.get('/reports/csv', async (req, res, next) => {
+  try {
+    const { startDate, endDate } = req.query;
+    const cards = await getTimeCards({ startDate, endDate, limit: 5000 });
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="time-cards.csv"');
+    res.write('id,worker,worksite,action_type,date,hours,start_time,end_time,status\n');
+    for (const c of cards) {
+      const cells = [
+        c.id, c.workers?.name || '', c.worksites?.name || '',
+        c.action_type, c.date, c.hours ?? '', c.start_time ?? '', c.end_time ?? '', c.status,
+      ].map((v) => `"${String(v).replace(/"/g, '""')}"`);
+      res.write(cells.join(',') + '\n');
+    }
+    res.end();
+  } catch (e) { next(e); }
+});
+
 router.patch('/workers/:id', async (req, res, next) => {
   try {
     // role is intentionally NOT in the allowlist: prevents privilege escalation

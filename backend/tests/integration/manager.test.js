@@ -106,3 +106,24 @@ describe('manager workers', () => {
     expect(r.body.role).not.toBe('admin');
   });
 });
+
+describe('manager reports', () => {
+  it('returns summary structure', async () => {
+    const r = await request(app)
+      .get('/api/manager/reports/summary?startDate=2026-01-01&endDate=2026-12-31')
+      .set('Authorization', `Bearer ${managerToken}`);
+    expect(r.status).toBe(200);
+    expect(r.body).toHaveProperty('byWorker');
+    expect(r.body).toHaveProperty('byWorksite');
+    expect(r.body).toHaveProperty('total');
+  });
+
+  it('returns CSV with header row', async () => {
+    const r = await request(app)
+      .get('/api/manager/reports/csv')
+      .set('Authorization', `Bearer ${managerToken}`);
+    expect(r.status).toBe(200);
+    expect(r.headers['content-type']).toMatch(/text\/csv/);
+    expect(r.text.split('\n')[0]).toContain('worker,worksite');
+  });
+});
