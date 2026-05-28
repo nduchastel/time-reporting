@@ -1,136 +1,59 @@
 // tests/setup.js
-import { vi } from 'vitest';
-import { GOOD_TRANSCRIPTIONS, BAD_TRANSCRIPTIONS } from './fixtures/transcriptions.js';
+//
+// Global test setup. Delegates to the in-memory fakes in tests/fakes/. Each
+// test starts with the same baseline seed (see beforeEach) so per-test
+// `vi.mock(...)` overrides remain optional. Per-test vi.mock takes precedence
+// over the global mocks defined here.
 
-// Mock OpenAI for all tests
-vi.mock('openai', () => {
-  return {
-    default: class MockOpenAI {
-      constructor() {
-        this.chat = {
-          completions: {
-            create: vi.fn(async ({ messages }) => {
-              const userMessage = messages.find(m => m.role === 'user');
-              const transcription = userMessage.content.match(/Transcription: "(.+)"/)?.[1];
+import { vi, beforeEach } from 'vitest';
+import * as fakeSupabaseModule from './fakes/fakeSupabase.js';
+import FakeOpenAI, {
+  reset as resetOpenAI,
+  registerFixture,
+} from './fakes/fakeOpenAI.js';
+import {
+  GOOD_TRANSCRIPTIONS,
+  BAD_TRANSCRIPTIONS,
+  EDGE_CASES,
+} from './fixtures/transcriptions.js';
+import { TEST_WORKER, TEST_WORKSITES } from './fixtures/testCases.js';
 
-              if (!transcription) {
-                throw new Error('No transcription found in message');
-              }
+vi.mock('openai', () => ({ default: FakeOpenAI }));
+vi.mock('../src/db/supabase.js', () => fakeSupabaseModule);
 
-              // Find matching fixture
-              const allTranscriptions = { ...GOOD_TRANSCRIPTIONS, ...BAD_TRANSCRIPTIONS };
-              const fixture = Object.values(allTranscriptions).find(t => t.text === transcription);
+beforeEach(() => {
+  fakeSupabaseModule.reset();
+  resetOpenAI();
 
-              if (!fixture) {
-                throw new Error(`No mock data for transcription: ${transcription}`);
-              }
+  // Pre-register every transcription fixture so `extractionService.create({...})`
+  // can resolve a canned extraction without scripted setup.
+  for (const fix of [
+    ...Object.values(GOOD_TRANSCRIPTIONS),
+    ...Object.values(BAD_TRANSCRIPTIONS),
+    ...Object.values(EDGE_CASES),
+  ]) {
+    registerFixture(Buffer.from(fix.text), {
+      transcription: fix.text,
+      extraction: { ...fix.expected },
+    });
+  }
 
-              // Build response from expected data
-              const extracted = {
-                action_type: fixture.expected.action_type,
-                worker: fixture.expected.worker || null,
-                worksite: fixture.expected.worksite || null,
-                hours: fixture.expected.hours !== undefined ? fixture.expected.hours : null,
-                start_time: fixture.expected.start_time || null,
-                end_time: fixture.expected.end_time || null,
-                date: fixture.expected.date || userMessage.content.match(/Today's date: "(.+)"/)?.[1],
-                confidence: fixture.expected.confidence,
-                additional_workers: fixture.expected.additional_workers || [],
-                notes: fixture.expected.notes || null
-              };
-
-              return {
-                choices: [{
-                  message: {
-                    content: JSON.stringify(extracted)
-                  }
-                }]
-              };
-            })
-          }
-        };
-      }
-    }
-  };
-});
-
-// Mock Supabase for all tests
-vi.mock('../src/db/supabase.js', () => {
-  return {
-    supabase: {
-      from: vi.fn((table) => {
-        let insertedData = null;
-
-        let lastSelectFields = '*';
-        const mockChain = {
-          select: vi.fn((fields = '*') => { lastSelectFields = fields; return mockChain; }),
-          eq: vi.fn(() => mockChain),
-          ilike: vi.fn(() => mockChain),
-          gte: vi.fn(() => mockChain),
-          lte: vi.fn(() => mockChain),
-          order: vi.fn(() => mockChain),
-          limit: vi.fn(() => mockChain),
-          single: vi.fn(async () => {
-            // Apply select() projection to the returned data so tests can verify
-            // that sensitive fields are excluded from the response.
-            const project = (row) => {
-              if (!row || lastSelectFields === '*' || lastSelectFields.includes('*')) return row;
-              const fields = lastSelectFields.split(',').map((f) => f.trim().split('(')[0].trim());
-              const out = {};
-              for (const f of fields) if (f in row) out[f] = row[f];
-              return out;
-            };
-            // If we have inserted data, return it (projected)
-            if (insertedData) {
-              const idDefault = table === 'workers' ? 'test-worker-id' : 'test-timecard-id';
-              return {
-                data: project({ id: insertedData.id || idDefault, ...insertedData }),
-                error: null
-              };
-            }
-
-            // Return mock data based on table
-            if (table === 'workers') {
-              return {
-                data: { id: 'test-worker-id', name: 'Bob Martinez' },
-                error: null
-              };
-            }
-            if (table === 'worksites') {
-              return {
-                data: { id: 'test-worksite-id', name: 'Simons Property' },
-                error: null
-              };
-            }
-            return { data: null, error: null };
-          }),
-          insert: vi.fn((data) => {
-            insertedData = data;
-            return mockChain;
-          }),
-          update: vi.fn((patch) => {
-            insertedData = { id: insertedData?.id || 'test-timecard-id', ...(insertedData || {}), ...patch };
-            return mockChain;
-          }),
-          // For GET queries that don't call .single()
-          then: vi.fn(async (resolve) => {
-            const result = {
-              data: [],
-              error: null
-            };
-            return resolve(result);
-          })
-        };
-        return mockChain;
-      })
-    },
-    supabaseAdmin: {
-      storage: {
-        from: vi.fn(() => ({
-          upload: vi.fn(async () => ({ data: { path: 'mock/path' }, error: null })),
-          createSignedUrl: vi.fn(async () => ({ data: { signedUrl: 'https://mock-signed.example' }, error: null })),
-        })),
-      },
-    }
-  };
+  // Baseline seed used by integration tests. Tests that need different state
+  // can call `_state` / `seed()` from fakeSupabase directly.
+  fakeSupabaseModule.seed({
+    workers: [
+      { id: TEST_WORKER.id, name: TEST_WORKER.name, phone: '+1-555-0000', language: TEST_WORKER.language, role: 'worker', status: 'active' },
+      { id: 'wid1', name: 'Worker One', phone: '+1-555-0001', language: 'en', role: 'worker', status: 'active' },
+    ],
+    worksites: [
+      { id: TEST_WORKSITES.simons.id, name: TEST_WORKSITES.simons.name },
+      { id: TEST_WORKSITES.acme.id, name: TEST_WORKSITES.acme.name },
+      { id: TEST_WORKSITES.hyatt.id, name: TEST_WORKSITES.hyatt.name },
+    ],
+    time_cards: [
+      { id: 'tc1', worker_id: TEST_WORKER.id, worksite_id: TEST_WORKSITES.simons.id, action_type: 'HOURS', date: '2026-05-20', hours: 8, status: 'pending' },
+      { id: 'tc2', worker_id: TEST_WORKER.id, worksite_id: TEST_WORKSITES.simons.id, action_type: 'HOURS', date: '2026-05-21', hours: 8, status: 'pending' },
+      { id: 'tc3', worker_id: TEST_WORKER.id, worksite_id: TEST_WORKSITES.acme.id, action_type: 'HOURS', date: '2026-05-22', hours: 8, status: 'pending' },
+    ],
+  });
 });
