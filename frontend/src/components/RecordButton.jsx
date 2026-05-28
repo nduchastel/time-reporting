@@ -15,6 +15,39 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
   const [debugLogs, setDebugLogs] = useState([]);
   const [debugExpanded, setDebugExpanded] = useState(false);
 
+  // TEST-ONLY: when the URL contains ?testMode=1, render a button that uploads a fixed audio fixture
+  // instead of using the microphone. Used by Playwright; never reached in production paths.
+  const isTestMode = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('testMode') === '1';
+
+  const handleTestSubmit = async () => {
+    setIsProcessing(true);
+    setError(null);
+    onTranscription('');
+    onExtractedData(null);
+    try {
+      const session = getWorkerSession();
+      if (!session?.token) {
+        setError('Please sign in again.');
+        return;
+      }
+      const blob = new Blob([new Uint8Array([0x1A, 0x45, 0xDF, 0xA3])], { type: 'audio/webm' });
+      const fd = new FormData();
+      fd.append('audio', blob, 'fake.webm');
+      fd.append('workerId', session.id);
+      fd.append('actionType', actionType);
+      const r = await fetch(`${API_URL}/api/time-cards/voice`, {
+        method: 'POST', body: fd, headers: { Authorization: `Bearer ${session.token}` },
+      });
+      const data = await r.json();
+      if (!r.ok) { setError(data.message || 'fake submit failed'); return; }
+      onTranscription(data.transcription);
+      onExtractedData(data.extractedData);
+      onProcessedData?.(data.processedData);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const timerRef = useRef(null);
@@ -278,19 +311,29 @@ export default function RecordButton({ onTranscription, onExtractedData, isRecor
           </div>
         )}
 
-        <button
-          onClick={handleRecord}
-          disabled={isProcessing}
-          aria-label={isProcessing ? 'Processing...' : isRecording ? 'Tap to stop recording' : 'Tap to record'}
-          className={`w-24 h-24 rounded-full shadow-xl mx-auto flex items-center justify-center ${
-            isRecording ? 'bg-red-500 animate-pulse' : 'bg-red-600'
-          } ${isProcessing ? 'opacity-50' : ''}`}
-          style={{ fontSize: '48px' }}
-        >
-          <span className="text-white">
-            {isProcessing ? '⏳' : isRecording ? '⏹' : '⏺'}
-          </span>
-        </button>
+        {isTestMode ? (
+          <button
+            onClick={handleTestSubmit}
+            disabled={isProcessing}
+            className="px-4 py-3 bg-purple-600 text-white rounded-lg font-bold disabled:opacity-50"
+          >
+            {isProcessing ? 'Processing…' : 'Submit fake recording'}
+          </button>
+        ) : (
+          <button
+            onClick={handleRecord}
+            disabled={isProcessing}
+            aria-label={isProcessing ? 'Processing...' : isRecording ? 'Tap to stop recording' : 'Tap to record'}
+            className={`w-24 h-24 rounded-full shadow-xl mx-auto flex items-center justify-center ${
+              isRecording ? 'bg-red-500 animate-pulse' : 'bg-red-600'
+            } ${isProcessing ? 'opacity-50' : ''}`}
+            style={{ fontSize: '48px' }}
+          >
+            <span className="text-white">
+              {isProcessing ? '⏳' : isRecording ? '⏹' : '⏺'}
+            </span>
+          </button>
+        )}
 
         <div className="mt-4">
           {isRecording && (
