@@ -97,6 +97,8 @@ cd ../frontend && npm install
 - OpenAI API configuration
 - Troubleshooting common issues
 
+**Testing:** see [docs/testing.md](docs/testing.md). Run `npm run test:all` from the repo root.
+
 ---
 
 ## API Documentation
