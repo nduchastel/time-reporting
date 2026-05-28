@@ -1,6 +1,7 @@
 // backend/tests/integration/manager.test.js
-import { describe, it, expect, beforeAll, vi } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
 import request from 'supertest';
+import { reset, seed } from '../fakes/fakeSupabase.js';
 
 process.env.JWT_SECRET = 'test-secret';
 
@@ -125,5 +126,59 @@ describe('manager reports', () => {
     expect(r.status).toBe(200);
     expect(r.headers['content-type']).toMatch(/text\/csv/);
     expect(r.text.split('\n')[0]).toContain('worker,worksite');
+  });
+});
+
+describe('manager workers — PIN boundaries', () => {
+  beforeEach(() => { reset(); });
+
+  it('rejects PIN of length 3', async () => {
+    const r = await request(app).post('/api/manager/workers').set('Authorization', `Bearer ${managerToken}`)
+      .send({ name: 'X', phone: '+1-555-1', pin: '123' });
+    expect(r.status).toBe(400);
+    expect(r.body.error).toBe('INVALID_PIN');
+  });
+
+  it('rejects PIN of length 7', async () => {
+    const r = await request(app).post('/api/manager/workers').set('Authorization', `Bearer ${managerToken}`)
+      .send({ name: 'X', phone: '+1-555-2', pin: '1234567' });
+    expect(r.status).toBe(400);
+  });
+
+  it('accepts PIN of length 4', async () => {
+    const r = await request(app).post('/api/manager/workers').set('Authorization', `Bearer ${managerToken}`)
+      .send({ name: 'X', phone: '+1-555-3', pin: '4321' });
+    expect(r.status).toBe(201);
+  });
+
+  it('accepts PIN of length 6', async () => {
+    const r = await request(app).post('/api/manager/workers').set('Authorization', `Bearer ${managerToken}`)
+      .send({ name: 'X', phone: '+1-555-4', pin: '123456' });
+    expect(r.status).toBe(201);
+  });
+});
+
+describe('manager reports — CSV escaping & empty state', () => {
+  beforeEach(() => {
+    reset();
+    seed({
+      workers: [{ id: 'w1', name: "O'Brien, Inc" }],
+      worksites: [{ id: 's1', name: 'Site "A"' }],
+      time_cards: [{ id: 't1', worker_id: 'w1', worksite_id: 's1', action_type: 'HOURS', date: '2026-05-20', hours: 8, status: 'pending', created_at: new Date().toISOString() }],
+    });
+  });
+
+  it('escapes quotes and commas in CSV cells', async () => {
+    const r = await request(app).get('/api/manager/reports/csv').set('Authorization', `Bearer ${managerToken}`);
+    expect(r.status).toBe(200);
+    expect(r.text).toMatch(/"O'Brien, Inc"/);
+    expect(r.text).toMatch(/"Site ""A"""/);
+  });
+
+  it('summary returns zeros for empty range', async () => {
+    reset();
+    const r = await request(app).get('/api/manager/reports/summary?startDate=2030-01-01&endDate=2030-12-31').set('Authorization', `Bearer ${managerToken}`);
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ byWorker: [], byWorksite: [], total: 0, flaggedCount: 0, count: 0 });
   });
 });
