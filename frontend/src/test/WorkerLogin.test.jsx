@@ -31,4 +31,24 @@ describe('WorkerLogin', () => {
     fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
     expect(await screen.findByText(/wrong phone or pin/i)).toBeInTheDocument();
   });
+
+  it('shows generic error on network failure', async () => {
+    vi.spyOn(window, 'fetch').mockRejectedValue(new TypeError('fetch failed'));
+    render(<WorkerLogin onLoggedIn={() => {}} />);
+    fireEvent.change(screen.getByLabelText(/phone/i), { target: { value: '+1' } });
+    fireEvent.change(screen.getByLabelText(/pin/i),   { target: { value: '1234' } });
+    fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    expect(await screen.findByText(/login failed/i)).toBeInTheDocument();
+  });
+
+  it('disables button while submitting', async () => {
+    let resolveFetch;
+    vi.spyOn(window, 'fetch').mockReturnValue(new Promise((res) => { resolveFetch = res; }));
+    render(<WorkerLogin onLoggedIn={() => {}} />);
+    fireEvent.change(screen.getByLabelText(/phone/i), { target: { value: '+1' } });
+    fireEvent.change(screen.getByLabelText(/pin/i),   { target: { value: '1234' } });
+    fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    expect(screen.getByRole('button', { name: /signing in/i })).toBeDisabled();
+    resolveFetch({ ok: true, json: async () => ({ token: 't', worker: { id: 'w1', name: 'B', language: 'en' } }) });
+  });
 });

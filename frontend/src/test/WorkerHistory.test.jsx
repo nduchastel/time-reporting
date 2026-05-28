@@ -21,4 +21,22 @@ describe('WorkerHistory', () => {
     expect(screen.getByText(/HOURS/)).toBeInTheDocument();
     expect(screen.getByText(/pending/)).toBeInTheDocument();
   });
+
+  it('shows loading state initially', () => {
+    vi.spyOn(window, 'fetch').mockReturnValue(new Promise(() => {}));
+    render(<WorkerHistory open onClose={() => {}} />);
+    expect(screen.getByText(/loading/i)).toBeInTheDocument();
+  });
+
+  it('shows empty state when API returns []', async () => {
+    vi.spyOn(window, 'fetch').mockResolvedValue({ ok: true, json: async () => [] });
+    render(<WorkerHistory open onClose={() => {}} />);
+    expect(await screen.findByText(/no submissions yet/i)).toBeInTheDocument();
+  });
+
+  it('shows error state on API failure', async () => {
+    vi.spyOn(window, 'fetch').mockResolvedValue({ ok: false, status: 500, json: async () => ({ error: 'X', message: 'boom' }) });
+    render(<WorkerHistory open onClose={() => {}} />);
+    expect(await screen.findByText(/boom|HTTP 500/i)).toBeInTheDocument();
+  });
 });

@@ -18,4 +18,22 @@ describe('ManagerLogin', () => {
     await waitFor(() => expect(cb).toHaveBeenCalled());
     expect(JSON.parse(localStorage.getItem('time-reporting.manager'))).toMatchObject({ id: 'm1', role: 'manager' });
   });
+
+  it('shows error on 401', async () => {
+    vi.spyOn(window, 'fetch').mockResolvedValue({ ok: false, status: 401, json: async () => ({ error: 'INVALID_CREDENTIALS', message: 'no' }) });
+    render(<ManagerLogin onLoggedIn={() => {}} />);
+    fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'm' } });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'x' } });
+    fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    expect(await screen.findByText(/wrong username or password/i)).toBeInTheDocument();
+  });
+
+  it('shows generic error on other failures', async () => {
+    vi.spyOn(window, 'fetch').mockResolvedValue({ ok: false, status: 500, json: async () => ({ error: 'X', message: 'oops' }) });
+    render(<ManagerLogin onLoggedIn={() => {}} />);
+    fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'm' } });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'x' } });
+    fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    expect(await screen.findByText(/login failed/i)).toBeInTheDocument();
+  });
 });

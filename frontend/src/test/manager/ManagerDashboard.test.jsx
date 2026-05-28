@@ -20,4 +20,19 @@ describe('ManagerDashboard', () => {
     fireEvent.click(screen.getByRole('button', { name: /approve/i }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
   });
+
+  it('renders empty state when no cards', async () => {
+    vi.spyOn(window, 'fetch').mockResolvedValue({ ok: true, json: async () => [] });
+    render(<ManagerDashboard />);
+    expect(await screen.findByText(/nothing to show/i)).toBeInTheDocument();
+  });
+
+  it('clears manager session on 401 and reloads', async () => {
+    const reloadMock = vi.fn();
+    Object.defineProperty(window, 'location', { value: { reload: reloadMock }, writable: true });
+    vi.spyOn(window, 'fetch').mockResolvedValue({ ok: false, status: 401, json: async () => ({ error: 'X', message: 'no' }) });
+    render(<ManagerDashboard />);
+    await waitFor(() => expect(reloadMock).toHaveBeenCalled());
+    expect(localStorage.getItem('time-reporting.manager')).toBeNull();
+  });
 });
