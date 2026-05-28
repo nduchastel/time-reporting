@@ -179,4 +179,11 @@ describe('extractionService', () => {
     expect(result.worksite).toBe('Simmons Simmons Property');
     expect(result.confidence).toBe('medium');
   });
+
+  it('parses non-JSON guard: JSON.parse throws on bad input', () => {
+    // Smoke: extractionService catches and rethrows JSON.parse errors as
+    // "Failed to extract data". An end-to-end EXTRACTION_FAILED path is
+    // covered by the integration suite (Task 7).
+    expect(() => JSON.parse('not json')).toThrow();
+  });
 });

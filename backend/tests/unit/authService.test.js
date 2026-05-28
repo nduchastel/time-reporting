@@ -1,5 +1,6 @@
 // backend/tests/unit/authService.test.js
 import { describe, it, expect } from 'vitest';
+import jwt from 'jsonwebtoken';
 import { hashSecret, verifySecret, issueToken, verifyToken } from '../../src/services/authService.js';
 
 describe('authService', () => {
@@ -20,5 +21,21 @@ describe('authService', () => {
   it('verifyToken throws on tampered token', () => {
     process.env.JWT_SECRET = 'test-secret';
     expect(() => verifyToken('not.a.token')).toThrow();
+  });
+
+  it('issueToken throws when JWT_SECRET is unset', () => {
+    const original = process.env.JWT_SECRET;
+    delete process.env.JWT_SECRET;
+    try {
+      expect(() => issueToken({ sub: 'x', role: 'worker' })).toThrow(/JWT_SECRET/);
+    } finally {
+      process.env.JWT_SECRET = original;
+    }
+  });
+
+  it('verifyToken throws on expired token', () => {
+    process.env.JWT_SECRET = 'test-secret';
+    const t = jwt.sign({ sub: 'x', role: 'worker' }, process.env.JWT_SECRET, { expiresIn: '-1s' });
+    expect(() => verifyToken(t)).toThrow();
   });
 });

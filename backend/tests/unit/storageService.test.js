@@ -65,4 +65,10 @@ describe('storageService.uploadAudio', () => {
       uploadAudio({ localPath: '/tmp/x.webm', mimeType: 'audio/webm', workerId: 'w1' })
     ).rejects.toThrow(/Signed URL failed: no sign/);
   });
+
+  it('does not produce double slashes when localPath has no extension', async () => {
+    await uploadAudio({ localPath: '/tmp/x', mimeType: 'audio/webm', workerId: 'w1' });
+    const [key] = uploadFn.mock.calls[0];
+    expect(key).not.toMatch(/\/\//);
+  });
 });
