@@ -23,6 +23,9 @@ vi.mock('../../src/db/supabase.js', async () => {
             if (chain._col === 'username' && chain._val === 'mgr1') {
               return { data: { id: 'm1', name: 'Manager', role: 'manager', password_hash: pwHash, status: 'active' }, error: null };
             }
+            if (chain._col === 'username' && chain._val === 'wkr1') {
+              return { data: { id: 'w2', name: 'Worker', role: 'worker', password_hash: pwHash, status: 'active' }, error: null };
+            }
             return { data: null, error: null };
           },
         };
@@ -109,5 +112,32 @@ describe('requireAuth middleware', () => {
     const token = issueToken({ sub: 'm1', role: 'manager' });
     const r = await request(makeApp(['manager'])).get('/protected').set('Authorization', `bearer ${token}`);
     expect(r.status).toBe(200);
+  });
+});
+
+describe('worker login enumeration safety', () => {
+  it('returns 401 (not 404) on unknown phone', async () => {
+    const r = await request(app).post('/api/auth/worker/login').send({ phone: 'unknown', pin: '1234' });
+    expect(r.status).toBe(401);
+    expect(r.body.error).toBe('INVALID_CREDENTIALS');
+  });
+
+  it('rejects missing fields with 400', async () => {
+    const r = await request(app).post('/api/auth/worker/login').send({ phone: '+1-555-0100' });
+    expect(r.status).toBe(400);
+    expect(r.body.error).toBe('MISSING_FIELDS');
+  });
+});
+
+describe('manager login negative cases', () => {
+  it('rejects non-manager role even with valid credentials', async () => {
+    // wkr1 maps to a worker-role record; manager login route must refuse.
+    const r = await request(app).post('/api/auth/manager/login').send({ username: 'wkr1', password: 's3cret' });
+    expect(r.status).toBe(401);
+  });
+
+  it('rejects missing password with 400', async () => {
+    const r = await request(app).post('/api/auth/manager/login').send({ username: 'mgr1' });
+    expect(r.status).toBe(400);
   });
 });
