@@ -30,3 +30,8 @@ Thumbs.db
 dist/
 build/
 *.log
+
+# Playwright
+e2e/test-results/
+e2e/playwright-report/
+e2e/playwright/.cache/

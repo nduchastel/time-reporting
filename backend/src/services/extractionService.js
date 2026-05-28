@@ -1,9 +1,13 @@
 // src/services/extractionService.js
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+// TEST_MODE=1 substitutes the in-memory FakeOpenAI for the real client. Refuses in production.
+const useTestFake = process.env.TEST_MODE === '1' && process.env.NODE_ENV !== 'production';
+const FakeOpenAI = useTestFake ? (await import('../../tests/fakes/fakeOpenAI.js')).default : null;
+
+const openai = useTestFake
+  ? new FakeOpenAI()
+  : new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const SYSTEM_PROMPT = `Extract time entry data from transcription. Return JSON:
 {

@@ -38,7 +38,16 @@ if (process.env.TEST_MODE === '1' && process.env.NODE_ENV !== 'production') {
     res.json({ ok: true });
   });
   app.post('/__test__/openai-next', (req, res) => {
-    nextOpenAI(req.body || {});
+    // The fake's queue is FIFO with one consume per OpenAI call. A voice upload makes two calls
+    // (transcription then extraction), so when both fields are provided we enqueue twice so each
+    // call is satisfied — the first item satisfies transcription, the second satisfies extraction.
+    const body = req.body || {};
+    if (body.transcription && body.extraction) {
+      nextOpenAI({ transcription: body.transcription });
+      nextOpenAI({ extraction: body.extraction });
+    } else {
+      nextOpenAI(body);
+    }
     res.json({ ok: true });
   });
 }
@@ -51,10 +60,17 @@ app.use((err, req, res, next) => {
   });
 });
 
-if (process.env.NODE_ENV !== 'test' && import.meta.url === `file://${process.argv[1]}`) {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+// When this file is the main entry point (node src/server.js), start the listener.
+// Skip when imported by tests (Vitest sets NODE_ENV=test).
+if (process.env.NODE_ENV !== 'test') {
+  const { resolve } = await import('node:path');
+  const { fileURLToPath } = await import('node:url');
+  const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+  if (isMain) {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  }
 }
 
 export default app;

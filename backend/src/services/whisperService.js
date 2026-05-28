@@ -2,9 +2,13 @@
 import OpenAI from 'openai';
 import fs from 'fs';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// TEST_MODE=1 substitutes the in-memory FakeOpenAI for the real client. Refuses in production.
+const useTestFake = process.env.TEST_MODE === '1' && process.env.NODE_ENV !== 'production';
+const FakeOpenAI = useTestFake ? (await import('../../tests/fakes/fakeOpenAI.js')).default : null;
+
+const openai = useTestFake
+  ? new FakeOpenAI()
+  : new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 /**
  * Transcribe audio file using Whisper API
