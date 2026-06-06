@@ -1,7 +1,7 @@
 # Automated Testing — Design
 
 **Date:** 2026-05-27
-**Status:** Draft, awaiting review
+**Status:** ✅ Implemented (2026-05-28) — see the [Changelog](#changelog) and `docs/testing.md`
 **Author:** Claude (with Nicolas)
 
 ---
@@ -283,3 +283,10 @@ Each step ends with all suites green and a commit. If a step uncovers a real app
 - Playwright: 2 specs, passing, both running in <30 s combined.
 - `docs/testing.md` exists and a fresh reader can run the suites and add a new test from it alone.
 - No production code path changes behavior. Optional small bug fixes flagged in commit messages.
+
+---
+
+## Changelog
+
+### 2026-05-28 — Design implemented
+Built as specified via the companion plan `../plans/2026-05-27-automated-testing.md`. All success criteria above were met: the in-memory fakes, `TEST_MODE` endpoints, expanded backend/frontend coverage, the smoke E2E, the two Playwright specs, and `docs/testing.md` all shipped, running fully offline. `docs/testing.md` is now the maintained reference; this spec is kept as the design record.

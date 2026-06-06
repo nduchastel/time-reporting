@@ -680,3 +680,15 @@ The system is designed to be:
 - **Extensible:** Modular architecture allows adding features (GPS, photos, integrations) without refactoring
 
 Next steps: Create detailed implementation plan and begin Phase 1 development.
+
+---
+
+## Changelog
+
+### 2026-05-28 — Implementation status against this design
+The core of this design is built and tested (Phases 1–3, plus a full automated test suite), and deployed to production (Vercel frontend, Railway backend, Supabase). Mapped to the docs:
+- **Worker voice → transcription → extraction → review → submit:** delivered (Phases 1–2). See `docs/phase1-decisions.md`, `docs/phase2-implementation-plan.md`.
+- **Manager dashboard — review / edit / flag / approve, worker management, reports + CSV:** delivered (Phase 3). See `docs/phase3-plan.md`.
+- **Audit trail** (original transcription + extracted data preserved, approver + timestamp): delivered.
+
+**Designed but not yet built** (Phase 4 backlog): anomaly detection and configurable rule engine, GPS/geolocation verification, photo capture, payroll integrations, offline support, reports charts, audio-retention policy, rate limiting, and per-worker row-level access on `GET /api/time-cards` (currently unauthenticated — `TODO(Task 10)`). Where this design describes those as core, treat them as aspirational until built.

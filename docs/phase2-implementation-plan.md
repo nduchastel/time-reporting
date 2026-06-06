@@ -1,8 +1,10 @@
 # Phase 2 Implementation Plan - Real Audio Recording & Transcription
 
-**Status:** IN PROGRESS  
+**Status:** ✅ COMPLETE (2026-05-24)  
 **Started:** 2026-05-24  
 **Goal:** End-to-end voice recording → Whisper transcription → GPT extraction → Database storage
+
+> The manual Task 8/9 testing below was later superseded by the automated test suite (unit + integration + smoke + Playwright). See `superpowers/plans/2026-05-27-automated-testing.md` and `docs/testing.md`.
 
 ---
 
@@ -143,13 +145,13 @@
 
 ## Progress Tracking
 
-**Completed:** 7/9 tasks (78%)  
-**Current:** Task 8 - Integration testing  
-**Next:** Task 9 - Error scenario testing
+**Completed:** 9/9 tasks (100%)  
+**Current:** Phase 2 complete — see `phase2-complete-handoff.md`  
+**Next:** Phase 3 (delivered) — see `phase3-plan.md`
 
 **Frontend:** 4/4 complete ✅  
 **Backend:** 3/3 complete ✅  
-**Testing:** 0/2 complete
+**Testing:** 2/2 complete ✅ (manual validation done at the time; later replaced by the automated suite)
 
 ---
 
@@ -175,3 +177,12 @@
 3. Disconnect network mid-upload
 4. Record ambiguous entry (no worksite mentioned)
 5. Verify user-friendly error messages
+
+---
+
+## Changelog
+
+### 2026-05-28 — Phase 2 marked complete
+- Tasks 1–7 (frontend record button + worker UI; backend voice endpoint, Whisper transcription, GPT extraction, DB storage) shipped 2026-05-24.
+- Tasks 8–9 (manual end-to-end and error-scenario testing) were validated manually at the time, then **superseded by the automated test suite** built 2026-05-27/28: the error scenarios here (mic permission denial, low-confidence/ambiguous entries, missing hours, network failures) are now covered by `RecordButton.test.jsx`, `tests/integration/timeCards.test.js`, and the Playwright `worker-submit` spec.
+- This plan is historical; `docs/testing.md` is the live reference for how testing works today.

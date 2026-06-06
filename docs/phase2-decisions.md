@@ -455,3 +455,13 @@ Error codes:
 
 - 2026-05-24: Created decision log, documented Decisions 1-6
 - 2026-05-24: Added Decisions 7-9 (file upload, cleanup, error structure)
+
+---
+
+## Changelog
+
+### 2026-05-28 — Resolution of the open (TBD) decisions
+- **Decision 10 (Real-time vs Batch Processing):** Resolved as **real-time / synchronous**. `POST /api/time-cards/voice` transcribes and extracts inline and returns the result in the same request; no queue.
+- **Decision 11 (Offline Support Strategy):** **Not implemented.** Deferred beyond Phase 3; remains a Phase 4 idea.
+- **Decision 12 (Audio Quality Validation):** **Partially addressed.** There is no pre-upload duration/volume check; instead the backend rejects results with `confidence: 'low'` (and missing hours for HOURS/OFF) after transcription. See `backend/src/routes/timeCards.js`.
+- Decisions 1–9 were all implemented as decided and remain accurate.

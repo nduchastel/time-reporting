@@ -1,7 +1,7 @@
 # Phase 2 Complete - Handoff for Phase 3
 
 **Date:** 2026-05-24  
-**Status:** Phase 2 COMPLETE ✅ | Phase 3 READY TO START
+**Status:** Phase 2 COMPLETE ✅ | Phase 3 COMPLETE ✅ (delivered 2026-05-28 — this handoff is now historical; see `phase3-plan.md`)
 
 ---
 
@@ -239,3 +239,10 @@ No additional context needed - this handoff document + existing docs contain eve
 **Latest commit:** `74366f4 - feat: redesign debug window with bottom bar (DevTools style)`  
 **Ready for:** Phase 3 implementation  
 **Estimated effort:** 8 tasks, ~2-3 weeks of development time
+
+---
+
+## Changelog
+
+### 2026-05-28 — Superseded
+Phase 3 (all 8 tasks) has since been delivered, and an automated test suite was added on top. This handoff is kept as a point-in-time record of the Phase 2 → Phase 3 boundary. For current status see `phase3-plan.md` (Changelog) and `docs/testing.md`.

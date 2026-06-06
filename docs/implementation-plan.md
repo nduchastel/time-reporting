@@ -1,5 +1,7 @@
 # Time Reporting System - Implementation Plan
 
+> **Status:** ✅ DELIVERED (Phase 1 MVP, 2026-05-23). This is the original Phase-1 execution plan; the inline `- [ ]` checkboxes were never ticked during execution and are **not maintained** — treat them as historical. The authoritative record of what shipped is the [Changelog](#changelog) at the end of this file plus `phase1-decisions.md`. Phases 2 and 3 (built on top of this MVP) are tracked in `phase2-*.md` and `phase3-plan.md`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build a voice-based time tracking PWA with AI transcription, focusing on Phase 1 MVP with comprehensive test coverage using mocked transcription.
@@ -1547,3 +1549,12 @@ import { GOOD_TRANSCRIPTIONS, BAD_TRANSCRIPTIONS, EDGE_CASES } from './tests/fix
 ---
 
 **Plan complete and ready for implementation!**
+
+---
+
+## Changelog
+
+### 2026-05-28 — Plan delivered; checkboxes retired
+The Phase 1 MVP described here was fully implemented (2026-05-23): ES-module Express backend, React 19 + Vite + Tailwind v4 PWA, Supabase schema (workers/worksites/time_cards), extraction + time-card services, the `POST`/`GET /api/time-cards` routes, the four-screen Worker UI, and the mocked-transcription test suite. See `phase1-decisions.md` → "Phase 1 Completion Summary" for the per-task breakdown and test counts.
+
+The inline `- [ ]` checkboxes were not ticked as work progressed, so they no longer reflect reality. Rather than retro-fit ~47 individual marks, this plan is now treated as historical; current status lives in the phase docs and `docs/testing.md`. Work delivered since this plan: Phase 2 (real voice → Whisper → GPT), Phase 3 (worker history + manager dashboard), and a full automated test suite.

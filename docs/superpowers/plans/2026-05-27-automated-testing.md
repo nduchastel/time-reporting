@@ -1,5 +1,7 @@
 # Automated Testing Implementation Plan
 
+> **Status:** ✅ EXECUTED (delivered 2026-05-28). The in-memory fakes, `TEST_MODE` boot, backend/frontend test expansion, smoke E2E, Playwright scenarios, and `npm run test:all` all shipped. Inline `- [ ]` checkboxes are historical and **not maintained**; the live reference for how testing works is `docs/testing.md`, and the outcome is recorded in the [Changelog](#changelog) below.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add shared in-memory fakes for Supabase + OpenAI, fill backend test gaps, expand frontend tests, add an HTTP-only smoke E2E, add two Playwright golden-path scenarios, and wire everything to `npm run test:all` — all running offline with no external service calls.
@@ -2508,3 +2510,10 @@ If everything passed without edits, this is a no-op.
 
 - Small (≤5 lines, single file): fix in place, mention the bug in the commit message.
 - Larger: write a `.skip`-marked failing test with a `// TODO(bug): ...` comment, finish the rest of the task, raise it as a separate issue with the user before you continue past Task 21.
+
+---
+
+## Changelog
+
+### 2026-05-28 — Plan executed
+Delivered across `53bc250`…`09f7c56` (2026-05-27 → 2026-05-28). What shipped: `fakeSupabase.js` + `fakeOpenAI.js` (fixture + scripted modes); shared `tests/setup.js`; `TEST_MODE=1` server boot mounting `/__test__/reset|seed|openai-next` (with a guard test that they 404 in production); expanded backend unit + integration coverage (auth, time-cards, manager, storage); hardened frontend component tests; an HTTP-only smoke E2E (worker submit → manager approve → reports); two Playwright golden-path specs (`worker-submit`, `manager-approve`); the frontend `?testMode=1` swap; a root `package.json` with `test:all`; and `docs/testing.md`. All suites run offline with no external calls. `docs/testing.md` is the maintained reference going forward.

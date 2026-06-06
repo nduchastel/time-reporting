@@ -295,3 +295,10 @@
 - Swipe gestures for navigation
 
 **Next:** See [Phase 2 Implementation Plan](phase2-implementation-plan.md)
+
+---
+
+## Changelog
+
+### 2026-05-28 — Decisions confirmed in shipped code
+All six Phase 1 architectural decisions held through Phases 2 and 3 and remain reflected in the codebase: ES Modules (`"type": "module"`), Vitest over Jest, Express, Supabase PostgreSQL, the mock-transcription testing strategy (now realized as the in-memory `fakeOpenAI`/`fakeSupabase` — see `docs/testing.md`), and Tailwind v4 with `@tailwindcss/postcss`. No Phase 1 decision was reversed. Everything under "Deferred to Phase 2" above was subsequently delivered in Phase 2.

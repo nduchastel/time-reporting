@@ -1,6 +1,6 @@
 # Phase 3 Implementation Plan - Worker History & Manager Dashboard
 
-**Status:** PLANNED  
+**Status:** ✅ COMPLETE (2026-05-28) — all 8 tasks delivered. See the [Changelog](#changelog) for the per-task commit map and the short list of deferred items.  
 **Goal:** Add worker history view and manager review dashboard
 
 ---
@@ -194,12 +194,14 @@ ALTER TABLE workers ADD COLUMN password_hash TEXT;
 
 ## Progress Tracking
 
-**Completed:** 0/8 tasks (0%)  
-**Current Phase:** Phase 2 (voice recording complete)  
-**Next:** Finish Phase 2 testing, then start Phase 3
+**Completed:** 8/8 tasks (100%) — delivered 2026-05-24 → 2026-05-28  
+**Current Phase:** Phase 3 complete; automated-testing initiative also complete (see `superpowers/plans/2026-05-27-automated-testing.md`)  
+**Next:** Phase 4 ideas (below), plus the deferred items listed in the Changelog
 
-**Worker Features:** 0/3 complete  
-**Manager Features:** 0/5 complete
+**Worker Features:** 3/3 complete ✅  
+**Manager Features:** 5/5 complete ✅
+
+> The decision recommendations above (Decisions 1–5) were all adopted as recommended: username/password manager auth, Supabase Storage for audio, last-5 worker history, single React app with `#/manager` routes, and polling for refresh.
 
 ---
 
@@ -215,3 +217,30 @@ ALTER TABLE workers ADD COLUMN password_hash TEXT;
 - Supabase Storage (for audio files)
 - JWT library (for manager authentication)
 - bcrypt (for password hashing)
+
+---
+
+## Changelog
+
+### 2026-05-28 — Phase 3 marked complete
+All 8 tasks delivered between 2026-05-24 and 2026-05-28. Per-task commit map:
+
+| Task | Status | Implementing commits |
+|---|---|---|
+| 1 — Worker recent history (last 5) | ✅ Done | `048dfe7` history modal; audio playback via `<audio controls>` in `WorkerHistory.jsx` |
+| 2 — Worker onboarding / PIN auth | ✅ Done | `0a9f989` worker PIN + manager login; `648e541` PIN login + hash router; `b247727` timing-safe enumeration fix |
+| 3 — Audio storage | ✅ Done | `53bc250` upload to Supabase Storage; `412653b` sanitize workerId; signed-URL playback |
+| 4 — Manager authentication (JWT + role) | ✅ Done | `0a9f989`, `b247727`; `e7abae2` DB auth columns + indexes; `requireAuth([roles])` middleware |
+| 5 — Manager review dashboard (approve/edit/flag) | ✅ Done | `7fb77a8` endpoints; `894eb74` dashboard UI; `491bc71` 404 mapping + hardening |
+| 6 — Edit time cards (audit trail) | ✅ Done | `7fb77a8` PATCH endpoint; `EditTimeCardModal.jsx`; original transcription + `extracted_data` preserved |
+| 7 — Worker management (CRUD) | ✅ Done | `83716d4` worker CRUD with bcrypted PIN; `83621aa` privilege-escalation hardening + validation |
+| 8 — Reports | ✅ Done (CSV) | `606f1b6` reports summary + CSV export |
+
+### Deferred / not delivered (tracked for Phase 4)
+These were mentioned in the plan body but intentionally not built in Phase 3:
+- **Worker-ownership auth on `GET /api/time-cards`** — still unauthenticated; see `TODO(Task 10)` in `backend/src/routes/timeCards.js`. The "workers see only their own cards" security note is **not yet enforced**.
+- **Rate limiting on auth endpoints** — not implemented.
+- **Reports charts** (hours-over-time, worksite distribution) — only CSV export shipped; no charting library.
+- **Bulk actions** (select multiple → approve all) — not implemented.
+- **Audio retention policy** (90-day auto-delete) — not implemented; uploads persist indefinitely.
+- **Minor UX**: pull-to-refresh and localStorage offline cache for history; PWA "install as app" prompt.
