@@ -1,26 +1,30 @@
-// frontend/src/components/manager/ManagerApp.jsx
+// frontend/src/components/admin/AdminApp.jsx
+// Admin portal, reachable at #/admin. Admins log in through the SAME manager login
+// (username + password) — there is no separate admin login. The JWT's role gates this:
+// non-admins are denied. A forced first-login password change blocks the portal until done.
 import { useState } from 'react';
 import { useHashRoute } from '../../lib/router';
 import { getManagerSession, clearManagerSession, setManagerSession } from '../../lib/auth';
-import ManagerLogin from './ManagerLogin';
-import ManagerDashboard from './ManagerDashboard';
-import WorkersView from './WorkersView';
-import ReportsView from './ReportsView';
+import ManagerLogin from '../manager/ManagerLogin';
 import ChangeCredential from '../ChangeCredential';
+import UsersView from './UsersView';
 
-const NAV = [
-  { path: '/manager',          label: 'Review',  Comp: ManagerDashboard },
-  { path: '/manager/workers',  label: 'Workers', Comp: WorkersView },
-  { path: '/manager/reports',  label: 'Reports', Comp: ReportsView },
-];
-
-export default function ManagerApp() {
-  const { path, navigate } = useHashRoute();
+export default function AdminApp() {
+  const { navigate } = useHashRoute();
   const [changing, setChanging] = useState(false);
   const session = getManagerSession();
+
   if (!session?.token) return <ManagerLogin onLoggedIn={() => window.location.reload()} />;
 
-  // Forced first-login password change blocks the dashboard until cleared.
+  if (session.role !== 'admin') {
+    return (
+      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center gap-3 p-6">
+        <p className="text-lg font-semibold">You don’t have access to the admin portal.</p>
+        <button onClick={() => navigate('/manager')} className="text-blue-600 underline">Go to the manager dashboard</button>
+      </div>
+    );
+  }
+
   if (session.must_change_credential) {
     return (
       <ChangeCredential
@@ -30,26 +34,19 @@ export default function ManagerApp() {
     );
   }
 
-  const View = (NAV.find((n) => n.path === path) || NAV[0]).Comp;
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-white shadow p-3 flex items-center gap-4">
-        <strong>Manager</strong>
+        <strong>Admin</strong>
         <nav className="flex gap-3 ml-2">
-          {NAV.map((n) => (
-            <button key={n.path} onClick={() => navigate(n.path)} className={`px-2 py-1 rounded ${path === n.path ? 'bg-blue-100 font-semibold' : ''}`}>
-              {n.label}
-            </button>
-          ))}
-          {session.role === 'admin' && (
-            <button onClick={() => navigate('/admin')} className="px-2 py-1 rounded text-purple-700">Admin</button>
-          )}
+          <button onClick={() => navigate('/admin')} className="px-2 py-1 rounded bg-blue-100 font-semibold">Users</button>
+          <button onClick={() => navigate('/manager')} className="px-2 py-1 rounded">Manager view</button>
         </nav>
         <span className="ml-auto text-sm text-gray-600">{session.name}</span>
         <button onClick={() => setChanging(true)} className="text-sm text-blue-600 underline">Change password</button>
         <button onClick={() => { clearManagerSession(); window.location.reload(); }} className="text-sm text-red-600 underline">Sign out</button>
       </header>
-      <View />
+      <UsersView />
       {changing && (
         <ChangeCredential kind="password" token={session.token} onCancel={() => setChanging(false)} onSuccess={() => setChanging(false)} />
       )}

@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import timeCardsRouter from './routes/timeCards.js';
 import authRouter from './routes/auth.js';
 import managerRouter from './routes/manager.js';
+import adminRouter from './routes/admin.js';
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.get('/health', (req, res) => {
 app.use('/api', timeCardsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/manager', managerRouter);
+app.use('/api/admin', adminRouter);
 
 // Test-mode endpoints — only when TEST_MODE=1 AND NODE_ENV !== 'production'.
 // Used by smoke E2E and Playwright to seed state and queue OpenAI responses.
