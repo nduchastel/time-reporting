@@ -86,3 +86,30 @@ When adding a backend route, extend the relevant fake if it uses a new query sha
 - Backend is ESM with top-level `await` (used for conditional fake imports) — keep imports static-analyzable where the fake-swap pattern is in play.
 - **No `package-lock.json` is committed** (intentional — each deploy platform regenerates its own to avoid npm proxy conflicts). Don't commit lockfiles.
 - Deploys are automatic on push to `main`: frontend → Vercel, backend → Railway, Supabase provisioned manually.
+
+## Documentation maintenance
+
+Every doc is one of two kinds. Know which before you edit, and never mix the two behaviors.
+
+**🟢 Living docs — keep current as features ship; NO changelog.** They must always describe the *present* state, so a changelog would just be noise. When you change behavior, edit the body in place.
+- `README.md`, this `CLAUDE.md`
+- `docs/deployment-plan.md`, `docs/quick-start-guide.md`, `docs/validation-and-startup.md`
+- `docs/database-schema.md`, `docs/testing.md`
+- `docs/development/*` (local-setup, development-modes, README)
+- `backend/src/db/README.md`, `frontend/README.md`
+- Future **user guides** (worker install iOS/Android, manager setup — Phase 4 #24–26)
+
+**📜 Historical docs — frozen once their phase ships; record status in a CHANGELOG at the end.** Don't rewrite the body to match new reality; append a dated changelog entry instead. These are point-in-time design/decision records.
+- `Design/2026-05-23-construction-time-tracking-design.md`
+- `docs/phase1-decisions.md`, `docs/phase2-decisions.md`, `docs/phase2-implementation-plan.md`, `docs/phase2-complete-handoff.md`, `docs/phase3-plan.md`, `docs/implementation-plan.md`
+- `docs/superpowers/plans/*`, `docs/superpowers/specs/*`
+- Phase plans (`docs/phase4-plan.md`, `docs/pre-beta-ship-plan.md`, `docs/phase5-backlog.md`): while the phase is **in progress** you may update its Status / Progress-Tracking section; once the phase **ships**, freeze the body and append a Changelog (exactly how phases 1–3 were closed out).
+
+**Snapshots / logs** (`DEPLOYMENT-READY.md`, `deployment-log.md`) are frozen point-in-time records — leave them as-is; no changelog, no rewrite.
+
+**Rules:**
+- Changelog entries are dated and appended at the very end: `### YYYY-MM-DD — short summary`.
+- A new historical doc is born with a Status line at the top; a new living doc never gets a changelog.
+- When you ship new functionality (Phase 4, 5, 6, …): **(a)** refresh the affected 🟢 living docs so they don't go stale, and **(b)** append a Changelog entry to the relevant 📜 phase/design doc — do **not** rewrite a past phase's body.
+
+**Per-phase ship checklist — refresh these living docs when a phase lands:** `README.md` roadmap · `docs/deployment-plan.md` · `docs/quick-start-guide.md` · `docs/validation-and-startup.md` · `docs/database-schema.md` · `docs/testing.md` · user guides · this `CLAUDE.md`.
