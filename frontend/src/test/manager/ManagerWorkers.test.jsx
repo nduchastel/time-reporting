@@ -39,6 +39,37 @@ describe('WorkersView', () => {
     expect(screen.queryByRole('combobox', { name: /role/i })).toBeNull();
   });
 
+  it('sends visible_panels on edit (Task 12)', async () => {
+    const worker = { id: 'w1', name: 'Alice', phone: '+1', language: 'en', role: 'worker', status: 'active', visible_panels: ['IN', 'OUT', 'HOURS', 'OFF'] };
+    const fetchMock = vi.spyOn(window, 'fetch')
+      .mockResolvedValueOnce({ ok: true, json: async () => [worker] })
+      .mockResolvedValueOnce({ ok: true, json: async () => worker })
+      .mockResolvedValueOnce({ ok: true, json: async () => [worker] });
+    render(<WorkersView />);
+    await waitFor(() => expect(screen.getByText('Alice')).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /^edit$/i }));
+    fireEvent.click(screen.getByRole('checkbox', { name: 'IN' }));
+    fireEvent.click(screen.getByRole('checkbox', { name: 'OUT' }));
+    fireEvent.click(screen.getByRole('checkbox', { name: 'OFF' }));
+    fireEvent.click(screen.getByRole('button', { name: /^save$/i }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
+    const patch = fetchMock.mock.calls[1];
+    expect(patch[1].method).toBe('PATCH');
+    expect(JSON.parse(patch[1].body).visible_panels).toEqual(['HOURS']);
+  });
+
+  it('blocks an edit that clears all panels (Task 12)', async () => {
+    const worker = { id: 'w1', name: 'Alice', phone: '+1', language: 'en', role: 'worker', status: 'active', visible_panels: ['HOURS'] };
+    const fetchMock = vi.spyOn(window, 'fetch').mockResolvedValueOnce({ ok: true, json: async () => [worker] });
+    render(<WorkersView />);
+    await waitFor(() => expect(screen.getByText('Alice')).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /^edit$/i }));
+    fireEvent.click(screen.getByRole('checkbox', { name: 'HOURS' }));
+    fireEvent.click(screen.getByRole('button', { name: /^save$/i }));
+    expect(await screen.findByText(/at least one panel/i)).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it('submits POST to /api/manager/workers when adding', async () => {
     const fetchMock = vi.spyOn(window, 'fetch')
       .mockResolvedValueOnce({ ok: true, json: async () => WORKERS })

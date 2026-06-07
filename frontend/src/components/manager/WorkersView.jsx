@@ -2,23 +2,33 @@
 import { useEffect, useState } from 'react';
 import { apiFetch, getManagerSession } from '../../lib/auth';
 
+const PANELS = ['IN', 'OUT', 'HOURS', 'OFF'];
+
 export default function WorkersView() {
   const [list, setList] = useState([]);
   const [editing, setEditing] = useState(null); // null = closed, {} = new, {id,…} = edit
+  const [err, setErr] = useState(null);
   const session = getManagerSession();
 
   const load = () => apiFetch('/api/manager/workers', { token: session.token }).then(setList);
   useEffect(() => { load(); }, []);
 
   const save = async (e) => {
-    e.preventDefault();
-    const body = Object.fromEntries(new FormData(e.currentTarget));
-    if (editing.id) {
-      await apiFetch(`/api/manager/workers/${editing.id}`, { method: 'PATCH', token: session.token, body: JSON.stringify(body) });
-    } else {
-      await apiFetch(`/api/manager/workers`, { method: 'POST', token: session.token, body: JSON.stringify(body) });
-    }
-    setEditing(null); load();
+    e.preventDefault(); setErr(null);
+    const fd = new FormData(e.currentTarget);
+    const body = Object.fromEntries(fd);
+    try {
+      if (editing.id) {
+        const panels = fd.getAll('visible_panels');
+        if (panels.length === 0) { setErr('A worker must have at least one panel.'); return; }
+        body.visible_panels = panels;
+        await apiFetch(`/api/manager/workers/${editing.id}`, { method: 'PATCH', token: session.token, body: JSON.stringify(body) });
+      } else {
+        delete body.visible_panels;
+        await apiFetch(`/api/manager/workers`, { method: 'POST', token: session.token, body: JSON.stringify(body) });
+      }
+      setEditing(null); load();
+    } catch (e2) { setErr(e2.message || 'Save failed.'); }
   };
 
   return (
@@ -61,6 +71,19 @@ export default function WorkersView() {
                 </select>
               </label>
             )}
+            {editing.id && (
+              <fieldset className="mb-3">
+                <legend className="text-sm font-medium mb-1">Visible panels</legend>
+                <div className="flex gap-3 flex-wrap">
+                  {PANELS.map((p) => (
+                    <label key={p} className="text-sm flex items-center gap-1">
+                      <input type="checkbox" name="visible_panels" value={p} defaultChecked={(editing.visible_panels || PANELS).includes(p)} /> {p}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
+            {err && <p className="text-red-600 text-sm mb-2">{err}</p>}
             <div className="flex gap-2">
               <button type="button" onClick={() => setEditing(null)} className="flex-1 bg-gray-200 py-2 rounded">Cancel</button>
               <button type="submit" className="flex-1 bg-blue-600 text-white py-2 rounded font-semibold">Save</button>
