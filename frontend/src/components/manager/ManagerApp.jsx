@@ -5,13 +5,15 @@ import { getManagerSession, clearManagerSession, setManagerSession } from '../..
 import ManagerLogin from './ManagerLogin';
 import ManagerDashboard from './ManagerDashboard';
 import WorkersView from './WorkersView';
+import WorksitesView from './WorksitesView';
 import ReportsView from './ReportsView';
 import ChangeCredential from '../ChangeCredential';
 
 const NAV = [
-  { path: '/manager',          label: 'Review',  Comp: ManagerDashboard },
-  { path: '/manager/workers',  label: 'Workers', Comp: WorkersView },
-  { path: '/manager/reports',  label: 'Reports', Comp: ReportsView },
+  { path: '/manager',           label: 'Review',    Comp: ManagerDashboard },
+  { path: '/manager/workers',   label: 'Workers',   Comp: WorkersView },
+  { path: '/manager/worksites', label: 'Worksites', Comp: WorksitesView },
+  { path: '/manager/reports',   label: 'Reports',   Comp: ReportsView },
 ];
 
 export default function ManagerApp() {
