@@ -38,9 +38,11 @@ Employee records with authentication and preferences.
 | `email` | TEXT | UNIQUE | Email address (optional) |
 | `phone` | TEXT | | Phone number for SMS (optional) |
 | `language` | TEXT | DEFAULT 'en' | Preferred language (en, fr, es, etc.) |
-| `status` | TEXT | DEFAULT 'active' | active \| inactive |
+| `status` | TEXT | DEFAULT 'active' | active \| disabled |
 | `disabled_range` | JSONB | | Date ranges when worker is disabled |
 | `custom_rules` | JSONB | | Worker-specific validation rules |
+| `must_change_credential` | BOOLEAN | NOT NULL, DEFAULT false | Phase 4 — true until the user replaces a temporary PIN/password on first login |
+| `visible_panels` | TEXT[] | NOT NULL, DEFAULT '{IN,OUT,HOURS,OFF}' | Phase 4 — which action panels this worker sees (non-empty subset) |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() | Record creation timestamp |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() | Last update timestamp |
 
@@ -50,8 +52,9 @@ Employee records with authentication and preferences.
 
 **Notes:**
 - Phase 3 added (applied): `role` (worker/manager/admin), `username`, `password_hash`, `pin` — see "Phase 3 Additions (Applied)" below
+- Phase 4 added (migration `003_phase4.sql`): `must_change_credential`, `visible_panels` — credential lifecycle + per-worker panel visibility
 - `language` used for Whisper transcription (auto-detection fallback)
-- `status = 'inactive'` prevents new time card submissions
+- `status = 'disabled'` prevents login / new time card submissions
 
 ---
 
@@ -65,7 +68,7 @@ Job site locations where work is performed.
 | `name` | TEXT | NOT NULL, UNIQUE | Worksite name (e.g., "Simons Property") |
 | `address` | TEXT | | Physical address (optional) |
 | `client` | TEXT | | Client/customer name (optional) |
-| `status` | TEXT | DEFAULT 'active' | active \| inactive |
+| `status` | TEXT | DEFAULT 'active', CHECK (active\|archived\|disabled) | Phase 4 widened to allow `archived` |
 | `disabled_range` | JSONB | | Date ranges when site is disabled |
 | `custom_rules` | JSONB | | Site-specific validation rules |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() | Record creation timestamp |
@@ -79,6 +82,7 @@ Job site locations where work is performed.
 - GPT extracts worksite name from transcription
 - Fuzzy match: "Simon's property" → matches "Simons Property"
 - If no match found, `worksite_id` is null (valid for some action types)
+- Phase 4 (migration `003_phase4.sql`) widened the `status` CHECK to include `archived`. Managers **archive** sites instead of deleting them (`time_cards` keep their links); archived sites are excluded from active pickers via `GET /api/manager/worksites?status=active`.
 
 ---
 
@@ -441,7 +445,11 @@ ORDER BY tc.created_at ASC;
 
 ## Migration
 
-**File:** `backend/src/db/migrations/001_initial_schema.sql`
+**Files (apply in order):**
+- `001_initial_schema.sql` — tables, indexes, triggers
+- `002_phase3_auth_and_indexes.sql` — auth columns + indexes
+- `003_phase4.sql` — `must_change_credential`, `visible_panels`, widened `worksites.status` CHECK
+- `004_phase4_rls.sql` — enables Row-Level Security (⚠️ set `SUPABASE_SERVICE_ROLE_KEY` first — see [Security (Row Level Security)](#security-row-level-security))
 
 **Run in Supabase SQL Editor:**
 1. Go to [Supabase Dashboard](https://supabase.com/dashboard)
@@ -504,6 +512,22 @@ Migration applied: 002_phase3_auth_and_indexes.sql
 - Audio storage: `audio_url` points to Supabase Storage (signed URL)
 - Manager dashboard queries (join with approved_by)
 - Worker history queries (recent 5 entries)
+
+---
+
+## Phase 4 Additions (Applied)
+
+Migrations applied: `003_phase4.sql`, `004_phase4_rls.sql`
+
+### New worker fields:
+- `must_change_credential` BOOLEAN DEFAULT false — forces a PIN/password change on first login (set true on create and on admin reset; cleared by `POST /api/auth/change-credential`)
+- `visible_panels` TEXT[] DEFAULT '{IN,OUT,HOURS,OFF}' — per-worker action panel visibility (manager-editable; must be a non-empty subset)
+
+### Worksite change:
+- `status` CHECK widened to `active | archived | disabled`; worksites are **archived**, not deleted, to preserve `time_cards` history
+
+### Row-Level Security:
+- RLS enabled on `workers`, `worksites`, `time_cards` (default-deny for anon/authenticated; backend uses the service-role key, which bypasses RLS). See [Security (Row Level Security)](#security-row-level-security).
 
 ---
 

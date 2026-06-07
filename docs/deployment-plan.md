@@ -145,17 +145,28 @@
    # Database
    SUPABASE_URL=https://your-project.supabase.co
    SUPABASE_ANON_KEY=your-anon-key-from-supabase
-   
+   # REQUIRED before enabling RLS (migration 004): the backend connects with this
+   # service-role key, which bypasses RLS. Without it, RLS locks the API out.
+   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-from-supabase
+
    # AI Services (NEVER PUT IN FRONTEND!)
    OPENAI_API_KEY=sk-proj-your-openai-api-key-here
-   
+
+   # Auth (REQUIRED) — long random string used to sign JWT session tokens
+   JWT_SECRET=a-long-random-secret
+
    # Server Config
    PORT=3001
    NODE_ENV=production
-   
-   # CORS (add after Vercel deployment)
+
+   # CORS (add after Vercel deployment) — comma-separated allowlist
    ALLOWED_ORIGINS=https://time-reporting.vercel.app
+
+   # Error monitoring (optional) — no-op when unset
+   SENTRY_DSN=
    ```
+
+   > Phase 4 also runs once on a fresh environment: **`node src/db/create-admin.js <username> <password> [name]`** to seed the first admin (everyone else is created through the `#/admin` portal). See `docs/security.md`.
 
 4. **Deploy:**
    - Click "Deploy"
@@ -209,15 +220,14 @@
    - **Database Password:** (Generate strong password and save it!)
    - **Region:** Choose closest to your workers (e.g., US East for Canada/USA)
 
-2. **Run Migration:**
+2. **Run Migrations (in order):**
    - Go to SQL Editor in Supabase dashboard
-   - Click "New Query"
-   - Copy entire contents of `backend/src/db/migrations/001_initial_schema.sql`
-   - Click "Run"
-   - Verify tables created in Table Editor:
-     - ✅ `workers` (7 columns)
-     - ✅ `worksites` (7 columns)
-     - ✅ `time_cards` (15 columns)
+   - Run each file's contents in order:
+     1. `001_initial_schema.sql` — tables, indexes, triggers
+     2. `002_phase3_auth_and_indexes.sql` — auth columns + indexes
+     3. `003_phase4.sql` — `must_change_credential`, `visible_panels`, widened `worksites.status`
+     4. `004_phase4_rls.sql` — enables RLS (**set `SUPABASE_SERVICE_ROLE_KEY` in Railway first**, or the API locks itself out)
+   - Verify tables created in Table Editor (`workers`, `worksites`, `time_cards`)
 
 3. **Seed Test Data:**
    - Create `.env` file in `backend/` with Supabase credentials:
@@ -332,10 +342,10 @@ time_cards (id, worker_id, worksite_id, action_type, date, hours, transcription,
 ### Database Deployment
 
 - [ ] Create Supabase project
-- [ ] Run migration SQL
+- [ ] Run migrations `001` → `002` → `003` → `004` in order (set service-role key before `004`)
 - [ ] Seed test data
 - [ ] Verify tables created
-- [ ] Copy credentials
+- [ ] Copy credentials (incl. **service-role key**)
 
 ### Backend Deployment (Railway)
 
@@ -344,11 +354,16 @@ time_cards (id, worker_id, worksite_id, action_type, date, hours, transcription,
 - [ ] Add environment variables:
   - [ ] `SUPABASE_URL`
   - [ ] `SUPABASE_ANON_KEY`
+  - [ ] `SUPABASE_SERVICE_ROLE_KEY` (required before enabling RLS)
   - [ ] `OPENAI_API_KEY`
+  - [ ] `JWT_SECRET` (long random string)
+  - [ ] `ALLOWED_ORIGINS` (Vercel origin)
+  - [ ] `SENTRY_DSN` (optional)
   - [ ] `PORT=3001`
   - [ ] `NODE_ENV=production`
 - [ ] Deploy
 - [ ] Test health endpoint
+- [ ] Run `node src/db/create-admin.js <username> <password>` once → first admin
 - [ ] Copy Railway URL
 
 ### Frontend Deployment (Vercel)

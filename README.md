@@ -277,10 +277,11 @@ See [Design Doc](Design/2026-05-23-construction-time-tracking-design.md#cost-ana
 - Manager dashboard (review, approve, edit, flag), worker CRUD, reports + CSV
 - Full automated test suite (unit + integration + smoke + Playwright)
 
-**Phase 4 — Beta hardening, admin & user management (next, pre-beta):**
-- Security: worker-ownership auth, auth rate limiting, CORS lockdown, JWT TTL, Supabase RLS
-- Error monitoring; PWA install prompt
-- Admin portal + full user management (gated `#/admin`); per-worker panel visibility
+**Phase 4 — Beta hardening, admin & user management — ✅ Delivered:**
+- Security: worker-ownership auth on time-card reads, auth-endpoint rate limiting, CORS allowlist, role-based JWT TTLs (worker 7d / manager-admin 24h), Supabase RLS (defense-in-depth)
+- Error monitoring (no-op without DSN, PII-scrubbed); PWA install (manifest + service worker + install prompt)
+- Admin portal + full user management (gated `#/admin`); temporary-credential + forced-first-login-change lifecycle; self-service PIN/password change; `create-admin` bootstrap script
+- Per-worker panel visibility; worksite management (add/edit/archive)
 - Worker install guides (iOS/Android) + manager setup guide
 - See [Phase 4 Plan](docs/phase4-plan.md)
 

@@ -22,7 +22,7 @@ Runs backend, frontend, and Playwright suites in sequence. ~3 minutes on a clean
 
 ## How the fakes work
 
-`backend/tests/fakes/fakeSupabase.js` is an in-memory replacement for the Supabase client. It backs four tables (`workers`, `worksites`, `time_cards`, `storage`) with plain JS arrays + a Map. It implements only the chain shapes the production code uses; calling an unimplemented method throws `not implemented: ...` to fail loudly instead of silently passing. Helpers: `reset()`, `seed({...})`, `snapshot()`.
+`backend/tests/fakes/fakeSupabase.js` is an in-memory replacement for the Supabase client. It backs four tables (`workers`, `worksites`, `time_cards`, `storage`) with plain JS arrays + a Map. It implements only the chain shapes the production code uses; calling an unimplemented method throws `not implemented: ...` to fail loudly instead of silently passing. On `insert`/`seed` it applies the same column defaults as the SQL schema (e.g. `workers.visible_panels`, `workers.must_change_credential`, `worksites.status`) so seeded rows look production-shaped. Helpers: `reset()`, `seed({...})`, `snapshot()`.
 
 `backend/tests/fakes/fakeOpenAI.js` is a class with the shape of the `openai` package's default export. Two modes:
 - **Fixture mode**: hash an audio buffer with `registerFixture(buf, { transcription, extraction })`. Subsequent `audio.transcriptions.create({ file: buf })` returns the canned response.
@@ -40,6 +40,8 @@ When `TEST_MODE=1` is set in the backend environment **and** `NODE_ENV !== 'prod
   - `POST /__test__/openai-next` — body `{ transcription, extraction }`, queues OpenAI response
 
 These endpoints **do not bypass auth** for any production route — they're separate URLs that only exist in test mode. They 404 when `TEST_MODE` isn't set or when `NODE_ENV=production`. There's a unit test (`tests/integration/testMode.test.js`) that verifies this.
+
+The auth-endpoint **rate limiter is skipped when `TEST_MODE=1`**, so the real-server smoke/Playwright flows (which log in repeatedly) aren't throttled. The Vitest integration suite does *not* set `TEST_MODE`, so the limiter is active there and `tests/integration/rateLimit.test.js` exercises the 429 path.
 
 The frontend has a parallel `?testMode=1` URL flag: when present, the worker UI renders a "Submit fake recording" button instead of the microphone-driven record button. It uploads a 4-byte audio fixture; `fakeOpenAI` is queued separately to drive the response. **The `?testMode=1` flag does not bypass auth or any other security control** — it only swaps a UI element.
 

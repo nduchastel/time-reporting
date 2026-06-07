@@ -1,6 +1,6 @@
 # Phase 4 Implementation Plan — Beta Hardening, Admin & User Management
 
-**Status:** PLANNED  
+**Status:** SHIPPED — 2026-06-07 (build complete; awaiting the Pre-Beta-Ship QA gate)  
 **Created:** 2026-06-06  
 **Goal:** Get the app safe and complete enough to ship a **beta to real customers**. Phase 4 is the last *build* phase before launch; the [Pre-Beta-Ship QA gate](pre-beta-ship-plan.md) runs after it, then we ship. Everything not listed here is deferred to the [Phase 5 backlog](phase5-backlog.md).
 
@@ -213,11 +213,12 @@ Security review/pen-test and load testing were **not** selected as beta gates; t
 
 ## Progress Tracking
 
-**Completed:** 0/19 tasks (0%)  
-**Current:** Not started — planning approved 2026-06-06. Detailed execution plan: [`superpowers/plans/2026-06-06-phase4.md`](superpowers/plans/2026-06-06-phase4.md).  
-**Next:** Apply migration `003`, then begin Group A (security), which also unblocks the Pre-Beta-Ship security expectations.
+**Completed:** 19/19 tasks (100%) — build done 2026-06-07.  
+**Next:** Run the [Pre-Beta-Ship QA gate](pre-beta-ship-plan.md) (automated P4 coverage + manual device-matrix QA), then beta launch.
 
-**Security:** 0/5 · **Observability:** 0/1 · **Admin:** 0/3 · **Panels:** 0/3 · **Install/Onboarding:** 0/2 · **Credential lifecycle:** 0/3 · **Worksites:** 0/2
+**Security:** 5/5 · **Observability:** 1/1 · **Admin:** 3/3 · **Panels:** 3/3 · **Install/Onboarding:** 2/2 · **Credential lifecycle:** 3/3 · **Worksites:** 2/2
+
+Test totals at completion: **144 backend / 61 frontend** (offline). Playwright E2E + RLS still need a live-instance smoke as part of the QA gate.
 
 ---
 
@@ -228,6 +229,9 @@ Scope agreed after triaging the full remaining backlog: Phase 4 = beta-hardening
 
 ### 2026-06-06 — Auth model settled (Group F added)
 Clarified the credential model and added `security.md` as the authoritative reference. Decisions: workers use phone + PIN, managers/admins use username + password; **one login path** (admins use the manager username/password endpoint, role gates `#/admin` — no separate admin login, fixing the earlier ambiguity in Task 7). Creators set a **temporary** secret; **all roles are forced to change it on first login**; users can change their own secret anytime; managers/admins can reset locked-out users. New Group F (Tasks 15–17): forced first-login change + `must_change_credential`, self-service change, and a bootstrap `create-admin` script. Task count 14 → 17.
+
+### 2026-06-07 — Phase 4 shipped
+All 19 tasks built and tested across stacked branches (setup → security → admin-credentials → worksites → panels → observability → install), each landing with tests and a green suite. Highlights: ownership auth on `GET /api/time-cards`; auth rate limiting; CORS allowlist; role-based JWT TTLs; RLS (defense-in-depth, backend uses the service-role key); provider-agnostic, PII-scrubbed error monitoring; admin portal (`#/admin`) + full user management; temporary-credential/forced-first-login lifecycle + self-service change + `create-admin` bootstrap; per-worker panel visibility; worksite add/edit/archive; PWA install (manifest + service worker + install prompt); worker iOS/Android + manager onboarding guides. Migrations `003_phase4.sql` (columns) and `004_phase4_rls.sql` (RLS) added. New env: `ALLOWED_ORIGINS`, `SENTRY_DSN`, and **required-for-RLS** `SUPABASE_SERVICE_ROLE_KEY`. Final offline suite: 144 backend / 61 frontend. Status frozen; remaining verification (Playwright E2E, live RLS smoke, device-matrix QA) belongs to the Pre-Beta-Ship gate. Body above is now frozen — see [`superpowers/plans/2026-06-06-phase4.md`](superpowers/plans/2026-06-06-phase4.md) for the task-level record.
 
 ### 2026-06-06 — Worksite management + execution plan
 Added **Group G (Tasks 18–19): worksite management** — managers can add/edit/**archive** job sites (archive, not hard-delete, to preserve `time_cards` history); closes the gap where worksites only existed if seeded. Added the **Setup & cross-cutting** section (migration `003_phase4.sql` bundling `must_change_credential` + `visible_panels` + `worksites.status`; new env vars; `create-admin` prod run; `validation-and-startup.md` refresh; feature-branch workflow). Task count 17 → 19. Wrote the detailed task-by-task execution plan at `superpowers/plans/2026-06-06-phase4.md`.

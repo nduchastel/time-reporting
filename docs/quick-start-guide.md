@@ -203,9 +203,9 @@
 
 ## 🎯 Next Steps
 
-**Done (Phases 1–3):** real audio recording, Whisper transcription, frontend↔backend wiring, worker PIN + manager auth, manager dashboard, reports + CSV, audio storage, automated test suite.
+**Done (Phases 1–4):** real audio recording, Whisper transcription, frontend↔backend wiring, worker PIN + manager auth, manager dashboard, reports + CSV, audio storage, automated test suite — **plus Phase 4:** worker-ownership auth on `GET /time-cards`, auth rate limiting, CORS lockdown, role-based JWT TTL, RLS, error monitoring, PWA install, admin portal + user management with the temporary-credential/forced-first-login lifecycle, per-worker panel visibility, worksite management, and worker/manager onboarding guides. See [`phase4-plan.md`](phase4-plan.md) and [`onboarding/`](onboarding/).
 
-**Next — Phase 4 (pre-beta):** worker-ownership auth on `GET /time-cards`, auth rate limiting, CORS lockdown, JWT TTL, RLS, error monitoring, PWA install, admin portal + user management, per-worker panel visibility, and worker/manager onboarding guides. See [`phase4-plan.md`](phase4-plan.md).
+**Next — Pre-Beta-Ship QA gate**, then beta launch. See [`pre-beta-ship-plan.md`](pre-beta-ship-plan.md).
 
 **Later — Phase 5 (post-beta):** anomaly detection, charts/PDF, GPS, photos, crew entries, push, payroll, offline sync. See [`phase5-backlog.md`](phase5-backlog.md).
 

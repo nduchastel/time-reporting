@@ -217,10 +217,13 @@ cd frontend
 cat > .env << 'EOF'
 # Backend API URL
 VITE_API_URL=http://localhost:3001
+
+# Error monitoring (Optional — Phase 4). Unset = no-op (stays offline locally).
+# VITE_SENTRY_DSN=
 EOF
 ```
 
-**Note:** `VITE_API_URL` points to your local backend server.
+**Note:** `VITE_API_URL` points to your local backend server. `VITE_SENTRY_DSN` is optional; error reporting is a no-op when it's unset.
 
 ---
 

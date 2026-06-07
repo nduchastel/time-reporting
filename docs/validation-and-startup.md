@@ -2,6 +2,8 @@
 
 **Purpose:** Post-deployment validation, initial setup, and first-time user instructions
 
+> **Auth model (current, Phase 4).** Workers sign in with **phone + PIN**; managers/admins with **username + password** (admins use the same manager login — their role unlocks `#/admin`). The **first admin** is created with `node src/db/create-admin.js <username> <password>`; that admin then creates everyone else from the `#/admin` portal. New users get a *temporary* secret and are **forced to change it on first login**. Sections below marked "(Phase 1 MVP)" describe the original no-auth state and are kept for history — for real onboarding follow the dedicated guides: [`onboarding/manager-setup.md`](onboarding/manager-setup.md), [`onboarding/worker-ios.md`](onboarding/worker-ios.md), [`onboarding/worker-android.md`](onboarding/worker-android.md), and the full model in [`security.md`](security.md).
+
 ---
 
 ## 📋 Table of Contents
@@ -39,17 +41,23 @@ curl https://time-reporting-backend.railway.app/health
 
 ### Step 2: Verify Database Connection (Supabase)
 
-```bash
-# Test database by getting time cards
-curl https://time-reporting-backend.railway.app/api/time-cards
+`GET /api/time-cards` now **requires authentication** (Phase 4), so an unauthenticated curl returns **401** — that itself confirms the route and auth middleware are wired. To exercise the DB, log in first and reuse the token:
 
-# Expected response:
-[]
-# (Empty array is OK - no time cards created yet)
+```bash
+# Unauthenticated → expect 401 (auth is working)
+curl -i https://time-reporting-backend.railway.app/api/time-cards
+# HTTP/1.1 401 Unauthorized
+
+# Authenticated check: log in as your admin/manager, then call with the token
+TOKEN=$(curl -s -X POST https://time-reporting-backend.railway.app/api/auth/manager/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"<admin-username>","password":"<password>"}' | sed -E 's/.*"token":"([^"]+)".*/\1/')
+curl https://time-reporting-backend.railway.app/api/manager/time-cards -H "Authorization: Bearer $TOKEN"
+# Expected: [] (empty array is OK - no time cards yet)
 ```
 
-**✅ Success:** Status 200, returns array (empty or with data)  
-**❌ Failure:** 500 error with "Supabase" in message → Check SUPABASE_URL and SUPABASE_ANON_KEY in Railway
+**✅ Success:** unauthenticated call returns 401; authenticated call returns a JSON array  
+**❌ Failure:** 500 with "Supabase" in message → check `SUPABASE_URL` / `SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` (the last is required once RLS migration `004` is applied)
 
 ---
 

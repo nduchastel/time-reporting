@@ -48,11 +48,12 @@ Full testing reference: `docs/testing.md`.
 
 ### Backend request flow (`backend/src/`)
 
-`server.js` → `routes/*` → `services/*` → `db/supabase.js`. Routes are thin; all business logic lives in `services/`. The three route groups:
+`server.js` → `routes/*` → `services/*` → `db/supabase.js`. Routes are thin; all business logic lives in `services/`. The route groups:
 
-- `routes/timeCards.js` mounted at `/api` — the worker-facing voice pipeline.
-- `routes/auth.js` at `/api/auth` — `worker/login` (phone + PIN), `manager/login` (username + password).
-- `routes/manager.js` at `/api/manager` — gated by `requireAuth(['manager','admin'])`; approve/edit/flag time cards, manage workers.
+- `routes/timeCards.js` mounted at `/api` — the worker-facing voice pipeline. `GET /api/time-cards` is auth'd: workers see only their own cards (token `sub` overrides any `workerId`); managers/admins query any.
+- `routes/auth.js` at `/api/auth` — `worker/login` (phone + PIN), `manager/login` (username + password, also used by admins), `change-credential` (authenticated PIN/password change). Login endpoints are rate-limited.
+- `routes/manager.js` at `/api/manager` — gated by `requireAuth(['manager','admin'])`; approve/edit/flag time cards, manage workers (incl. `visible_panels`), and worksite CRUD (`/worksites`, archive-not-delete).
+- `routes/admin.js` at `/api/admin` — gated by `requireAuth(['admin'])`; full user management (`/users`: create any role with a temp secret, edit/role-change/enable-disable, reset-credential, delete with can't-delete-self / can't-delete-last-admin guards).
 
 ### The two-step voice submission (important, non-obvious)
 
@@ -60,15 +61,17 @@ Full testing reference: `docs/testing.md`.
 
 ### Data model
 
-A single `workers` table holds both workers and managers/admins, distinguished by `role` (`worker`/`manager`/`admin`). Workers authenticate with a bcrypt-hashed `pin`; managers with a `password_hash`. Plus `worksites` and `time_cards` (status workflow: `pending` → `approved`/`edited`/`flagged`, with original transcription + `extracted_data` preserved as an audit trail). Schema lives in `backend/src/db/migrations/`.
+A single `workers` table holds both workers and managers/admins, distinguished by `role` (`worker`/`manager`/`admin`). Workers authenticate with a bcrypt-hashed `pin`; managers with a `password_hash`. Phase 4 added `must_change_credential` (forced first-login secret change) and `visible_panels` (per-worker action panels). Plus `worksites` (with a `status` of `active`/`archived` — archive, don't delete) and `time_cards` (status workflow: `pending` → `approved`/`edited`/`flagged`, with original transcription + `extracted_data` preserved as an audit trail). Schema lives in `backend/src/db/migrations/` (001–004).
 
 ### Auth
 
-JWT bearer tokens issued by `services/authService.js`, verified in `middleware/requireAuth.js` (`requireAuth([roles])`). Login routes run a constant-time bcrypt compare against a dummy hash on the not-found branch to prevent username/phone enumeration via timing — preserve that pattern when touching auth. `getTimeCards` always applies a bounded `limit` (DoS guard).
+JWT bearer tokens issued by `services/authService.js` (role-based TTL: worker 7d, manager/admin 24h), verified in `middleware/requireAuth.js` (`requireAuth([roles])`). Login routes run a constant-time bcrypt compare against a dummy hash on the not-found branch to prevent username/phone enumeration via timing — preserve that pattern when touching auth. Login endpoints are per-IP rate-limited (`middleware/rateLimit.js`, skipped under `TEST_MODE`). CORS is locked to `ALLOWED_ORIGINS`. `getTimeCards` always applies a bounded `limit` (DoS guard).
+
+**Credential lifecycle:** a creator sets a *temporary* secret (`must_change_credential=true`); the user is forced to change it on first login via `POST /api/auth/change-credential`; users can self-change anytime; managers reset worker PINs, admins reset manager/admin passwords. The first admin is bootstrapped with `backend/src/db/create-admin.js`. RLS is defense-in-depth (the backend uses the service-role key, which bypasses RLS). Full model: `docs/security.md`.
 
 ### Frontend (`frontend/src/`)
 
-Hash-based routing (`lib/router.js`, `useHashRoute`) — no router library. `App.jsx` dispatches: `#/manager*` → `ManagerApp`; everything else → worker flow (login gate → `WorkerUI`). Sessions (JWT + user info) are stored in `localStorage` via `lib/auth.js`; all API calls go through `apiFetch` there, which injects the bearer token and reads `VITE_API_URL` (defaults to `http://localhost:3001`).
+Hash-based routing (`lib/router.js`, `useHashRoute`) — no router library. `App.jsx` dispatches: `#/admin*` → `AdminApp` (gated `role==='admin'`); `#/manager*` → `ManagerApp`; everything else → worker flow (login gate → `WorkerUI`). A `must_change_credential` session flag funnels any role to a forced `ChangeCredential` screen first. Sessions (JWT + user info) are stored in `localStorage` via `lib/auth.js`; all API calls go through `apiFetch` there, which injects the bearer token, reads `VITE_API_URL` (defaults to `http://localhost:3001`), and auto-logs-out on a token-error 401. `main.jsx` wraps the app in an `ErrorBoundary` and mounts the PWA `InstallPrompt`; error reporting (`lib/errorReporter.js`) and the backend reporter (`services/errorReporter.js`) are no-ops unless a DSN is set.
 
 ## Test infrastructure (TEST_MODE and fakes)
 
