@@ -178,4 +178,52 @@ router.patch('/workers/:id', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+// ── Worksites ─────────────────────────────────────────────────────────────
+// Managers add/edit/archive job sites. Worksites are referenced by time_cards,
+// so we ARCHIVE (status='archived') rather than hard-delete to preserve history.
+const WORKSITE_STATUSES = ['active', 'archived'];
+const WORKSITE_FIELDS = 'id, name, address, client, status, created_at, updated_at';
+
+function mapWorksiteDbError(e, res, next) {
+  if (e?.code === '23505') return res.status(409).json({ error: 'DUPLICATE', message: 'A worksite with that name already exists' });
+  if (e?.code === '23514') return res.status(400).json({ error: 'INVALID_VALUE', message: 'One or more fields have an invalid value' });
+  if (e?.code === 'PGRST116') return res.status(404).json({ error: 'NOT_FOUND', message: 'Worksite not found' });
+  return next(e);
+}
+
+router.get('/worksites', async (req, res, next) => {
+  try {
+    let q = supabase.from('worksites').select(WORKSITE_FIELDS).order('name', { ascending: true });
+    if (req.query.status && WORKSITE_STATUSES.includes(req.query.status)) q = q.eq('status', req.query.status);
+    const { data, error } = await q;
+    if (error) throw error;
+    res.json(data);
+  } catch (e) { next(e); }
+});
+
+router.post('/worksites', async (req, res, next) => {
+  try {
+    const { name, address, client } = req.body || {};
+    if (!name) return res.status(400).json({ error: 'MISSING_FIELDS', message: 'name is required' });
+    const row = { name, address: address ?? null, client: client ?? null, status: 'active' };
+    const { data, error } = await supabase.from('worksites').insert(row).select(WORKSITE_FIELDS).single();
+    if (error) return mapWorksiteDbError(error, res, next);
+    res.status(201).json(data);
+  } catch (e) { next(e); }
+});
+
+router.patch('/worksites/:id', async (req, res, next) => {
+  try {
+    const allowed = ['name', 'address', 'client', 'status'];
+    const patch = {};
+    for (const k of allowed) if (k in req.body) patch[k] = req.body[k];
+    if ('status' in patch && !WORKSITE_STATUSES.includes(patch.status)) {
+      return res.status(400).json({ error: 'INVALID_STATUS', message: `status must be one of ${WORKSITE_STATUSES.join(', ')}` });
+    }
+    const { data, error } = await supabase.from('worksites').update(patch).eq('id', req.params.id).select(WORKSITE_FIELDS).single();
+    if (error) return mapWorksiteDbError(error, res, next);
+    res.json(data);
+  } catch (e) { next(e); }
+});
+
 export default router;
