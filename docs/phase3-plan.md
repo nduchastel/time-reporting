@@ -196,7 +196,7 @@ ALTER TABLE workers ADD COLUMN password_hash TEXT;
 
 **Completed:** 8/8 tasks (100%) — delivered 2026-05-24 → 2026-05-28  
 **Current Phase:** Phase 3 complete; automated-testing initiative also complete (see `superpowers/plans/2026-05-27-automated-testing.md`)  
-**Next:** Phase 4 ideas (below), plus the deferred items listed in the Changelog
+**Next:** **Phase 4 — beta hardening, admin & user management** (see [`phase4-plan.md`](phase4-plan.md)). The deferred items from the Changelog below were triaged into Phase 4 (security, admin, panels, PWA, guides) and the [Phase 5 backlog](phase5-backlog.md) on 2026-06-06.
 
 **Worker Features:** 3/3 complete ✅  
 **Manager Features:** 5/5 complete ✅

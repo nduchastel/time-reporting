@@ -269,23 +269,26 @@ See [Design Doc](Design/2026-05-23-construction-time-tracking-design.md#cost-ana
 
 ---
 
-## Future Roadmap
+## Roadmap
 
-**Phase 3 (Planned):**
-- Worker history view (last 5 entries)
-- Worker onboarding with PIN authentication
-- Manager dashboard (review, approve, edit, flag)
-- Reports and analytics
-- Audio file storage and playback
+**Phases 1–3 — ✅ Delivered:**
+- Voice → transcription → extraction → review → submit
+- Worker PIN auth & last-5 history; audio storage + playback
+- Manager dashboard (review, approve, edit, flag), worker CRUD, reports + CSV
+- Full automated test suite (unit + integration + smoke + Playwright)
 
-**Phase 4 (Ideas):**
-- Geolocation verification
-- Payroll system integration
-- Push notifications for managers
-- Team/crew management
-- Offline support with sync
+**Phase 4 — Beta hardening, admin & user management (next, pre-beta):**
+- Security: worker-ownership auth, auth rate limiting, CORS lockdown, JWT TTL, Supabase RLS
+- Error monitoring; PWA install prompt
+- Admin portal + full user management (gated `#/admin`); per-worker panel visibility
+- Worker install guides (iOS/Android) + manager setup guide
+- See [Phase 4 Plan](docs/phase4-plan.md)
 
-See [Phase 3 Plan](docs/phase3-plan.md) for full details.
+**Pre-Beta-Ship — QA gate** before launch: automated coverage for all Phase 4 features + manual device-matrix QA. See [Pre-Beta-Ship Plan](docs/pre-beta-ship-plan.md).
+
+**🚀 Beta launch** (real-customer beta) after the QA gate passes.
+
+**Phase 5 — Post-beta backlog:** anomaly detection, reports charts/PDF, bulk approve, GPS, photos, crew entries, push notifications, payroll integration, offline sync, retention/monitoring/backup hardening, SSO. See [Phase 5 Backlog](docs/phase5-backlog.md).
 
 ---
 
