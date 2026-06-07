@@ -7,6 +7,7 @@ import { extractTimeCardData } from '../services/extractionService.js';
 import { createTimeCard, getTimeCards } from '../services/timeCardService.js';
 import { transcribeAudio } from '../services/whisperService.js';
 import { uploadAudio } from '../services/storageService.js';
+import { requireAuth } from '../middleware/requireAuth.js';
 import { supabase } from '../db/supabase.js';
 
 const router = express.Router();
@@ -98,10 +99,15 @@ router.post('/time-cards', async (req, res, next) => {
   }
 });
 
-// TODO(Task 10): protect with requireAuth + ownership check (workers see own only).
-router.get('/time-cards', async (req, res, next) => {
+// Authenticated read. Workers may only see their own cards: their token's `sub`
+// overrides any client-supplied workerId. Managers/admins may query any worker.
+router.get('/time-cards', requireAuth(), async (req, res, next) => {
   try {
-    const { workerId, status, startDate, endDate, limit } = req.query;
+    let { workerId, status, startDate, endDate, limit } = req.query;
+
+    if (req.user.role === 'worker') {
+      workerId = req.user.sub;
+    }
 
     const timeCards = await getTimeCards({
       workerId,

@@ -19,6 +19,17 @@ export async function apiFetch(path, { token, ...init } = {}) {
     headers.set('Content-Type', 'application/json');
   }
   const r = await fetch(`${API_URL}${path}`, { ...init, headers });
+  // Re-auth UX: an authenticated request (one that carried a token) coming back
+  // 401 means the session expired or was revoked. Clear it and bounce to login.
+  // Login requests carry no token, so failed logins fall through to normal error
+  // handling and keep showing their message.
+  if (r.status === 401 && token) {
+    clearWorkerSession();
+    clearManagerSession();
+    if (typeof window !== 'undefined' && window.location) {
+      try { window.location.reload(); } catch { /* jsdom / non-browser: ignore */ }
+    }
+  }
   if (!r.ok) {
     const body = await r.json().catch(() => ({}));
     const err = new Error(body.message || `HTTP ${r.status}`);

@@ -22,7 +22,9 @@ export default function WorkerHistory({ open, onClose }) {
     const session = getWorkerSession();
     if (!session) return;
     setItems(null); setErr(null);
-    apiFetch(`/api/time-cards?workerId=${encodeURIComponent(session.id)}&limit=5`, { token: session.token })
+    // The server scopes results to the authenticated worker via the token —
+    // no client-supplied workerId (which a worker could tamper with).
+    apiFetch(`/api/time-cards?limit=5`, { token: session.token })
       .then(setItems).catch(e => setErr(e.message));
   }, [open]);
 

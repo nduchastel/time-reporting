@@ -23,7 +23,18 @@ if (useTestFake) {
     throw new Error('Missing Supabase credentials in environment variables');
   }
 
-  supabase = createClient(supabaseUrl, supabaseAnonKey);
+  // The backend is a trusted server that performs its own authorization
+  // (requireAuth + role checks). Phase 4 enables Supabase RLS as defense-in-depth:
+  // tables are default-deny for the anon/authenticated roles, so a leaked anon key
+  // is useless. The server therefore connects with the service-role key (which
+  // bypasses RLS) for its primary client. If the service key is missing we fall
+  // back to anon and warn — RLS must NOT be enabled in that configuration or the
+  // app will be locked out of its own database.
+  const primaryKey = supabaseServiceKey || supabaseAnonKey;
+  if (!supabaseServiceKey) {
+    console.warn('[supabase] SUPABASE_SERVICE_ROLE_KEY not set — using anon key. Do not enable RLS (migration 004) without the service-role key.');
+  }
+  supabase = createClient(supabaseUrl, primaryKey, { auth: { persistSession: false } });
   supabaseAdmin = supabaseServiceKey
     ? createClient(supabaseUrl, supabaseServiceKey, { auth: { persistSession: false } })
     : supabase;

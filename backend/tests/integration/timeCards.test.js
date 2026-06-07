@@ -1,10 +1,17 @@
 // tests/integration/timeCards.test.js
 import { describe, it, expect, beforeEach } from 'vitest';
 import request from 'supertest';
+
+process.env.JWT_SECRET = 'test-secret';
+
 import app from '../../src/server.js';
-import { ALL_TEST_CASES } from '../fixtures/testCases.js';
+import { ALL_TEST_CASES, TEST_WORKER } from '../fixtures/testCases.js';
 import { reset, seed } from '../fakes/fakeSupabase.js';
 import { registerFixture } from '../fakes/fakeOpenAI.js';
+import { issueToken } from '../../src/services/authService.js';
+
+const workerToken  = issueToken({ sub: TEST_WORKER.id, role: 'worker' });
+const managerToken = issueToken({ sub: 'm1', role: 'manager' });
 
 describe('POST /api/time-cards', () => {
   it('should create time card from voice transcription', async () => {
@@ -42,13 +49,59 @@ describe('POST /api/time-cards', () => {
 });
 
 describe('GET /api/time-cards', () => {
-  it('should get time cards with filters', async () => {
+  it('should get time cards with filters (manager token)', async () => {
     const response = await request(app)
       .get('/api/time-cards')
       .query({ workerId: 'test-worker-id' })
+      .set('Authorization', `Bearer ${managerToken}`)
       .expect(200);
 
     expect(Array.isArray(response.body)).toBe(true);
+  });
+});
+
+describe('GET /api/time-cards — ownership (A1)', () => {
+  beforeEach(() => {
+    reset();
+    seed({
+      workers: [
+        { id: TEST_WORKER.id, name: 'Bob', phone: '+1-555-0000', role: 'worker', status: 'active' },
+        { id: 'wid1', name: 'Other', phone: '+1-555-0001', role: 'worker', status: 'active' },
+      ],
+      time_cards: [
+        { id: 'own1', worker_id: TEST_WORKER.id, action_type: 'HOURS', date: '2026-05-20', hours: 8, status: 'pending' },
+        { id: 'own2', worker_id: TEST_WORKER.id, action_type: 'HOURS', date: '2026-05-21', hours: 8, status: 'pending' },
+        { id: 'other1', worker_id: 'wid1', action_type: 'HOURS', date: '2026-05-20', hours: 8, status: 'pending' },
+      ],
+    });
+  });
+
+  it('rejects unauthenticated request with 401', async () => {
+    const r = await request(app).get('/api/time-cards');
+    expect(r.status).toBe(401);
+  });
+
+  it('worker sees only their own cards', async () => {
+    const r = await request(app).get('/api/time-cards').set('Authorization', `Bearer ${workerToken}`);
+    expect(r.status).toBe(200);
+    expect(r.body.map((c) => c.id).sort()).toEqual(['own1', 'own2']);
+  });
+
+  it('worker cannot read another worker by passing workerId (override ignored)', async () => {
+    const r = await request(app)
+      .get('/api/time-cards?workerId=wid1')
+      .set('Authorization', `Bearer ${workerToken}`);
+    expect(r.status).toBe(200);
+    expect(r.body.every((c) => c.worker_id === TEST_WORKER.id)).toBe(true);
+    expect(r.body.some((c) => c.id === 'other1')).toBe(false);
+  });
+
+  it('manager can read any worker', async () => {
+    const r = await request(app)
+      .get('/api/time-cards?workerId=wid1')
+      .set('Authorization', `Bearer ${managerToken}`);
+    expect(r.status).toBe(200);
+    expect(r.body.map((c) => c.id)).toEqual(['other1']);
   });
 });
 
@@ -129,13 +182,13 @@ describe('GET /api/time-cards — limit clamping', () => {
   });
 
   it('caps limit at 1000 even when query asks for more', async () => {
-    const r = await request(app).get('/api/time-cards?limit=99999');
+    const r = await request(app).get('/api/time-cards?limit=99999').set('Authorization', `Bearer ${managerToken}`);
     expect(r.status).toBe(200);
     expect(r.body.length).toBeLessThanOrEqual(1000);
   });
 
   it('uses default 100 when limit is invalid', async () => {
-    const r = await request(app).get('/api/time-cards?limit=oops');
+    const r = await request(app).get('/api/time-cards?limit=oops').set('Authorization', `Bearer ${managerToken}`);
     expect(r.status).toBe(200);
     expect(r.body.length).toBe(100);
   });
