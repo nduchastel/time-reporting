@@ -27,9 +27,9 @@ export function reset() {
 }
 
 export function seed({ workers = [], worksites = [], time_cards = [] } = {}) {
-  for (const w of workers) state.workers.push({ ...w });
-  for (const s of worksites) state.worksites.push({ ...s });
-  for (const t of time_cards) state.time_cards.push({ ...t });
+  for (const w of workers) state.workers.push(withDefaults('workers', w));
+  for (const s of worksites) state.worksites.push(withDefaults('worksites', s));
+  for (const t of time_cards) state.time_cards.push(withDefaults('time_cards', t));
 }
 
 export function snapshot() {
@@ -47,7 +47,22 @@ const UNIQUE_FIELDS = {
   time_cards: [],
 };
 
+// Column defaults applied on insert when the field is absent, mirroring the SQL
+// schema defaults (migrations 001–003) so tests see production-shaped rows.
+const COLUMN_DEFAULTS = {
+  workers: () => ({ visible_panels: ['IN', 'OUT', 'HOURS', 'OFF'], must_change_credential: false }),
+  worksites: () => ({ status: 'active' }),
+  time_cards: () => ({}),
+};
+
 function nowIso() { return new Date().toISOString(); }
+
+function withDefaults(table, row) {
+  const defaults = (COLUMN_DEFAULTS[table] || (() => ({})))();
+  const out = { ...defaults };
+  for (const [k, v] of Object.entries(row)) if (v !== undefined) out[k] = v;
+  return out;
+}
 
 function projectRow(row, fields) {
   if (!row) return row;
@@ -134,7 +149,7 @@ function tableQuery(table) {
             f in row && row[f] != null && state[table].some((existing) => existing[f] === row[f]));
           if (dup) return { data: null, error: { code: '23505', message: `duplicate ${dup}` } };
           const id = row.id || randomUUID();
-          const created = { id, created_at: nowIso(), updated_at: nowIso(), ...row };
+          const created = { id, created_at: nowIso(), updated_at: nowIso(), ...withDefaults(table, row) };
           state[table].push(created);
           return { data: projectRow(created, _select), error: null };
         },
