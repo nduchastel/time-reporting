@@ -6,8 +6,10 @@ import timeCardsRouter from './routes/timeCards.js';
 import authRouter from './routes/auth.js';
 import managerRouter from './routes/manager.js';
 import adminRouter from './routes/admin.js';
+import { captureError, installProcessHandlers } from './services/errorReporter.js';
 
 dotenv.config();
+installProcessHandlers();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -72,6 +74,7 @@ if (process.env.TEST_MODE === '1' && process.env.NODE_ENV !== 'production') {
 // Error handler
 app.use((err, req, res, next) => {
   console.error('Error:', err);
+  captureError(err, { route: req.path, method: req.method });
   res.status(500).json({
     error: err.message || 'Internal server error'
   });
