@@ -30,7 +30,18 @@ export default function WorkerUI() {
   const [changingPin, setChangingPin] = useState(false);
 
   const session = getWorkerSession();
-  const currentAction = ACTION_TYPES[currentScreen];
+
+  // Per-worker panel visibility: render only the action panels this worker is
+  // configured for. Guard against an empty/invalid set by falling back to all.
+  let panels = ACTION_TYPES;
+  if (Array.isArray(session?.visible_panels)) {
+    const filtered = ACTION_TYPES.filter((a) => session.visible_panels.includes(a.type));
+    if (filtered.length) panels = filtered;
+    else console.warn('visible_panels resolved to no panels; showing all as a fallback.');
+  }
+
+  const screen = Math.min(currentScreen, panels.length - 1);
+  const currentAction = panels[screen];
 
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50;
@@ -51,14 +62,14 @@ export default function WorkerUI() {
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
 
-    if (isLeftSwipe && currentScreen < ACTION_TYPES.length - 1) {
+    if (isLeftSwipe && screen < panels.length - 1) {
       setSlideDirection('slide-in-right');
-      setCurrentScreen(currentScreen + 1);
+      setCurrentScreen(screen + 1);
       setTimeout(() => setSlideDirection(''), 300);
     }
-    if (isRightSwipe && currentScreen > 0) {
+    if (isRightSwipe && screen > 0) {
       setSlideDirection('slide-in-left');
-      setCurrentScreen(currentScreen - 1);
+      setCurrentScreen(screen - 1);
       setTimeout(() => setSlideDirection(''), 300);
     }
   };
@@ -121,14 +132,14 @@ export default function WorkerUI() {
           className="text-2xl ml-2"
         >🔑</button>
         <div className="flex justify-center gap-2 flex-1">
-          {ACTION_TYPES.map((_, index) => (
+          {panels.map((p, index) => (
             <button
-              key={index}
+              key={p.type}
               onClick={() => setCurrentScreen(index)}
               className={`w-3 h-3 rounded-full ${
-                index === currentScreen ? 'bg-blue-600' : 'bg-gray-300'
+                index === screen ? 'bg-blue-600' : 'bg-gray-300'
               }`}
-              aria-label={`Go to ${ACTION_TYPES[index].label}`}
+              aria-label={`Go to ${p.label}`}
             />
           ))}
         </div>

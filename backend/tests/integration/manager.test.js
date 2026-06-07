@@ -108,6 +108,36 @@ describe('manager workers', () => {
   });
 });
 
+describe('manager worker panel visibility (Task 10)', () => {
+  it('defaults a new worker to all four panels', async () => {
+    const r = await request(app).post('/api/manager/workers').set('Authorization', `Bearer ${managerToken}`)
+      .send({ name: 'Panels', phone: '+1-555-0299' });
+    expect(r.status).toBe(201);
+    expect(r.body.visible_panels).toEqual(['IN', 'OUT', 'HOURS', 'OFF']);
+  });
+
+  it('persists a visible_panels update (canonical order)', async () => {
+    const r = await request(app).patch('/api/manager/workers/wid1').set('Authorization', `Bearer ${managerToken}`)
+      .send({ visible_panels: ['HOURS', 'IN'] });
+    expect(r.status).toBe(200);
+    expect(r.body.visible_panels).toEqual(['IN', 'HOURS']);
+  });
+
+  it('rejects an empty panel set', async () => {
+    const r = await request(app).patch('/api/manager/workers/wid1').set('Authorization', `Bearer ${managerToken}`)
+      .send({ visible_panels: [] });
+    expect(r.status).toBe(400);
+    expect(r.body.error).toBe('INVALID_PANELS');
+  });
+
+  it('rejects unknown panel values', async () => {
+    const r = await request(app).patch('/api/manager/workers/wid1').set('Authorization', `Bearer ${managerToken}`)
+      .send({ visible_panels: ['HOURS', 'BOGUS'] });
+    expect(r.status).toBe(400);
+    expect(r.body.error).toBe('INVALID_PANELS');
+  });
+});
+
 describe('manager reports', () => {
   it('returns summary structure', async () => {
     const r = await request(app)

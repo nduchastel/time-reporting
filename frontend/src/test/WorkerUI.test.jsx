@@ -44,4 +44,17 @@ describe('WorkerUI', () => {
     fireEvent.click(screen.getByRole('button', { name: /go to check out/i }));
     expect(screen.getByRole('heading', { name: /check out/i })).toBeInTheDocument();
   });
+
+  it('renders only the worker’s configured panels (Task 11)', () => {
+    localStorage.setItem('time-reporting.worker', JSON.stringify({ id: 'w1', token: 't', visible_panels: ['HOURS'] }));
+    render(<WorkerUI />);
+    expect(screen.getAllByRole('button', { name: /go to/i })).toHaveLength(1);
+    expect(screen.getByRole('heading', { name: /hours worked/i })).toBeInTheDocument();
+  });
+
+  it('falls back to all panels when none are configured', () => {
+    localStorage.setItem('time-reporting.worker', JSON.stringify({ id: 'w1', token: 't' }));
+    render(<WorkerUI />);
+    expect(screen.getAllByRole('button', { name: /go to/i })).toHaveLength(4);
+  });
 });

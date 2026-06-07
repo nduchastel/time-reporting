@@ -3,6 +3,7 @@ import express from 'express';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { getTimeCards, updateTimeCard } from '../services/timeCardService.js';
 import { hashSecret } from '../services/authService.js';
+import { normalizePanels } from '../services/validation.js';
 import { supabase } from '../db/supabase.js';
 
 const router = express.Router();
@@ -54,7 +55,7 @@ router.get('/workers', async (req, res, next) => {
   try {
     const { data, error } = await supabase
       .from('workers')
-      .select('id, name, phone, language, role, status, created_at, updated_at')
+      .select('id, name, phone, language, role, status, visible_panels, created_at, updated_at')
       .order('name', { ascending: true });
     if (error) throw error;
     res.json(data);
@@ -104,7 +105,7 @@ router.post('/workers', async (req, res, next) => {
 
     const insertRow = { name, phone, language, role, status: 'active' };
     if (pin) insertRow.pin = await hashSecret(String(pin));
-    const { data, error } = await supabase.from('workers').insert(insertRow).select('id, name, phone, language, role, status').single();
+    const { data, error } = await supabase.from('workers').insert(insertRow).select('id, name, phone, language, role, status, visible_panels').single();
     if (error) return mapWorkerDbError(error, res, next);
     res.status(201).json(data);
   } catch (e) { next(e); }
@@ -172,7 +173,15 @@ router.patch('/workers/:id', async (req, res, next) => {
     }
     if (req.body.pin) patch.pin = await hashSecret(String(req.body.pin));
 
-    const { data, error } = await supabase.from('workers').update(patch).eq('id', req.params.id).select('id, name, phone, language, role, status').single();
+    if ('visible_panels' in req.body) {
+      const panels = normalizePanels(req.body.visible_panels);
+      if (!panels) {
+        return res.status(400).json({ error: 'INVALID_PANELS', message: 'visible_panels must be a non-empty subset of IN, OUT, HOURS, OFF' });
+      }
+      patch.visible_panels = panels;
+    }
+
+    const { data, error } = await supabase.from('workers').update(patch).eq('id', req.params.id).select('id, name, phone, language, role, status, visible_panels').single();
     if (error) return mapWorkerDbError(error, res, next);
     res.json(data);
   } catch (e) { next(e); }
