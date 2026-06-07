@@ -1,0 +1,19 @@
+{
+  "name": "Time Reporting",
+  "short_name": "TimeReport",
+  "description": "Voice-based time tracking for construction crews.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f9fafb",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
