@@ -1,7 +1,6 @@
 # Deployment Plan
 
-**Status:** Ready for deployment  
-**Date:** 2026-05-23  
+**Status:** ✅ Deployed — production is live (frontend on Vercel, backend on Railway, Supabase DB)  
 **Phase:** Production deployment with free/low-cost hosting
 
 ---
@@ -190,8 +189,8 @@
 
 **What it does:**
 - Stores worker profiles, worksites, time cards
-- Handles authentication (future phase)
-- Provides real-time subscriptions (future phase)
+- Backs authentication (JWT issued by the backend; worker PIN + manager password — built in Phase 3)
+- Provides real-time subscriptions (available; not used yet — the manager dashboard polls)
 - Automatic backups
 
 **Why Supabase:**

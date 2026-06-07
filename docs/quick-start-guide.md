@@ -6,11 +6,12 @@
 
 ## ✅ What's Ready
 
-- ✅ **Backend API** - Express server with GPT extraction
-- ✅ **Frontend PWA** - React mobile interface with 4 action screens
-- ✅ **Database Schema** - PostgreSQL migrations ready
-- ✅ **18/18 Tests Passing** - Comprehensive test coverage
-- ✅ **Documentation** - Complete deployment plan
+- ✅ **Backend API** - Express server: voice → Whisper → GPT extraction, JWT auth, manager + reports endpoints
+- ✅ **Frontend PWA** - React worker UI (record/review/submit + history) and manager dashboard (`#/manager`)
+- ✅ **Auth** - Worker PIN login + manager username/password (Phase 3)
+- ✅ **Database Schema** - PostgreSQL migrations (incl. Phase 3 auth columns + indexes)
+- ✅ **Automated tests** - unit + integration + smoke + Playwright (`npm run test:all`)
+- ✅ **Deployed** - production live on Vercel + Railway + Supabase
 
 ---
 
@@ -202,18 +203,11 @@
 
 ## 🎯 Next Steps
 
-**Immediate (Phase 2):**
-1. Implement real audio recording
-2. Add Whisper API transcription
-3. Connect frontend to backend API
-4. Test on real mobile devices
+**Done (Phases 1–3):** real audio recording, Whisper transcription, frontend↔backend wiring, worker PIN + manager auth, manager dashboard, reports + CSV, audio storage, automated test suite.
 
-**Future (Phase 3+):**
-1. Manager dashboard
-2. Authentication & authorization
-3. Anomaly detection rules
-4. Job costing reports
-5. Multi-language support
+**Next — Phase 4 (pre-beta):** worker-ownership auth on `GET /time-cards`, auth rate limiting, CORS lockdown, JWT TTL, RLS, error monitoring, PWA install, admin portal + user management, per-worker panel visibility, and worker/manager onboarding guides. See [`phase4-plan.md`](phase4-plan.md).
+
+**Later — Phase 5 (post-beta):** anomaly detection, charts/PDF, GPS, photos, crew entries, push, payroll, offline sync. See [`phase5-backlog.md`](phase5-backlog.md).
 
 ---
 
@@ -222,9 +216,9 @@
 - **Full Deployment Plan:** `docs/deployment-plan.md`
 - **Design Specification:** `Design/2026-05-23-construction-time-tracking-design.md`
 - **Implementation Plan:** `docs/implementation-plan.md`
-- **Technical Decisions:** `docs/decisions.md`
+- **Technical Decisions:** `docs/phase1-decisions.md`, `docs/phase2-decisions.md`
 
 ---
 
 **Repository:** https://github.com/nduchastel/time-reporting  
-**Status:** Ready for production deployment ✅
+**Status:** ✅ Deployed to production (Phases 1–3 shipped; Phase 4 in planning)

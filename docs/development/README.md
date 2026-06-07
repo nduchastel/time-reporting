@@ -6,8 +6,8 @@ Complete guide for local development of the time reporting system.
 
 - **[Local Setup](local-setup.md)** - Installing dependencies and configuring environment
 - **[Development Modes](development-modes.md)** - Real API vs Mock mode explained with diagrams
-- **[Testing](testing.md)** - Running and writing tests
-- **[Debugging](debugging.md)** - Tips for troubleshooting common issues
+- **[Testing](../testing.md)** - Running and writing tests
+- **[Debugging](../testing.md#debugging)** - Tips for troubleshooting common issues
 
 ---
 

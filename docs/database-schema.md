@@ -49,7 +49,7 @@ Employee records with authentication and preferences.
 - `idx_workers_email` on `email` (unique)
 
 **Notes:**
-- Phase 3 will add: `role` (worker/manager/admin), `username`, `password_hash`, `pin`
+- Phase 3 added (applied): `role` (worker/manager/admin), `username`, `password_hash`, `pin` — see "Phase 3 Additions (Applied)" below
 - `language` used for Whisper transcription (auto-detection fallback)
 - `status = 'inactive'` prevents new time card submissions
 
@@ -501,7 +501,7 @@ Migration applied: 002_phase3_auth_and_indexes.sql
 - `idx_workers_role` on `role`
 
 ### New features:
-- Audio storage: `audio_url` will point to Supabase Storage
+- Audio storage: `audio_url` points to Supabase Storage (signed URL)
 - Manager dashboard queries (join with approved_by)
 - Worker history queries (recent 5 entries)
 
@@ -540,7 +540,7 @@ USING (
 );
 ```
 
-**Current (Phase 2):** No RLS enabled - development only
+**Current:** No RLS enabled — access control is enforced server-side (JWT + `requireAuth` role checks). Row-level security is planned for Phase 4 as defense-in-depth (see `phase4-plan.md`, Task 5).
 
 ---
 
