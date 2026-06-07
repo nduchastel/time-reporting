@@ -11,7 +11,22 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+// Behind a single proxy (Railway) — lets express-rate-limit read the real client
+// IP from X-Forwarded-For without trusting the whole chain.
+app.set('trust proxy', 1);
+
+// CORS allowlist. ALLOWED_ORIGINS is a comma-separated list; unset falls back to
+// local dev origins. Requests with no Origin (curl, same-origin, mobile webview)
+// are allowed; any other origin not on the list is rejected.
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3001')
+  .split(',').map((s) => s.trim()).filter(Boolean);
+
+app.use(cors({
+  origin(origin, cb) {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+    return cb(new Error(`Origin not allowed by CORS: ${origin}`));
+  },
+}));
 app.use(express.json());
 
 app.get('/health', (req, res) => {

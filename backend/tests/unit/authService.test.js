@@ -18,6 +18,22 @@ describe('authService', () => {
     expect(payload.role).toBe('worker');
   });
 
+  it('issueToken applies role-based TTL (worker 7d, manager/admin 24h)', () => {
+    process.env.JWT_SECRET = 'test-secret';
+    const worker  = jwt.decode(issueToken({ sub: 'w', role: 'worker' }));
+    const manager = jwt.decode(issueToken({ sub: 'm', role: 'manager' }));
+    const admin   = jwt.decode(issueToken({ sub: 'a', role: 'admin' }));
+    expect(worker.exp  - worker.iat).toBe(7 * 24 * 60 * 60);
+    expect(manager.exp - manager.iat).toBe(24 * 60 * 60);
+    expect(admin.exp   - admin.iat).toBe(24 * 60 * 60);
+  });
+
+  it('issueToken honors an explicit expiresIn override', () => {
+    process.env.JWT_SECRET = 'test-secret';
+    const t = jwt.decode(issueToken({ sub: 'w', role: 'worker' }, { expiresIn: '1h' }));
+    expect(t.exp - t.iat).toBe(60 * 60);
+  });
+
   it('verifyToken throws on tampered token', () => {
     process.env.JWT_SECRET = 'test-secret';
     expect(() => verifyToken('not.a.token')).toThrow();

@@ -509,38 +509,25 @@ Migration applied: 002_phase3_auth_and_indexes.sql
 
 ## Security (Row Level Security)
 
-**Phase 3 will add RLS policies:**
+**This app is backend-mediated:** browsers never talk to Supabase directly — they call the Express API, which authorizes every request (`requireAuth` + role checks) and then queries Supabase. So `auth.uid()`-style per-user policies (which assume the *browser* holds a Supabase user session) don't apply here. RLS is used purely as **defense-in-depth**.
+
+**Phase 4 (migration `004_phase4_rls.sql`) enables RLS as a lockout for leaked keys:**
 
 ```sql
--- Workers can only see their own time cards
-CREATE POLICY "Workers see own cards"
-ON time_cards FOR SELECT
-USING (auth.uid() = worker_id);
-
--- Managers can see all time cards
-CREATE POLICY "Managers see all cards"
-ON time_cards FOR SELECT
-USING (
-  EXISTS (
-    SELECT 1 FROM workers
-    WHERE id = auth.uid()
-    AND role IN ('manager', 'admin')
-  )
-);
-
--- Only managers can approve/edit
-CREATE POLICY "Managers can update"
-ON time_cards FOR UPDATE
-USING (
-  EXISTS (
-    SELECT 1 FROM workers
-    WHERE id = auth.uid()
-    AND role IN ('manager', 'admin')
-  )
-);
+ALTER TABLE workers    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE worksites  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE time_cards ENABLE ROW LEVEL SECURITY;
+-- No anon/authenticated policies → those roles are denied by default.
 ```
 
-**Current:** No RLS enabled — access control is enforced server-side (JWT + `requireAuth` role checks). Row-level security is planned for Phase 4 as defense-in-depth (see `phase4-plan.md`, Task 5).
+How it works:
+- The backend connects with the **service-role key** (`SUPABASE_SERVICE_ROLE_KEY`), which has `BYPASSRLS` — so the API is unaffected and all server-side behavior is unchanged.
+- With RLS enabled and **no** permissive policies, the `anon` and `authenticated` roles are denied by default. A leaked anon key (e.g. one accidentally shipped in a client bundle) therefore cannot read or write these tables.
+- Server-side authorization (JWT + `requireAuth`) remains the functional access gate; RLS is the backstop.
+
+**⚠️ Deploy order:** set `SUPABASE_SERVICE_ROLE_KEY` in the backend **before** applying migration `004`. With RLS on and only an anon key, the API would be locked out of its own database. `src/db/supabase.js` warns at startup when the service-role key is missing.
+
+**If browsers ever talk to Supabase directly** (not the case today), add scoped per-user policies at that time (e.g. a worker may `SELECT` only their own `time_cards`).
 
 ---
 
