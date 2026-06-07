@@ -25,8 +25,11 @@
 | 28a | Temporary credentials + forced first-login change (all roles) | Auth |
 | 28b | Self-service change PIN/password | Auth |
 | 28c | Bootstrap `create-admin` script (first admin) | Auth |
+| 29 | Worksite management (manager add/edit/archive job sites) | Worksites |
 
 (Item numbers map to the master backlog discussed on 2026-06-06; they're kept for traceability across the phase docs.)
+
+**Detailed, task-by-task execution plan:** [`superpowers/plans/2026-06-06-phase4.md`](superpowers/plans/2026-06-06-phase4.md) — the checkbox to-do list to build against. This file is the *what/why*; that file is the *how*.
 
 **The full authentication/credential model is documented in [`security.md`](security.md)** — read it before touching anything in Group C or Group F below.
 
@@ -54,6 +57,7 @@ Phase 4 formalizes three roles, all stored in the existing `workers` table via t
 | Approve / edit / flag time cards | — | ✅ | ✅ |
 | CRUD workers, reset **worker** PIN | — | ✅ | ✅ |
 | Configure per-worker panel visibility (#27) | — | ✅ | ✅ |
+| Manage worksites — add / edit / archive (#29) | — | ✅ | ✅ |
 | Create / edit / delete **any** user (worker/manager/admin) | — | — | ✅ |
 | Change a user's **role / permissions** | — | — | ✅ |
 | Reset **manager/admin** passwords | — | — | ✅ |
@@ -169,6 +173,34 @@ Implements the agreed model: a creator sets a **temporary** secret → the user 
 - A one-time CLI (e.g. `backend/src/db/create-admin.js`) that takes a username + password, bcrypt-hashes the password, and inserts an `admin` row (`must_change_credential` optional for the bootstrap admin).
 - Documented in `security.md` and the deployment/setup docs so the first admin can be created on a fresh environment.
 
+### Group G — Worksite management (#29)
+
+Today there is **no way to add/edit job sites** in the app — worksites only exist if seeded, and voice entries match them by name (unmatched ones save with `worksite_id = null`). Managers need to manage them for worksite-based reports to be meaningful.
+
+**Task 18 — Backend worksite CRUD** (`/api/manager/worksites`, `requireAuth(['manager','admin'])`)
+- `GET /worksites` — list (all, or filter by status).
+- `POST /worksites` — create (`name`, `address`, `client`); reject duplicate names (409).
+- `PATCH /worksites/:id` — edit name/address/client/status.
+- **Archive, don't hard-delete:** worksites are referenced by `time_cards`, so deletion would orphan history. Use a `status` (`active` | `archived`) column; archived sites stop appearing in pickers but keep historical links intact.
+- Extend `fakeSupabase` for any new query shapes; map unique-violation (409) / not-found (404) like the worker routes.
+- Tests: CRUD happy paths, role boundary (worker forbidden), duplicate-name 409, archived site excluded from active list but referenced cards still resolve.
+
+**Task 19 — Manager worksite UI**
+- A `WorksitesView` in the manager dashboard (sibling of `WorkersView`): list with status, add/edit forms, archive/unarchive with confirmation.
+- Tests: list renders; create/edit submits; archived sites visually distinguished.
+
+---
+
+## Setup & cross-cutting (the "heads-up" items)
+
+These span multiple tasks — handle them as part of the build, not as afterthoughts.
+
+- **DB migration `003_phase4.sql`** — one migration bundling all Phase 4 schema changes: `workers.must_change_credential` (bool, default false), `workers.visible_panels` (text[]/jsonb, default all four), and `worksites.status` (default `'active'`). Tasks 10 (panels), 15 (credential lifecycle), and 18 (worksites) depend on it — apply it first.
+- **New production env vars** — `ALLOWED_ORIGINS` (CORS allowlist, Task 3) and the error-monitoring DSN (Task 6). Confirm `JWT_SECRET` is set in prod. All must **no-op/skip when unset** so local + tests stay offline.
+- **Run `create-admin` in prod once** (Task 17) so there's a real first admin to log in and create everyone else.
+- **Refresh `validation-and-startup.md`** (deferred from the doc-staleness pass) — update it for manager/admin login + worker PIN onboarding; align it with the #26 manager setup guide so the two don't diverge.
+- **Workflow:** Phase 4 is application code (auth, migrations, admin UI), so build on **feature branches with PRs** rather than committing straight to `main`. Recommended; confirm at kickoff.
+
 ---
 
 ## Out of scope (→ Phase 5)
@@ -181,11 +213,11 @@ Security review/pen-test and load testing were **not** selected as beta gates; t
 
 ## Progress Tracking
 
-**Completed:** 0/17 tasks (0%)  
-**Current:** Not started — planning approved 2026-06-06  
-**Next:** Begin Group A (security), which also unblocks the Pre-Beta-Ship security expectations.
+**Completed:** 0/19 tasks (0%)  
+**Current:** Not started — planning approved 2026-06-06. Detailed execution plan: [`superpowers/plans/2026-06-06-phase4.md`](superpowers/plans/2026-06-06-phase4.md).  
+**Next:** Apply migration `003`, then begin Group A (security), which also unblocks the Pre-Beta-Ship security expectations.
 
-**Security:** 0/5 · **Observability:** 0/1 · **Admin:** 0/3 · **Panels:** 0/3 · **Install/Onboarding:** 0/2 · **Credential lifecycle:** 0/3
+**Security:** 0/5 · **Observability:** 0/1 · **Admin:** 0/3 · **Panels:** 0/3 · **Install/Onboarding:** 0/2 · **Credential lifecycle:** 0/3 · **Worksites:** 0/2
 
 ---
 
@@ -196,3 +228,6 @@ Scope agreed after triaging the full remaining backlog: Phase 4 = beta-hardening
 
 ### 2026-06-06 — Auth model settled (Group F added)
 Clarified the credential model and added `security.md` as the authoritative reference. Decisions: workers use phone + PIN, managers/admins use username + password; **one login path** (admins use the manager username/password endpoint, role gates `#/admin` — no separate admin login, fixing the earlier ambiguity in Task 7). Creators set a **temporary** secret; **all roles are forced to change it on first login**; users can change their own secret anytime; managers/admins can reset locked-out users. New Group F (Tasks 15–17): forced first-login change + `must_change_credential`, self-service change, and a bootstrap `create-admin` script. Task count 14 → 17.
+
+### 2026-06-06 — Worksite management + execution plan
+Added **Group G (Tasks 18–19): worksite management** — managers can add/edit/**archive** job sites (archive, not hard-delete, to preserve `time_cards` history); closes the gap where worksites only existed if seeded. Added the **Setup & cross-cutting** section (migration `003_phase4.sql` bundling `must_change_credential` + `visible_panels` + `worksites.status`; new env vars; `create-admin` prod run; `validation-and-startup.md` refresh; feature-branch workflow). Task count 17 → 19. Wrote the detailed task-by-task execution plan at `superpowers/plans/2026-06-06-phase4.md`.
