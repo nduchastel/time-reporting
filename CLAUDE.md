@@ -94,7 +94,7 @@ Every doc is one of two kinds. Know which before you edit, and never mix the two
 **🟢 Living docs — keep current as features ship; NO changelog.** They must always describe the *present* state, so a changelog would just be noise. When you change behavior, edit the body in place.
 - `README.md`, this `CLAUDE.md`
 - `docs/deployment-plan.md`, `docs/quick-start-guide.md`, `docs/validation-and-startup.md`
-- `docs/database-schema.md`, `docs/testing.md`
+- `docs/database-schema.md`, `docs/testing.md`, `docs/security.md`
 - `docs/development/*` (local-setup, development-modes, README)
 - `backend/src/db/README.md`, `frontend/README.md`
 - Future **user guides** (worker install iOS/Android, manager setup — Phase 4 #24–26)

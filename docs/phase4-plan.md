@@ -22,8 +22,13 @@
 | 26 | Manager setup/config guide — browser | Onboarding |
 | 27 | Per-worker panel visibility (IN/OUT/HOURS/OFF) | Worker config |
 | 28 | Admin portal + full user management | Admin |
+| 28a | Temporary credentials + forced first-login change (all roles) | Auth |
+| 28b | Self-service change PIN/password | Auth |
+| 28c | Bootstrap `create-admin` script (first admin) | Auth |
 
 (Item numbers map to the master backlog discussed on 2026-06-06; they're kept for traceability across the phase docs.)
+
+**The full authentication/credential model is documented in [`security.md`](security.md)** — read it before touching anything in Group C or Group F below.
 
 ---
 
@@ -39,7 +44,7 @@ See `phase1-decisions.md`, `phase2-implementation-plan.md`, `phase3-plan.md`, an
 
 ---
 
-## Roles & permission model (target state)
+## Roles & permission model
 
 Phase 4 formalizes three roles, all stored in the existing `workers` table via the `role` column.
 
@@ -98,22 +103,22 @@ Phase 4 formalizes three roles, all stored in the existing `workers` table via t
 
 **Decision:** Admin UI ships as a **gated `#/admin` route in the existing React app**, guarded by `role==='admin'` (chosen 2026-06-06). Not a separate deployment.
 
-**Task 7 — Admin auth + route guard**
-- Admin logs in via the existing manager/username-password flow (role decides access), OR a dedicated `#/admin/login` — keep one credential path, branch on role.
-- `#/admin*` renders an `AdminApp`; non-admins are redirected/denied.
+**Task 7 — Admin auth + route guard** (single login path — see `security.md`)
+- **No separate admin login or admin credential.** Admins log in through the *existing* `POST /api/auth/manager/login` (username + password); the JWT's `role` decides access.
+- `#/admin*` renders an `AdminApp`, guarded by `role === 'admin'`; managers and workers are redirected/denied. Managers continue to land on the existing dashboard.
 
 **Task 8 — Backend user-management API** (`/api/admin/users`, `requireAuth(['admin'])`)
 - `GET /users` — list all users across roles.
-- `POST /users` — create worker/manager/admin. For manager/admin, collect `username` + `password` (bcrypt-hash); for worker, `phone` + optional `pin`.
+- `POST /users` — create worker/manager/admin with a **temporary** secret (sets `must_change_credential = true`). For manager/admin, collect `username` + temp `password` (bcrypt-hash); for worker, `phone` + temp `pin`.
 - `PATCH /users/:id` — edit profile, **change role**, enable/disable.
-- `POST /users/:id/reset-credential` — reset PIN (worker) or password (manager/admin).
+- `POST /users/:id/reset-credential` — reset PIN (worker) or password (manager/admin) to a new temporary value (re-sets `must_change_credential = true`).
 - `DELETE /users/:id` — hard delete, with guards: cannot delete self, cannot delete the last remaining admin.
 - Reuse `hashSecret`/validation; map unique-violation (409) and not-found (404) like the manager route.
-- Tests: role boundaries (manager forbidden), can't-escalate, can't-delete-last-admin, credential reset works.
+- Tests: role boundaries (manager forbidden), can't-escalate, can't-delete-last-admin, credential reset re-arms the first-login flow.
 
 **Task 9 — Admin UI**
 - User list with role/status filters; create/edit forms; role selector; reset-credential and delete actions with confirmation.
-- Surface generated/temporary credentials for hand-off to the user.
+- Surface the temporary credential once for hand-off to the user (they'll be forced to change it on first login).
 
 ### Group D — Per-worker panel visibility (#27)
 
@@ -142,7 +147,27 @@ Phase 4 formalizes three roles, all stored in the existing `workers` table via t
 - **#24 Worker — iOS:** step-by-step "Add to Home Screen" in Safari, mic permission, first login with phone + PIN.
 - **#25 Worker — Android:** install via Chrome prompt, mic permission, first login.
 - **#26 Manager — browser:** desktop/laptop login, dashboard tour, how to add workers, reset PINs, set panel visibility, run reports.
+- Cover the **first-login change** step in each guide (worker picks a new PIN; manager picks a new password).
 - Delivery: in-app help screens (preferred) and/or `docs/` pages; keep copy short and screenshot-ready. Decide rendering during build.
+
+### Group F — Credential lifecycle (see [`security.md`](security.md))
+
+Implements the agreed model: a creator sets a **temporary** secret → the user is **forced to change it on first login** (all roles) → users can **change their own** secret anytime → managers/admins can **reset** a locked-out user.
+
+**Task 15 — Temporary credentials + forced first-login change (#28a)**
+- Add a `must_change_credential` boolean to `workers` (default `false`; set `true` on create and on reset).
+- Backend: a `POST /api/auth/change-credential` endpoint (authenticated) that sets a new PIN (worker) or password (manager/admin), validates it, hashes it, and clears the flag.
+- Login response surfaces `must_change_credential`; protected routes/UI funnel the user to the change screen until it's cleared. Applies to **workers and managers/admins**.
+- Tests: a freshly-created/reset user is forced to change before normal use; flag clears after change.
+
+**Task 16 — Self-service change PIN/password (#28b)**
+- "Change my PIN/password" available to any logged-in user (reuses the Task 15 endpoint with the old-secret check).
+- Worker UI (change PIN) + manager/admin UI (change password).
+- Tests: wrong current secret rejected; successful change requires the new secret next login.
+
+**Task 17 — Bootstrap `create-admin` script (#28c)**
+- A one-time CLI (e.g. `backend/src/db/create-admin.js`) that takes a username + password, bcrypt-hashes the password, and inserts an `admin` row (`must_change_credential` optional for the bootstrap admin).
+- Documented in `security.md` and the deployment/setup docs so the first admin can be created on a fresh environment.
 
 ---
 
@@ -156,11 +181,11 @@ Security review/pen-test and load testing were **not** selected as beta gates; t
 
 ## Progress Tracking
 
-**Completed:** 0/14 tasks (0%)  
+**Completed:** 0/17 tasks (0%)  
 **Current:** Not started — planning approved 2026-06-06  
 **Next:** Begin Group A (security), which also unblocks the Pre-Beta-Ship security expectations.
 
-**Security:** 0/5 · **Observability:** 0/1 · **Admin:** 0/3 · **Panels:** 0/3 · **Install/Onboarding:** 0/2
+**Security:** 0/5 · **Observability:** 0/1 · **Admin:** 0/3 · **Panels:** 0/3 · **Install/Onboarding:** 0/2 · **Credential lifecycle:** 0/3
 
 ---
 
@@ -168,3 +193,6 @@ Security review/pen-test and load testing were **not** selected as beta gates; t
 
 ### 2026-06-06 — Plan created
 Scope agreed after triaging the full remaining backlog: Phase 4 = beta-hardening (security #1–5, observability #6), admin portal + user management (#28, as a gated `#/admin` route), per-worker panel visibility (#27), PWA install (#11), and worker/manager onboarding guides (#24–26). Anomaly detection (#15) and all other items deferred to Phase 5. A dedicated Pre-Beta-Ship QA gate (automated P4 coverage + manual device-matrix QA) was added between this phase and beta launch.
+
+### 2026-06-06 — Auth model settled (Group F added)
+Clarified the credential model and added `security.md` as the authoritative reference. Decisions: workers use phone + PIN, managers/admins use username + password; **one login path** (admins use the manager username/password endpoint, role gates `#/admin` — no separate admin login, fixing the earlier ambiguity in Task 7). Creators set a **temporary** secret; **all roles are forced to change it on first login**; users can change their own secret anytime; managers/admins can reset locked-out users. New Group F (Tasks 15–17): forced first-login change + `must_change_credential`, self-service change, and a bootstrap `create-admin` script. Task count 14 → 17.
