@@ -184,6 +184,16 @@ SUPABASE_ANON_KEY=your-anon-key
 # OpenAI API (Required for Real API Mode)
 OPENAI_API_KEY=sk-your-key
 
+# Auth (Required to log in — any non-empty string works locally)
+JWT_SECRET=local-dev-secret
+
+# CORS allowlist (Optional — Phase 4). Comma-separated origins allowed to call the API.
+# Unset = dev default (localhost:5173 / :3001). Set to your Vercel domain(s) in prod.
+# ALLOWED_ORIGINS=https://your-app.vercel.app
+
+# Error monitoring (Optional — Phase 4). Unset = no-op (stays offline locally).
+# SENTRY_DSN=
+
 # Server (Optional)
 PORT=3001
 NODE_ENV=development
@@ -194,6 +204,8 @@ EOF
 - `SUPABASE_URL` - from Supabase Settings → API
 - `SUPABASE_ANON_KEY` - from Supabase Settings → API  
 - `OPENAI_API_KEY` - from OpenAI platform (or omit for Mock Mode)
+- `JWT_SECRET` - any non-empty string locally; a long random secret in production
+- `ALLOWED_ORIGINS` / `SENTRY_DSN` - optional Phase 4 vars; both no-op when unset
 
 ### Frontend Configuration
 
