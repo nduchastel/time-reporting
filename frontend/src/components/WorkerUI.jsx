@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import RecordButton from './RecordButton';
 import WorkerHistory from './WorkerHistory';
+import ChangeCredential from './ChangeCredential';
+import { getWorkerSession } from '../lib/auth';
 import './WorkerUI.css';
 
 const ACTION_TYPES = [
@@ -25,7 +27,9 @@ export default function WorkerUI() {
   const [touchEnd, setTouchEnd] = useState(null);
   const [slideDirection, setSlideDirection] = useState('');
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [changingPin, setChangingPin] = useState(false);
 
+  const session = getWorkerSession();
   const currentAction = ACTION_TYPES[currentScreen];
 
   // Minimum swipe distance (in px)
@@ -111,6 +115,11 @@ export default function WorkerUI() {
           aria-label="View history"
           className="text-2xl"
         >🕘</button>
+        <button
+          onClick={() => setChangingPin(true)}
+          aria-label="Change PIN"
+          className="text-2xl ml-2"
+        >🔑</button>
         <div className="flex justify-center gap-2 flex-1">
           {ACTION_TYPES.map((_, index) => (
             <button
@@ -123,7 +132,7 @@ export default function WorkerUI() {
             />
           ))}
         </div>
-        <span className="w-8" /> {/* spacer to keep dots centered */}
+        <span className="w-16" /> {/* spacer to keep dots roughly centered */}
       </div>
 
       {/* Action screen */}
@@ -198,6 +207,9 @@ export default function WorkerUI() {
         )}
       </div>
       <WorkerHistory open={historyOpen} onClose={() => setHistoryOpen(false)} />
+      {changingPin && session?.token && (
+        <ChangeCredential kind="pin" token={session.token} onCancel={() => setChangingPin(false)} onSuccess={() => setChangingPin(false)} />
+      )}
     </div>
   );
 }
